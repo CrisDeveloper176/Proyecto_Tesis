@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio | Monitor de GPS{% endblock %}
+{% load static %}
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Monitorea tus activos en tiempo real</h1>
+        <p>Con nuestro avanzado sistema de GPS, mantén el control total sobre tus vehículos, flotas y activos con precisión y facilidad.</p>
+        <a href="" class="btn-primary">Comenzar</a>
+        <a href="#" class="btn-secondary">Ver Demo</a>
+    </div>
+</section>
+
+<section class="features">
+    <h2>Nuestras Características</h2>
+    <div class="features-grid">
+        <div class="feature-item">
+            <img src="{% static 'images/alerts.png' %}" alt="Monitoreo en tiempo real">
+            <h3>Monitoreo en Tiempo Real</h3>
+            <p>Sigue la ubicación exacta de tus vehículos y activos minuto a minuto, estés donde estés.</p>
+        </div>
+        <div class="feature-item">
+            <img src="{% static 'images/alerts.png' %}" alt="Alertas Personalizadas">
+            <h3>Alertas Personalizadas</h3>
+            <p>Recibe notificaciones instantáneas cuando algo inusual suceda.</p>
+        </div>
+        <div class="feature-item">
+            <img src="{% static 'images/alerts.png' %}" alt="Informes Detallados">
+            <h3>Informes Detallados</h3>
+            <p>Accede a informes completos sobre rutas, tiempos y actividad de tus activos.</p>
+        </div>
+        <div class="feature-item">
+            <img src="{% static 'images/alerts.png' %}" alt="Mapas Interactivos">
+            <h3>Mapas Interactivos</h3>
+            <p>Utiliza mapas interactivos avanzados para visualizar la ubicación de tus activos.</p>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <h2>¡Comienza a mejorar el control de tus activos hoy!</h2>
+    <a href="#" class="btn-primary">Registrarse Ahora</a>
+</section>
+{% endblock %}

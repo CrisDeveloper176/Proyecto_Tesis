@@ -78,7 +78,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'GPS',  # Nombre de tu base de datos
-        'HOST': 'DESKTOP-Q1PNIHN\SQLEXPRESS',  # O la dirección de tu servidor SQL Server
+        'HOST': r'DESKTOP-Q1PNIHN\SQLEXPRESS',  # O la dirección de tu servidor SQL Server
         'PORT': '',  # Generalmente puedes dejar esto vacío
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',

@@ -76,11 +76,16 @@ WSGI_APPLICATION = 'gps_monitoring_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'mssql',
+        'NAME': 'GPS',  # Nombre de tu base de datos
+        'HOST': 'DESKTOP-Q1PNIHN\SQLEXPRESS',  # O la dirección de tu servidor SQL Server
+        'PORT': '',  # Generalmente puedes dejar esto vacío
+        'OPTIONS': {
+            'driver': 'ODBC Driver 17 for SQL Server',
+            'trusted_connection': 'yes',  # Esto indica que se usará la autenticación de Windows
+        },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

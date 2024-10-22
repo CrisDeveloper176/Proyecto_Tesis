@@ -78,15 +78,16 @@ DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'GPS',  # Nombre de tu base de datos
-        'HOST': r'DESKTOP-Q1PNIHN\SQLEXPRESS',  # O la dirección de tu servidor SQL Server
-        'PORT': '',  # Generalmente puedes dejar esto vacío
+        'USER': '',  # Si usas autenticación de Windows, déjalo vacío
+        'PASSWORD': '',  # Déjalo vacío si es autenticación de Windows
+        'HOST': r'DESKTOP-Q1PNIHN\SQLEXPRESS',  # Nombre del servidor
+        'PORT': '',  # Dejar vacío si es el puerto predeterminado
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
-            'trusted_connection': 'yes',  # Esto indica que se usará la autenticación de Windows
+            'trusted_connection': 'yes',  # Para usar autenticación de Windows
         },
     }
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 

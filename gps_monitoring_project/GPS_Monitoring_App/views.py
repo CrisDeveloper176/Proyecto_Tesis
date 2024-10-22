@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from .models import RastreoGPS
+
 
 # Create your views here.
 @login_required(login_url='/login/')

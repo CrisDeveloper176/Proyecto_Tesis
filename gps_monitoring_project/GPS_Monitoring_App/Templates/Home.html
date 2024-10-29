@@ -3,43 +3,140 @@
 {% block title %}Inicio | Monitor de GPS{% endblock %}
 {% load static %}
 {% block content %}
-<section class="hero">
-    <div class="hero-content">
-        <h1>Monitorea tus activos en tiempo real</h1>
-        <p>Con nuestro avanzado sistema de GPS, mantén el control total sobre tus vehículos, flotas y activos con precisión y facilidad.</p>
-        <a href="" class="btn-primary">Comenzar</a>
-        <a href="#" class="btn-secondary">Ver Demo</a>
-    </div>
-</section>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoreo en Tiempo Real - GPS</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Leaflet CSS (para el mapa) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Monitoreo en Tiempo Real - GPS</h1>
 
-<section class="features">
-    <h2>Nuestras Características</h2>
-    <div class="features-grid">
-        <div class="feature-item">
-            <img src="{% static 'images/alerts.png' %}" alt="Monitoreo en tiempo real">
-            <h3>Monitoreo en Tiempo Real</h3>
-            <p>Sigue la ubicación exacta de tus vehículos y activos minuto a minuto, estés donde estés.</p>
-        </div>
-        <div class="feature-item">
-            <img src="{% static 'images/alerts.png' %}" alt="Alertas Personalizadas">
-            <h3>Alertas Personalizadas</h3>
-            <p>Recibe notificaciones instantáneas cuando algo inusual suceda.</p>
-        </div>
-        <div class="feature-item">
-            <img src="{% static 'images/alerts.png' %}" alt="Informes Detallados">
-            <h3>Informes Detallados</h3>
-            <p>Accede a informes completos sobre rutas, tiempos y actividad de tus activos.</p>
-        </div>
-        <div class="feature-item">
-            <img src="{% static 'images/alerts.png' %}" alt="Mapas Interactivos">
-            <h3>Mapas Interactivos</h3>
-            <p>Utiliza mapas interactivos avanzados para visualizar la ubicación de tus activos.</p>
+        <!-- Mapa -->
+        <div id="map"></div>
+
+        <!-- Vehículos en tiempo real -->
+        <div class="card mt-4">
+            <div class="card-header bg-primary text-white">
+                <h2 class="mb-0">Vehículos Monitoreados</h2>
+                <button class="btn btn-light btn-sm" onclick="refreshData()">Actualizar Ahora</button>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-responsive" id="vehicles-table">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Matrícula</th>
+                            <th>Ubicación Actual</th>
+                            <th>Velocidad</th>
+                            <th>Estado GPS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Ejemplo de datos dinámicos -->
+                        <tr>
+                            <td>ABC123</td>
+                            <td><span class="location">-33.4489, -70.6693</span></td>
+                            <td><span class="speed">80 km/h</span></td>
+                            <td><span class="status">Activo</span></td>
+                        </tr>
+                        <tr>
+                            <td>XYZ456</td>
+                            <td><span class="location">-36.8269, -73.0498</span></td>
+                            <td><span class="speed">50 km/h</span></td>
+                            <td><span class="status">Inactivo</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</section>
 
-<section class="cta">
-    <h2>¡Comienza a mejorar el control de tus activos hoy!</h2>
-    <a href="#" class="btn-primary">Registrarse Ahora</a>
-</section>
+    <!-- Leaflet JS (para el mapa) -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JavaScript para gestionar el mapa y actualizaciones -->
+    <script>
+        // Crear mapa centrado en Chile
+        var map = L.map('map').setView([-33.4489, -70.6693], 6);
+
+        // Añadir capa de mapas (OpenStreetMap)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Marcadores de ejemplo
+        var vehicles = [
+            { matricula: 'ABC123', lat: -33.4489, lon: -70.6693, speed: '80 km/h', status: 'Activo' },
+            { matricula: 'XYZ456', lat: -36.8269, lon: -73.0498, speed: '50 km/h', status: 'Inactivo' }
+        ];
+
+        var markers = [];
+
+        // Añadir los vehículos al mapa
+        vehicles.forEach(function(vehicle) {
+            var marker = L.marker([vehicle.lat, vehicle.lon]).addTo(map)
+                .bindPopup(`<b>${vehicle.matricula}</b><br>Velocidad: ${vehicle.speed}<br>Estado: ${vehicle.status}`);
+            markers.push(marker);
+        });
+
+        // Función para actualizar los datos (simulación de actualización dinámica)
+        function refreshData() {
+            // En una aplicación real, aquí se haría una petición AJAX para obtener los datos más recientes
+
+            // Ejemplo de actualización de datos (simulación)
+            vehicles[0].lat -= 0.01; // Cambia ligeramente la ubicación del primer vehículo
+            vehicles[0].speed = '90 km/h'; // Cambia la velocidad
+            vehicles[0].status = 'Activo'; // Cambia el estado
+
+            // Actualizar marcadores en el mapa
+            markers.forEach(function(marker, index) {
+                var vehicle = vehicles[index];
+                marker.setLatLng([vehicle.lat, vehicle.lon])
+                    .setPopupContent(`<b>${vehicle.matricula}</b><br>Velocidad: ${vehicle.speed}<br>Estado: ${vehicle.status}`);
+            });
+
+            // Actualizar la tabla en el DOM
+            var tableRows = document.querySelectorAll('#vehicles-table tbody tr');
+            tableRows.forEach(function(row, index) {
+                var vehicle = vehicles[index];
+                row.querySelector('.location').textContent = `${vehicle.lat.toFixed(4)}, ${vehicle.lon.toFixed(4)}`;
+                row.querySelector('.speed').textContent = vehicle.speed;
+                row.querySelector('.status').textContent = vehicle.status;
+            });
+
+            console.log("Datos actualizados");
+        }
+
+        // Simular actualización cada 10 segundos (se puede integrar con WebSockets para tiempo real)
+        setInterval(refreshData, 10000);
+    </script>
+</body>
+</html>
+
 {% endblock %}

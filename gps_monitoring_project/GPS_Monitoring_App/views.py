@@ -4,6 +4,9 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 
+from rest_framework import viewsets
+
+
 
 # Create your views here.
 @login_required(login_url='/login/')
@@ -23,4 +26,9 @@ def login_view(request):
             messages.error(request, 'Usuario o contraseña incorrectos')
     
     return render(request, 'login.html')
+
+def vehiculos(request):
+     return render(request, "Vehiculos")
+
+
 

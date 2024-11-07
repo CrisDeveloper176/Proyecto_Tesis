@@ -12,12 +12,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url= 'login', permanent =False)),
     path('home/', views.home, name='home'),
     path('Vehiculos/', views.vehiculos, name='Vehiculos'),
-    
-    
-
-    
-
-    
-    
+    path('monitoring/', views.monitoring_view, name='monitoring'),
+    path('api/vehiculo-ubicacion/', views.obtener_ubicacion_vehiculo, name='ubicacion_vehiculo'),
 ]
 

@@ -5,30 +5,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}RentaCarVidalGPS{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'Css/Styles.css' %}">
+    <style>
+
+</style>
 </head>
 <body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="/">Perfil</a></li>
-                <li><a href="#">Monitoreo</a></li>
-                <li><a href="#">Historial de viajes</a></li>
-                <li><a href="Vehiculos.html">registrar vehiculos</a></li>
-                <form action="{% url 'logout' %}" method="post" style="display:inline;">
+    <header class="bg-dark">  <!-- Se asegura que el fondo del header sea uniforme -->
+        <nav class="navbar navbar-expand-lg navbar-dark">
+            <a class="navbar-brand" href="/">RentaCarVidalGPS</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Perfil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'monitoring' %}">Monitoreo</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Historial de viajes</a>
+                    </li>
+                    <!-- Menú desplegable para registrar -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Registrar
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'Vehiculos' %}">Registrar Vehículos</a>
+                            <!-- Agrega más opciones aquí si es necesario -->
+                        </div>
+                    </li>
+                </ul>
+                <form action="{% url 'logout' %}" method="post" class="form-inline">
                     {% csrf_token %}
-                    <button type="submit">Cerrar sesión</button>
+                    <button type="submit" class="btn btn-outline-light">Cerrar sesión</button>
                 </form>
-            </ul>
+            </div>
         </nav>
     </header>
 
-    <main>
+    <!-- Bloque de contenido principal, cada vista lo definirá -->
+    <main class="container mt-5">
         {% block content %} {% endblock %}
     </main>
 
-    <footer>
+    <footer class="bg-dark text-white text-center py-3 mt-5">
         <p>&copy; 2024 Monitoreo GPS</p>
     </footer>
+
+    <!-- Bootstrap JS y dependencias -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

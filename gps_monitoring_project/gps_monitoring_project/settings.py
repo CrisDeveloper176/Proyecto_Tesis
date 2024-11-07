@@ -55,7 +55,7 @@ ROOT_URLCONF = 'gps_monitoring_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'GPS_Monitoring_App/Templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

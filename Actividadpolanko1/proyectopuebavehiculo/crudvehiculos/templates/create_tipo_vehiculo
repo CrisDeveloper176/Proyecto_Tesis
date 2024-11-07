@@ -1,0 +1,5 @@
+<form method="POST" action="{% url 'create_tipo_vehiculo' %}">
+    {% csrf_token %}
+    <input type="text" name="NombreTipo" placeholder="Nombre del Tipo de Vehículo" required>
+    <button type="submit">Crear Tipo de Vehículo</button>
+</form>

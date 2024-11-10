@@ -13,9 +13,9 @@
 </style>
 </head>
 <body>
-    <header class="bg-dark">  <!-- Se asegura que el fondo del header sea uniforme -->
+    <header class="bg-dark">  
         <nav class="navbar navbar-expand-lg navbar-dark">
-            <a class="navbar-brand" href="/">RentaCarVidalGPS</a>
+            <a class="navbar-brand" href="{% url 'home' %}">RentaCarVidalGPS</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -50,7 +50,7 @@
     </header>
 
     <!-- Bloque de contenido principal, cada vista lo definirá -->
-    <main class="container mt-5">
+    <main class="container-fluid">
         {% block content %} {% endblock %}
     </main>
 

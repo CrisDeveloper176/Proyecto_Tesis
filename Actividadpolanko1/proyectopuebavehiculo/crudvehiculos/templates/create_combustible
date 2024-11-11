@@ -1,6 +1,0 @@
-<form method="POST" action="{% url 'create_combustible' %}">
-    {% csrf_token %}
-    <input type="text" name="CodCombustible" placeholder="Código de Combustible" required>
-    <input type="text" name="NombreCombustible" placeholder="Nombre de Combustible" required>
-    <button type="submit">Crear Combustible</button>
-</form>

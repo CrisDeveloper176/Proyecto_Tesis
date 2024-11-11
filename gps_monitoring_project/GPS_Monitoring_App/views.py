@@ -33,6 +33,9 @@ def vehiculos(request):
 def monitoring_view(request):
      return render(request, 'monitoring.html')
 
+def Reportes(request):
+     return render(request, 'Reportes.html')
+
 def obtener_ubicacion_vehiculo(request):
  
     vehiculo = Vehiculo.objects.last()  
@@ -44,3 +47,30 @@ def obtener_ubicacion_vehiculo(request):
     else:
         data = {"error": "No se encontraron datos de ubicación."}
     return JsonResponse(data)
+
+from django.shortcuts import render
+import coreapi
+
+def listar_reportes(request):
+    # Inicializar el cliente y cargar el esquema
+    client = coreapi.Client()
+    schema = client.get("http://api-tesis-muddy-snow-7061.fly.dev/docs/")
+
+    # Definir las acciones para cada endpoint
+    endpoints = {
+        "viajes": ["Viaje", "list"],
+        "vehiculos": ["vehiculo", "list"],
+        "mantenimiento": ["Mantenimiento_Vehiculo", "list"],
+        "alertas": ["Alertas", "list"]
+    }
+
+    # Diccionario para almacenar los resultados de cada endpoint
+    data = {}
+    for key, action in endpoints.items():
+        try:
+            data[key] = client.action(schema, action)
+        except coreapi.exceptions.ErrorMessage as e:
+            data[key] = {"error": f"No se pudo obtener la lista de {key}: {str(e)}"}
+
+    # Pasar los datos a la plantilla
+    return render(request, "listar_reportes.html", data)

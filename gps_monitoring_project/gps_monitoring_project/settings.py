@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'GPS_Monitoring_App'
+    'GPS_Monitoring_App',
+    'coreapi',
 ]
 
 MIDDLEWARE = [

@@ -13,6 +13,7 @@ urlpatterns = [
     path('home/', views.home, name='home'),
     path('Vehiculos/', views.vehiculos, name='Vehiculos'),
     path('monitoring/', views.monitoring_view, name='monitoring'),
+    path('Reportes/', views.Reportes, name='Reportes'),
     path('api/vehiculo-ubicacion/', views.obtener_ubicacion_vehiculo, name='ubicacion_vehiculo'),
 ]
 

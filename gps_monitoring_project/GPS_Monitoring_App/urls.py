@@ -15,5 +15,6 @@ urlpatterns = [
     path('monitoring/', views.monitoring_view, name='monitoring'),
     path('Reportes/', views.Reportes, name='Reportes'),
     path('api/vehiculo-ubicacion/', views.obtener_ubicacion_vehiculo, name='ubicacion_vehiculo'),
+    path('crear-arrendatario/', views.crear_arrendatario, name='crear_arrendatario'),
 ]
 

@@ -8,6 +8,7 @@ from rest_framework import viewsets
 from django.http import JsonResponse
 from django.shortcuts import render
 import coreapi
+import requests
 
 # Create your views here.
 @login_required(login_url='/login/')
@@ -98,3 +99,31 @@ def listar_reportes(request):
 
     # Pasar los datos a la plantilla
     return render(request, "listar_reportes.html", data)
+
+
+
+def crear_arrendatario(request):
+    # Inicializa el cliente de la API
+    client = coreapi.Client()
+    
+    # Obtiene el esquema de la API
+    schema = client.get("https://apitesis.fly.dev/api/v1/Arrendatarios/")
+    
+    # Los parámetros del arrendatario que quieres crear
+    params = {
+        "Rut": "12345678-9",  # ejemplo, reemplaza con los datos correctos
+        "Nombre": "Juan",
+        "Apellido": "Pérez",
+        "Licencia_Conducir": "1234",
+        "Telefono": "123456789",
+        "Correo": "juan.perez@example.com",
+    }
+    
+    # Acción para crear el arrendatario
+    action = ["Arrendatarios", "create"]
+    
+    # Llama a la API
+    result = client.action(schema, action, params=params)
+    
+    # Renderiza el resultado en una plantilla o haz lo que necesites
+    return render(request, 'arrendatarios.html', {'arrendatarios': result})

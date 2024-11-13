@@ -1,0 +1,42 @@
+{% extends 'Base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Crear Arrendatario</h1>
+    <form method="post" action="{% url 'crear_arrendatario' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="rut" class="form-label">Rut</label>
+            <input type="text" class="form-control" id="rut" name="Rut" required>
+        </div>
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="nombre" name="Nombre" required>
+        </div>
+        <div class="mb-3">
+            <label for="apellido" class="form-label">Apellido</label>
+            <input type="text" class="form-control" id="apellido" name="Apellido" required>
+        </div>
+        <div class="mb-3">
+            <label for="licencia" class="form-label">Licencia de Conducir</label>
+            <input type="text" class="form-control" id="licencia" name="Licencia_Conducir" required>
+        </div>
+        <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="text" class="form-control" id="telefono" name="Telefono" required>
+        </div>
+        <div class="mb-3">
+            <label for="correo" class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control" id="correo" name="Correo" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Crear Arrendatario</button>
+    </form>
+    {% if result %}
+        <div class="mt-4 alert alert-success">
+            <h4>Arrendatario creado con éxito:</h4>
+            <pre>{{ result }}</pre>
+        </div>
+    {% endif %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

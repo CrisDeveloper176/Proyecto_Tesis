@@ -6,7 +6,8 @@ from django.shortcuts import redirect
 from .models import Vehiculo
 from rest_framework import viewsets
 from django.http import JsonResponse
-
+from django.shortcuts import render
+import coreapi
 
 # Create your views here.
 @login_required(login_url='/login/')
@@ -48,29 +49,52 @@ def obtener_ubicacion_vehiculo(request):
         data = {"error": "No se encontraron datos de ubicación."}
     return JsonResponse(data)
 
-from django.shortcuts import render
-import coreapi
+
+
+class APIClient:
+    
+
+    def __init__(self, base_url):
+        self.base_url = base_url
+
+    def get_data(self, endpoint):
+       
+        try:
+            response = requests.get(endpoint)
+            response.raise_for_status()  # Verifica que la respuesta sea exitosa
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            return {"error": f"No se pudo obtener la lista de {endpoint}: {str(e)}"}
+
+
+class ReportService:
+    """Clase para gestionar los reportes"""
+
+    def __init__(self, api_client):
+        self.api_client = api_client
+        # Definir los endpoints específicos para cada recurso
+        self.endpoints = {
+            "viajes": f"{self.api_client.base_url}Viaje/",
+            "vehiculos": f"{self.api_client.base_url}vehiculo/",
+            "mantenimiento": f"{self.api_client.base_url}Mantenimiento_Vehiculo/",
+            "alertas": f"{self.api_client.base_url}Alertas/"
+        }
+
+    def obtener_reportes(self):
+        """Obtiene los reportes de todos los endpoints definidos"""
+        data = {}
+        for key, endpoint in self.endpoints.items():
+            data[key] = self.api_client.get_data(endpoint)
+        return data
+
 
 def listar_reportes(request):
-    # Inicializar el cliente y cargar el esquema
-    client = coreapi.Client()
-    schema = client.get("http://api-tesis-muddy-snow-7061.fly.dev/docs/")
+    # Inicializar el cliente de API y el servicio de reportes
+    api_client = APIClient(base_url="https://apitesis.fly.dev/api/v1/")
+    report_service = ReportService(api_client)
 
-    # Definir las acciones para cada endpoint
-    endpoints = {
-        "viajes": ["Viaje", "list"],
-        "vehiculos": ["vehiculo", "list"],
-        "mantenimiento": ["Mantenimiento_Vehiculo", "list"],
-        "alertas": ["Alertas", "list"]
-    }
-
-    # Diccionario para almacenar los resultados de cada endpoint
-    data = {}
-    for key, action in endpoints.items():
-        try:
-            data[key] = client.action(schema, action)
-        except coreapi.exceptions.ErrorMessage as e:
-            data[key] = {"error": f"No se pudo obtener la lista de {key}: {str(e)}"}
+    # Obtener los datos de los reportes
+    data = report_service.obtener_reportes()
 
     # Pasar los datos a la plantilla
     return render(request, "listar_reportes.html", data)

@@ -48,6 +48,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">Historial de viajes</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'Reportes' %}">Reportes</a>
+                    </li>
                     <!-- Menú desplegable para registrar -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -55,6 +58,7 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="{% url 'Vehiculos' %}">Registrar Vehículos</a>
+                            <a class="dropdown-item" href="{% url 'arrendatarios' %}">Registrar Arrendatario</a>
                             <!-- Agrega más opciones aquí si es necesario -->
                         </div>
                     </li>
@@ -72,9 +76,7 @@
         {% block content %} {% endblock %}
     </main>
 
-    <footer>
-        <p>&copy; 2024 Monitoreo GPS</p>
-    </footer>
+
 
     <!-- Bootstrap JS y dependencias -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

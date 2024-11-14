@@ -37,6 +37,9 @@ def monitoring_view(request):
 
 def Reportes(request):
      return render(request, 'Reportes.html')
+ 
+def Arrendatarios(request):
+    return render(request= 'arrendatarios.html')
 
 def obtener_ubicacion_vehiculo(request):
  
@@ -102,7 +105,7 @@ def listar_reportes(request):
 
 
 
-def crear_arrendatario(request):
+#def crear_arrendatario(request):
     # Inicializa el cliente de la API
     client = coreapi.Client()
     

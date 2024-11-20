@@ -23,7 +23,7 @@ def login(request):
             return JsonResponse({'error': 'Todos los campos son obligatorios'}, status=400)
 
         # Configura la URL del endpoint de la API
-        url = "http://apitesis.fly.dev//api/v1/api/token/"  # Cambia la URL si es necesario
+        url = "http://apitesis.fly.dev/api/v1/token/"  # Cambia la URL si es necesario
 
         # Define los parámetros en formato JSON
         data = {
@@ -45,7 +45,7 @@ def login(request):
                 # Guarda el token en la sesión
                 token = response.json().get('token')
                 request.session['token'] = token
-                return redirect('home')  # Redirige a la página de inicio
+                return redirect('Home.html')  # Redirige a la página de inicio
             else:
                 # Si ocurre un error en la API, muestra el mensaje de error
                 return JsonResponse({'error': response.text}, status=response.status_code)

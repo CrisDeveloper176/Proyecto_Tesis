@@ -1,152 +1,180 @@
 {% extends 'Base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <!-- Título de la página -->
-    <h1 class="text-center">Gestión de Vehículos</h1>
 
-    <!-- Botón para agregar un nuevo registro -->
-    <div class="mb-3">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVehicleModal">Nuevo Vehículo</button>
-    </div>
+<div class="container mt-5">
+    <h1>Gestión de Vehículos</h1>
 
-    <!-- Contenedor flotante para los vehículos -->
-    <table class="table table-bordered table-striped">
+    <!-- Listar Vehículos -->
+    <h2>Lista de Vehículos</h2>
+    <table class="table table-bordered">
         <thead>
             <tr>
-                <th>#</th>
+                <th>ID</th>
                 <th>Matrícula</th>
                 <th>Estado</th>
                 <th>Kilometraje</th>
-                <th>Modelo</th>
+                <th>ID Modelo</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
+            {% for vehiculo in vehiculos %}
             <tr>
-                <td>1</td>
-                <td>ABC123</td>
-                <td>Activo</td>
-                <td>15,000 km</td>
-                <td>Model X</td>
+                <td>{{ vehiculo.ID_Vehiculo }}</td>
+                <td>{{ vehiculo.Matricula }}</td>
+                <td>{{ vehiculo.Estado_Vehiculo }}</td>
+                <td>{{ vehiculo.kilometraje }}</td>
+                <td>{{ vehiculo.ID_Modelo }}</td>
                 <td>
-                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editVehicleModal">Editar</button>
-                    <button class="btn btn-danger btn-sm">Eliminar</button>
+                    <!-- Botón para editar -->
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" 
+                            data-id="{{ vehiculo.ID_Vehiculo }}"
+                            data-matricula="{{ vehiculo.Matricula }}"
+                            data-estado="{{ vehiculo.Estado_Vehiculo }}"
+                            data-kilometraje="{{ vehiculo.kilometraje }}"
+                            data-id_modelo="{{ vehiculo.ID_Modelo }}">
+                        Editar
+                    </button>
+
+                    <!-- Botón para eliminar -->
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                            data-id="{{ vehiculo.ID_Vehiculo }}">
+                        Eliminar
+                    </button>
                 </td>
             </tr>
-            <tr>
-                <td>2</td>
-                <td>XYZ456</td>
-                <td>En Reparación</td>
-                <td>25,000 km</td>
-                <td>Model Y</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editVehicleModal">Editar</button>
-                    <button class="btn btn-danger btn-sm">Eliminar</button>
-                </td>
-            </tr>
-            <!-- Puedes agregar más filas para más vehículos -->
+            {% endfor %}
         </tbody>
     </table>
-</div>
-    
 
-    </div>
-    
+    <!-- Botón para abrir el modal de agregar -->
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Vehículo</button>
 
-
-    <!-- Modal para agregar un nuevo vehículo -->
-    <div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
+    <!-- Modal para Agregar Vehículo -->
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addVehicleModalLabel">Nuevo Vehículo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="create">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addModalLabel">Agregar Vehículo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
                         <div class="mb-3">
                             <label for="matricula" class="form-label">Matrícula</label>
-                            <input type="text" class="form-control" id="matricula" required>
+                            <input type="text" class="form-control" name="matricula" required>
                         </div>
                         <div class="mb-3">
-                            <label for="estadoVehiculo" class="form-label">Estado del Vehículo</label>
-                            <select class="form-select" id="estadoVehiculo" required>
-                                <option value="Activo">Activo</option>
-                                <option value="Inactivo">Inactivo</option>
-                                <option value="En Reparación">En Reparación</option>
-                            </select>
+                            <label for="estado_vehiculo" class="form-label">Estado del Vehículo</label>
+                            <input type="text" class="form-control" name="estado_vehiculo" required>
                         </div>
                         <div class="mb-3">
                             <label for="kilometraje" class="form-label">Kilometraje</label>
-                            <input type="number" class="form-control" id="kilometraje" required>
+                            <input type="number" class="form-control" name="kilometraje" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="idModelo" class="form-label">ID Modelo</label>
-                            <select class="form-select" id="idModelo" required>
-                                <option value="1">Model X</option>
-                                <option value="2">Model Y</option>
-                                <option value="3">Model Z</option>
-                                <!-- Estos valores deben venir de la base de datos -->
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary">Guardar</button>
-                </div>
+                        <select class="form-select" name="id_modelo" required>
+                            <option value="" disabled selected>Selecciona un modelo</option>
+                            {% for modelo in modelos %}
+                                <option value="{{ modelo.id }}">{{ modelo.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Agregar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Modal para editar un vehículo -->
-    <div class="modal fade" id="editVehicleModal" tabindex="-1" aria-labelledby="editVehicleModalLabel" aria-hidden="true">
+    <!-- Modal para Editar Vehículo -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editVehicleModalLabel">Editar Vehículo</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update">
+                    <input type="hidden" name="id_vehiculo" id="edit-id">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Vehículo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
                         <div class="mb-3">
-                            <label for="editMatricula" class="form-label">Matrícula</label>
-                            <input type="text" class="form-control" id="editMatricula" value="ABC123" required>
+                            <label for="matricula" class="form-label">Matrícula</label>
+                            <input type="text" class="form-control" name="matricula" id="edit-matricula" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editEstadoVehiculo" class="form-label">Estado del Vehículo</label>
-                            <select class="form-select" id="editEstadoVehiculo" required>
-                                <option value="Activo">Activo</option>
-                                <option value="Inactivo">Inactivo</option>
-                                <option value="En Reparación">En Reparación</option>
-                            </select>
+                            <label for="estado_vehiculo" class="form-label">Estado del Vehículo</label>
+                            <input type="text" class="form-control" name="estado_vehiculo" id="edit-estado" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editKilometraje" class="form-label">Kilometraje</label>
-                            <input type="number" class="form-control" id="editKilometraje" value="15000" required>
+                            <label for="kilometraje" class="form-label">Kilometraje</label>
+                            <input type="number" class="form-control" name="kilometraje" id="edit-kilometraje" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="editIdModelo" class="form-label">ID Modelo</label>
-                            <select class="form-select" id="editIdModelo" required>
-                                <option value="1">Model X</option>
-                                <option value="2">Model Y</option>
-                                <option value="3">Model Z</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary">Guardar Cambios</button>
-                </div>
+
+                        <select class="form-select" aria-label="Small select example">
+                            {% for modelo in modelos %}
+                                <option value="{{ modelo.id }}">{{ modelo.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Eliminar Vehículo -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete">
+                    <input type="hidden" name="id_vehiculo" id="delete-id">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Eliminar Vehículo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar este vehículo?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Pasar los datos del vehículo al modal de edición
+    document.getElementById('editModal').addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        document.getElementById('edit-id').value = button.getAttribute('data-id');
+        document.getElementById('edit-matricula').value = button.getAttribute('data-matricula');
+        document.getElementById('edit-estado').value = button.getAttribute('data-estado');
+        document.getElementById('edit-kilometraje').value = button.getAttribute('data-kilometraje');
+        document.getElementById('edit-id_modelo').value = button.getAttribute('data-id_modelo');
+    });
 
+    // Pasar el ID del vehículo al modal de eliminación
+    document.getElementById('deleteModal').addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        document.getElementById('delete-id').value = button.getAttribute('data-id');
+    });
+</script>
 
-    {% endblock %}
+{% endblock %}

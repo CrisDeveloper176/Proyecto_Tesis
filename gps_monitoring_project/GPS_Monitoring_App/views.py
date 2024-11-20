@@ -1,36 +1,107 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect
 from .models import Vehiculo
-from rest_framework import viewsets
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 import coreapi
+import json
 import requests
+
 
 # Create your views here.
 @login_required(login_url='/login/')
 def home(request):
        return render(request, 'Home.html')
 
-def login_view(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            login(request, user)
-            return redirect('Home.html')  
-        else:
-            messages.error(request, 'Usuario o contraseña incorrectos')
-    
+def login(request):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        # Verifica si los datos están vacíos
+        if not username or not password:
+            return JsonResponse({'error': 'Todos los campos son obligatorios'}, status=400)
+
+        # Configura la URL del endpoint de la API
+        url = "http://apitesis.fly.dev//api/v1/api/token/"  # Cambia la URL si es necesario
+
+        # Define los parámetros en formato JSON
+        data = {
+            "username": username,
+            "password": password,
+        }
+
+        # Configura las cabeceras para enviar JSON
+        headers = {
+            "Content-Type": "application/json",
+        }
+
+        try:
+            # Realiza la solicitud POST con los datos en formato JSON
+            response = requests.post(url, data=json.dumps(data), headers=headers)
+
+            # Verifica si la solicitud fue exitosa
+            if response.status_code == 200:
+                # Guarda el token en la sesión
+                token = response.json().get('token')
+                request.session['token'] = token
+                return redirect('home')  # Redirige a la página de inicio
+            else:
+                # Si ocurre un error en la API, muestra el mensaje de error
+                return JsonResponse({'error': response.text}, status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            # Maneja los errores de conexión o problemas con la solicitud
+            print(f"Error al autenticar el usuario: {e}")
+            return JsonResponse({'error': f"Error al autenticar el usuario: {str(e)}"}, status=400)
+
     return render(request, 'login.html')
 
+def register(request):
+    if request.method == "POST":
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        # Verifica si los datos están vacíos
+        if not username or not email or not password:
+            return JsonResponse({'error': 'Todos los campos son obligatorios'}, status=400)
+
+        # Configura la URL del endpoint de la API
+        url = "http://apitesis.fly.dev/api/v1/Login/"  # Cambia la URL si es necesario
+
+        # Define los parámetros en formato JSON
+        data = {
+            "user": username,  # Reemplaza con 'username' si ese es el parámetro correcto
+            "email": email,
+            "password": password,
+        }
+
+        # Configura las cabeceras para enviar JSON
+        headers = {
+            "Content-Type": "application/json",
+        }
+
+        try:
+            # Realiza la solicitud POST con los datos en formato JSON
+            response = requests.post(url, data=json.dumps(data), headers=headers)
+
+            # Verifica si la solicitud fue exitosa
+            if response.status_code == 200:
+                # Redirige a la página de login si el registro fue exitoso
+                return redirect('login')
+            else:
+                # Si ocurre un error en la API, muestra el mensaje de error
+                return JsonResponse({'error': response.text}, status=response.status_code)
+
+        except requests.exceptions.RequestException as e:
+            # Maneja los errores de conexión o problemas con la solicitud
+            print(f"Error al registrar el usuario: {e}")
+            return JsonResponse({'error': f"Error al registrar el usuario: {str(e)}"}, status=400)
+        
+    return render(request, 'register.html')
 def vehiculos(request):
-     return render(request, "Vehiculos.html")
+     return render(request, "vehiculos.html")
 
 def monitoring_view(request):
      return render(request, 'monitoring.html')
@@ -53,80 +124,27 @@ def obtener_ubicacion_vehiculo(request):
         data = {"error": "No se encontraron datos de ubicación."}
     return JsonResponse(data)
 
-
-
-class APIClient:
-    
-
-    def __init__(self, base_url):
-        self.base_url = base_url
-
-    def get_data(self, endpoint):
-       
-        try:
-            response = requests.get(endpoint)
-            response.raise_for_status()  # Verifica que la respuesta sea exitosa
-            return response.json()
-        except requests.exceptions.RequestException as e:
-            return {"error": f"No se pudo obtener la lista de {endpoint}: {str(e)}"}
-
-
-class ReportService:
-    """Clase para gestionar los reportes"""
-
-    def __init__(self, api_client):
-        self.api_client = api_client
-        # Definir los endpoints específicos para cada recurso
-        self.endpoints = {
-            "viajes": f"{self.api_client.base_url}Viaje/",
-            "vehiculos": f"{self.api_client.base_url}vehiculo/",
-            "mantenimiento": f"{self.api_client.base_url}Mantenimiento_Vehiculo/",
-            "alertas": f"{self.api_client.base_url}Alertas/"
-        }
-
-    def obtener_reportes(self):
-        """Obtiene los reportes de todos los endpoints definidos"""
-        data = {}
-        for key, endpoint in self.endpoints.items():
-            data[key] = self.api_client.get_data(endpoint)
-        return data
-
-
-def listar_reportes(request):
-    # Inicializar el cliente de API y el servicio de reportes
-    api_client = APIClient(base_url="https://apitesis.fly.dev/api/v1/")
-    report_service = ReportService(api_client)
-
-    # Obtener los datos de los reportes
-    data = report_service.obtener_reportes()
-
-    # Pasar los datos a la plantilla
-    return render(request, "listar_reportes.html", data)
-
-
-
-#def crear_arrendatario(request):
-    # Inicializa el cliente de la API
+def vehiculo_view(request):
     client = coreapi.Client()
-    
-    # Obtiene el esquema de la API
-    schema = client.get("https://apitesis.fly.dev/api/v1/Arrendatarios/")
-    
-    # Los parámetros del arrendatario que quieres crear
-    params = {
-        "Rut": "12345678-9",  # ejemplo, reemplaza con los datos correctos
-        "Nombre": "Juan",
-        "Apellido": "Pérez",
-        "Licencia_Conducir": "1234",
-        "Telefono": "123456789",
-        "Correo": "juan.perez@example.com",
-    }
-    
-    # Acción para crear el arrendatario
-    action = ["Arrendatarios", "create"]
-    
-    # Llama a la API
-    result = client.action(schema, action, params=params)
-    
-    # Renderiza el resultado en una plantilla o haz lo que necesites
-    return render(request, 'arrendatarios.html', {'arrendatarios': result})
+    try:
+        
+        schema = client.get("http://apitesis.fly.dev/docs/")
+        
+       
+        action = ["Modelo", "list"]
+        modelos = client.action(schema, action) 
+
+    except coreapi.exceptions.Error as e:
+        print(f"Error al cargar modelos desde la API: {e}")
+        modelos = [] 
+
+   
+    return render(request, 'vehiculos.html', {'modelos': modelos})
+
+
+
+
+
+
+
+

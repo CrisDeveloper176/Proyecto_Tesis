@@ -12,11 +12,13 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('', RedirectView.as_view(url= 'login', permanent =False)),
     path('home/', views.home, name='home'),
-    path('Vehiculos/', views.vehiculos, name='Vehiculos'),
     path('monitoring/', views.monitoring_view, name='monitoring'),
     path('Reportes/', views.Reportes, name='Reportes'),
     path('Arrendatarios/', views.Arrendatarios, name='arrendatarios'),
     path('api/vehiculo-ubicacion/', views.obtener_ubicacion_vehiculo, name='ubicacion_vehiculo'),
-    #path('crear-arrendatario/', views.crear_arrendatario, name='crear_arrendatario'),
+    path("vehiculos/", views.vehiculos, name="vehiculos"),
+    path('login/', views.login, name='login'),
+    path('register/', views.register, name='register'),
+
 ]
 

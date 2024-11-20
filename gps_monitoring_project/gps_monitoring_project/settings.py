@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'GPS_Monitoring_App',
     'coreapi',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -49,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'gps_monitoring_project.urls'
@@ -127,3 +129,6 @@ STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = 'login'
+API_TOKEN = "60XMXnbzk4eybuLoxgj02GxemnCq7AX8b1OmeN5tp"
+API_BASE_URL = "https://apitesis.fly.dev/"
+CORS_ALLOW_ALL_ORIGINS = True

@@ -41,12 +41,25 @@
 <script>
     function initMap() {
         const mapOptions = {
-            zoom: 15,
-            center: { lat: -33.8688, lng: 151.2093 }  // Ajusta las coordenadas según tu preferencia
+            zoom: 12,
+            center: { lat: -37.4667, lng: -72.5667 }  // Coordenadas centrales entre Laja y Huepil
         };
         const map = new google.maps.Map(document.getElementById('map'), mapOptions);
-        
-        // Aquí puedes agregar lógica para obtener y mostrar ubicaciones de vehículos en el mapa
+
+        // Puntos de interés (Laja y Huepil)
+        const puntos = [
+            { lat: -37.5667, lng: -72.5667, title: "Laja, Chile" },
+            { lat: -37.3658, lng: -72.5711, title: "Huepil, Chile" }
+        ];
+
+        // Agregar marcadores para cada punto
+        puntos.forEach(function(punto) {
+            new google.maps.Marker({
+                position: { lat: punto.lat, lng: punto.lng },
+                map: map,
+                title: punto.title
+            });
+        });
     }
 </script>
 
@@ -55,8 +68,11 @@
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCERVqzsVAyNTs8EswdkCTgVevQtYah7HA&callback=initMap">
 </script>
 
-<!-- Importar Bootstrap -->
+<!-- Importar Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Importar Bootstrap JS (con Popper.js) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
 {% endblock %}

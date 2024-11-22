@@ -5,10 +5,12 @@
 <div class="container mt-5">
     <h1>Gestión de Vehículos</h1>
 
+    
     <!-- Listar Vehículos -->
-    <h2>Lista de Vehículos</h2>
-    <table class="table table-bordered">
-        <thead>
+    <h2 class="mt-4">Lista de Vehículos</h2>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
             <tr>
                 <th>ID</th>
                 <th>Matrícula</th>
@@ -19,34 +21,41 @@
             </tr>
         </thead>
         <tbody>
-            {% for vehiculo in vehiculos %}
-            <tr>
-                <td>{{ vehiculo.ID_Vehiculo }}</td>
-                <td>{{ vehiculo.Matricula }}</td>
-                <td>{{ vehiculo.Estado_Vehiculo }}</td>
-                <td>{{ vehiculo.kilometraje }}</td>
-                <td>{{ vehiculo.ID_Modelo }}</td>
-                <td>
-                    <!-- Botón para editar -->
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" 
-                            data-id="{{ vehiculo.ID_Vehiculo }}"
-                            data-matricula="{{ vehiculo.Matricula }}"
-                            data-estado="{{ vehiculo.Estado_Vehiculo }}"
-                            data-kilometraje="{{ vehiculo.kilometraje }}"
-                            data-id_modelo="{{ vehiculo.ID_Modelo }}">
-                        Editar
-                    </button>
+            {% if vehiculos %}
+                {% for vehiculo in vehiculos %}
+                <tr>
+                    <td>{{ vehiculo.ID_Vehiculo }}</td>
+                    <td>{{ vehiculo.Matricula }}</td>
+                    <td>{{ vehiculo.Estado_Vehiculo }}</td>
+                    <td>{{ vehiculo.kilometraje }}</td>
+                    <td>{{ vehiculo.ID_Modelo }}</td>
+                    <td>
+                        <!-- Botón para editar -->
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
+                                data-id="{{ vehiculo.ID_Vehiculo }}"
+                                data-matricula="{{ vehiculo.Matricula }}"
+                                data-estado="{{ vehiculo.Estado_Vehiculo }}"
+                                data-kilometraje="{{ vehiculo.kilometraje }}"
+                                data-id_modelo="{{ vehiculo.ID_Modelo }}">
+                            Editar
+                        </button>
 
-                    <!-- Botón para eliminar -->
-                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                            data-id="{{ vehiculo.ID_Vehiculo }}">
-                        Eliminar
-                    </button>
-                </td>
-            </tr>
-            {% endfor %}
+                        <!-- Botón para eliminar -->
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                data-id="{{ vehiculo.ID_Vehiculo }}">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6" class="text-center">No se encontraron vehículos.</td>
+                </tr>
+            {% endif %}
         </tbody>
     </table>
+
 
     <!-- Botón para abrir el modal de agregar -->
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Vehículo</button>
@@ -80,6 +89,7 @@
                             {% for modelo in modelos %}
                                 <option value="{{ modelo.id }}">{{ modelo.nombre }}</option>
                             {% endfor %}
+                            <button type="button" class="btn btn-primary" data-bs-target="modal">+</button>
                         </select>
                     </div>
                     <div class="modal-footer">

@@ -1,11 +1,10 @@
-from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from .models import Vehiculo
 from django.http import JsonResponse
-from django.shortcuts import render,redirect
-import coreapi
+from django.shortcuts import render,redirect,HttpResponse
 import json
 import requests
+import coreapi
 
 
 # Create your views here.
@@ -22,38 +21,41 @@ def login(request):
         if not username or not password:
             return JsonResponse({'error': 'Todos los campos son obligatorios'}, status=400)
 
-        # Configura la URL del endpoint de la API
+        # URL del endpoint de la API
         url = "http://apitesis.fly.dev/api/v1/token/"  # Cambia la URL si es necesario
 
-        # Define los parámetros en formato JSON
+        # Parámetros para la solicitud
         data = {
             "username": username,
             "password": password,
         }
-
-        # Configura las cabeceras para enviar JSON
         headers = {
             "Content-Type": "application/json",
         }
 
         try:
-            # Realiza la solicitud POST con los datos en formato JSON
+            # Realiza la solicitud POST
             response = requests.post(url, data=json.dumps(data), headers=headers)
-
-            # Verifica si la solicitud fue exitosa
             if response.status_code == 200:
                 # Guarda el token en la sesión
-                token = response.json().get('token')
-                request.session['token'] = token
-                return redirect('Home.html')  # Redirige a la página de inicio
+                tokens = response.json()
+                access_token = tokens.get('access')
+                refresh_token = tokens.get('refresh')
+
+                if not access_token or not refresh_token:
+                    return JsonResponse({'error': 'No se recibieron tokens de acceso.'}, status=500)
+
+                request.session['access_token'] = access_token
+                request.session['refresh_token'] = refresh_token
+
+                return redirect('home')  # Redirige a la página de inicio
             else:
-                # Si ocurre un error en la API, muestra el mensaje de error
-                return JsonResponse({'error': response.text}, status=response.status_code)
+                error_message = response.json().get('detail', 'Credenciales inválidas o error desconocido.')
+                return JsonResponse({'error': error_message}, status=response.status_code)
 
         except requests.exceptions.RequestException as e:
-            # Maneja los errores de conexión o problemas con la solicitud
             print(f"Error al autenticar el usuario: {e}")
-            return JsonResponse({'error': f"Error al autenticar el usuario: {str(e)}"}, status=400)
+            return JsonResponse({'error': 'Error de conexión con la API.'}, status=500)
 
     return render(request, 'login.html')
 
@@ -100,8 +102,6 @@ def register(request):
             return JsonResponse({'error': f"Error al registrar el usuario: {str(e)}"}, status=400)
         
     return render(request, 'register.html')
-def vehiculos(request):
-     return render(request, "vehiculos.html")
 
 def monitoring_view(request):
      return render(request, 'monitoring.html')
@@ -123,24 +123,35 @@ def obtener_ubicacion_vehiculo(request):
     else:
         data = {"error": "No se encontraron datos de ubicación."}
     return JsonResponse(data)
+def getAPI(request):
+     URL_API = "https://apitesis.fly.dev/api/v1/vehiculo/"
+     
+     response = requests.get(URL_API)
+     if response.status_code == 200:
+        vehiculo = response.json()
+         
+        for producto in vehiculo:
+            print(producto)
+            
+        return HttpResponse(vehiculo) or []
+         
 
-def vehiculo_view(request):
-    client = coreapi.Client()
+def obtener_vehiculo(request):
+    
+    URL_API = "https://apitesis.fly.dev/api/v1/vehiculo/"
     try:
         
-        schema = client.get("http://apitesis.fly.dev/docs/")
-        
-       
-        action = ["Modelo", "list"]
-        modelos = client.action(schema, action) 
-
-    except coreapi.exceptions.Error as e:
-        print(f"Error al cargar modelos desde la API: {e}")
-        modelos = [] 
-
-   
-    return render(request, 'vehiculos.html', {'modelos': modelos})
-
+        response = requests.get(URL_API)
+        if response.status_code == 200:
+            vehiculos = response.json()
+        else:
+            print(f"Error en la solicitud: {response.status_code}")
+            vehiculos = []
+    except requests.RequestException as e:
+        print(f"Error en la solicitud: {e}")
+        vehiculos = []
+    
+    return render(request, 'vehiculos.html',{'vehiculos': vehiculos})
 
 
 

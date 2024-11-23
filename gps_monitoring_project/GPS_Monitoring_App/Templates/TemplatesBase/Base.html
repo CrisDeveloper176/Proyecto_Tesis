@@ -53,15 +53,15 @@
                     </li>
                     <!-- Menú desplegable para registrar -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Registrar
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                              Registrar
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                         <ul class="dropdown-menu">
                             <a class="dropdown-item" href="{% url 'vehiculos' %}">Registrar Vehículos</a>
-                            <a class="dropdown-item" href="{% url 'arrendatarios' %}">Registrar Arrendatario</a>
-                            <!-- Agrega más opciones aquí si es necesario -->
-                        </div>
+                            <a class="dropdown-item" href="{% url 'arrendatario' %}">Registrar Arrendatario</a>
+                        </ul>
                     </li>
+                    
                 </ul>
                 <form action="{% url 'logout' %}" method="post" class="form-inline">
                     {% csrf_token %}

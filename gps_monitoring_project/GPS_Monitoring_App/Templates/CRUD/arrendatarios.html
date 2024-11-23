@@ -1,9 +1,9 @@
-{% extends 'Base.html' %}
+{% extends 'TemplatesBase/Base.html' %}
 
 {% block content %}
 <div class="container mt-5">
     <h1 class="mb-4">Crear Arrendatario</h1>
-    <form method="post" action="{% url 'crear_arrendatario' %}">
+    <form method="post" action="">
         {% csrf_token %}
         <div class="mb-3">
             <label for="rut" class="form-label">Rut</label>

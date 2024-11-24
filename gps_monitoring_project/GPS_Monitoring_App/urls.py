@@ -21,6 +21,8 @@ urlpatterns = [
     path('Arrendatarios/', Arrendatarios, name='arrendatario'),
     path("vehiculos/", obtener_modelos_y_vehiculos, name="vehiculos"),
     path('vehiculos/Registrar', registrar_vehiculo, name='registrar_vehiculo'),
+    path('vehiculos/Editar/<int:ID_Vehiculo>/', editar_vehiculo , name='editar_Vehiculo'),
+    path('vehiculos/Eliminar/<int:ID_Vehiculo>/', eliminar_vehiculo, name='eliminar_Vehiculo'),
     path('login/', login, name='login'),
 
 ]

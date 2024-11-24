@@ -8,7 +8,8 @@
     
     <!-- Listar Vehículos -->
     <h2 class="mt-4">Lista de Vehículos</h2>
-
+<!-- Botón para abrir el modal de agregar -->
+<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Vehículo</button>
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr>
@@ -31,17 +32,15 @@
                     <td>{{ vehiculo.modelo_nombre }}</td> 
                     <td>
                         <!-- Botón para editar -->
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
-                                data-id="{{ vehiculo.ID_Vehiculo }}"
-                                data-matricula="{{ vehiculo.Matricula }}"
-                                data-estado="{{ vehiculo.Estado_Vehiculo }}"
-                                data-kilometraje="{{ vehiculo.kilometraje }}"
-                                data-id_modelo="{{ modelo.ID_Modelo }}">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" 
+                            data-id="{{ vehiculo.ID_Vehiculo }}" data-matricula="{{ vehiculo.Matricula }}" 
+                            data-estado="{{ vehiculo.Estado_Vehiculo }}" data-kilometraje="{{ vehiculo.kilometraje }}" 
+                            data-id-modelo="{{ vehiculo.ID_Modelo }}">
                             Editar
-                        </button>
+                       </button>
 
                         <!-- Botón para eliminar -->
-                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
                                 data-id="{{ vehiculo.ID_Vehiculo }}">
                             Eliminar
                         </button>
@@ -57,14 +56,13 @@
     </table>
 
 
-    <!-- Botón para abrir el modal de agregar -->
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Vehículo</button>
+    
 
     <!-- Modal para Agregar Vehículo -->
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form method="post" action="{% url 'registrar_vehiculo'%}">
+                <form method="post" action="{% url 'registrar_vehiculo' %}">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="create">
                     <div class="modal-header">
@@ -101,71 +99,115 @@
         </div>
     </div>
 
-    <!-- Modal para Editar Vehículo -->
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form method="post">
+                <form method="post" action="{% url 'editar_Vehiculo' ID_Vehiculo=0 %}" id="edit-form">
                     {% csrf_token %}
-                    <input type="hidden" name="action" value="update">
-                    <input type="hidden" name="id_vehiculo" id="edit-id">
+                    <input type="hidden" name="ID_Vehiculo" id="edit-id">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editModalLabel">Editar Vehículo</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="matricula" class="form-label">Matrícula</label>
+                            <label for="edit-matricula" class="form-label">Matrícula</label>
                             <input type="text" class="form-control" name="matricula" id="edit-matricula" required>
                         </div>
                         <div class="mb-3">
-                            <label for="estado_vehiculo" class="form-label">Estado del Vehículo</label>
+                            <label for="edit-estado" class="form-label">Estado del Vehículo</label>
                             <input type="text" class="form-control" name="estado_vehiculo" id="edit-estado" required>
                         </div>
                         <div class="mb-3">
-                            <label for="kilometraje" class="form-label">Kilometraje</label>
+                            <label for="edit-kilometraje" class="form-label">Kilometraje</label>
                             <input type="number" class="form-control" name="kilometraje" id="edit-kilometraje" required>
                         </div>
-
-                        <select class="form-select" aria-label="Small select example">
-                            {% for modelo in modelos %}
-                                <option value="{{ modelo.id }}">{{ modelo.nombre }}</option>
+                        <div class="mb-3">
+                            <label for="edit-modelo" class="form-label">Modelo</label>
+                            <select class="form-select" name="id_modelo" id="edit-modelo">
+                                {% for modelo in modelos %}
+                                <option value="{{ modelo.ID_Modelo }}">{{ modelo.Nombre_Modelo }}</option>
                             {% endfor %}
-                        </select>
+                            </select>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary" onclick=registrar_vehiculo()>Guardar cambios</button>
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+    
 
-    <!-- Modal para Eliminar Vehículo -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="delete">
-                    <input type="hidden" name="id_vehiculo" id="delete-id">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Eliminar Vehículo</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>¿Estás seguro de que deseas eliminar este vehículo?</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-danger">Eliminar</button>
-                    </div>
-                </form>
-            </div>
+ <!-- Modal para Eliminar Vehículo -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Vehículo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar este vehículo?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-
+<script>
+    editModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget; // Botón que disparó el modal
+        const idVehiculo = button.getAttribute("data-id");
+    
+        // Actualizar la acción del formulario
+        const form = document.getElementById("edit-form");
+        form.action = `/vehiculos/Editar/${idVehiculo}/`; // Asegúrate de que esta URL sea correcta en tu proyecto
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editModal = document.getElementById("editModal");
+        editModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget; // Botón que disparó el modal
+            const idVehiculo = button.getAttribute("data-id");
+            const matricula = button.getAttribute("data-matricula");
+            const estado = button.getAttribute("data-estado");
+            const kilometraje = button.getAttribute("data-kilometraje");
+            const modelo = button.getAttribute("data-modelo");
+    
+            // Llenar los campos del formulario del modal
+            document.getElementById("edit-id").value = idVehiculo;
+            document.getElementById("edit-matricula").value = matricula;
+            document.getElementById("edit-estado").value = estado;
+            document.getElementById("edit-kilometraje").value = kilometraje;
+    
+            // Seleccionar el modelo en el dropdown
+            const modeloSelect = document.getElementById("edit-modelo");
+            modeloSelect.value = modelo;
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const deleteModal = document.getElementById("deleteModal");
+    
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget; // Botón que abrió el modal
+            const idVehiculo = button.getAttribute("data-id"); // Obtiene el ID del vehículo
+    
+            // Encuentra el formulario dentro del modal
+            const form = deleteModal.querySelector("form");
+            form.action = `/vehiculos/Eliminar/${idVehiculo}/`; // Actualiza dinámicamente la URL
+        });
+    });
+</script>
 
 {% endblock %}

@@ -64,7 +64,7 @@
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form method="post">
+                <form method="post" action="{% url 'registrar_vehiculo'%}">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="create">
                     <div class="modal-header">
@@ -82,11 +82,11 @@
                         </div>
                         <div class="mb-3">
                             <label for="kilometraje" class="form-label">Kilometraje</label>
-                            <input type="number" class="form-control" name="kilometraje" required>
+                            <input type="text" class="form-control" name="kilometraje" required>
                         </div>
                         <label for="id_modelo" class="form-label">Modelo</label>
                         <select class="form-select" name="id_modelo" id="add-id-modelo" required>
-                            <option value="" disabled selected></option>
+                            <option value="" disabled selected>Selecciona un modelo</option>
                             {% for modelo in modelos %}
                                 <option value="{{ modelo.ID_Modelo }}">{{ modelo.Nombre_Modelo }}</option>
                             {% endfor %}
@@ -135,7 +135,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                        <button type="submit" class="btn btn-primary" onclick=registrar_vehiculo()>Guardar cambios</button>
                     </div>
                 </form>
             </div>
@@ -167,23 +167,5 @@
     </div>
 </div>
 
-
-<script>
-    // Pasar los datos del vehículo al modal de edición
-    document.getElementById('editModal').addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        document.getElementById('edit-id').value = button.getAttribute('data-id');
-        document.getElementById('edit-matricula').value = button.getAttribute('data-matricula');
-        document.getElementById('edit-estado').value = button.getAttribute('data-estado');
-        document.getElementById('edit-kilometraje').value = button.getAttribute('data-kilometraje');
-        document.getElementById('edit-id_modelo').value = button.getAttribute('data-id_modelo');
-    });
-
-    // Pasar el ID del vehículo al modal de eliminación
-    document.getElementById('deleteModal').addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        document.getElementById('delete-id').value = button.getAttribute('data-id');
-    });
-</script>
 
 {% endblock %}

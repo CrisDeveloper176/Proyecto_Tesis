@@ -46,20 +46,8 @@
         };
         const map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
-        // Puntos de interés (Laja y Huepil)
-        const puntos = [
-            { lat: -37.5667, lng: -72.5667, title: "Laja, Chile" },
-            { lat: -37.3658, lng: -72.5711, title: "Huepil, Chile" }
-        ];
+       
 
-        // Agregar marcadores para cada punto
-        puntos.forEach(function(punto) {
-            new google.maps.Marker({
-                position: { lat: punto.lat, lng: punto.lng },
-                map: map,
-                title: punto.title
-            });
-        });
     }
 </script>
 
@@ -68,7 +56,41 @@
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCERVqzsVAyNTs8EswdkCTgVevQtYah7HA&callback=initMap">
 </script>
 
+<script>
+    function enviarUbicacion() {
+        if (navigator.geolocation) {
+            // Obtener la ubicación del dispositivo
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
 
+                // Crear un objeto con las coordenadas
+                const datosUbicacion = {
+                    lat: lat,
+                    lon: lon
+                };
+
+                // Enviar la ubicación a la API de Django desplegada en Fly.io
+                fetch('https://tu-api.fly.dev/api/ubicacion/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(datosUbicacion)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Ubicación enviada:', data);
+                })
+                .catch(error => {
+                    console.error('Error al enviar ubicación:', error);
+                });
+            });
+        } else {
+            alert("La geolocalización no está soportada por este navegador.");
+        }
+    }
+</script>
 
 
 {% endblock %}

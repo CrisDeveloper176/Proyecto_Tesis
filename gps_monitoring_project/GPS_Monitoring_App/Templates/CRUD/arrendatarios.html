@@ -1,42 +1,246 @@
 {% extends 'TemplatesBase/Base.html' %}
 
 {% block content %}
+
 <div class="container mt-5">
-    <h1 class="mb-4">Crear Arrendatario</h1>
-    <form method="post" action="">
-        {% csrf_token %}
-        <div class="mb-3">
-            <label for="rut" class="form-label">Rut</label>
-            <input type="text" class="form-control" id="rut" name="Rut" required>
+    <h1>Gestión de Arrendatarios</h1>
+
+    <!-- Listar Arrendatarios -->
+    <h2 class="mt-4">Lista de Arrendatarios</h2>
+    <!-- Botón para abrir el modal de agregar -->
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Arrendatario</button>
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>id</th>
+                <th>RUT</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Licencia</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if arrendatarios %}
+                {% for arrendatario in arrendatarios %}
+                <tr>
+                    <td>{{ arrendatario.id }}</td>
+                    <td>{{ arrendatario.Rut }}</td>
+                    <td>{{ arrendatario.Nombre }}</td>
+                    <td>{{ arrendatario.Apellido }}</td>
+                    <td>{{ arrendatario.Licencia_Conducir }}</td>
+                    <td>{{ arrendatario.Telefono }}</td>
+                    <td>{{ arrendatario.Correo }}</td>
+                    <td>
+                        <!-- Botón para editar -->
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" 
+                            data-id="{{ arrendatario.id }}" data-rut="{{ arrendatario.Rut }}" data-nombre="{{ arrendatario.Nombre }}" 
+                            data-apellido="{{ arrendatario.Apellido }}" data-licencia="{{ arrendatario.Licencia_Conducir }}" 
+                            data-telefono="{{ arrendatario.Telefono }}" data-correo="{{ arrendatario.Correo }}">
+                            Editar
+                        </button>
+
+                        <!-- Botón para eliminar -->
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                data-id="{{ arrendatario.id }}">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">No se encontraron arrendatarios.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+    <!-- Modal para Agregar Arrendatario -->
+    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{% url 'registrar_arrendatario' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="create">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addModalLabel">Agregar Arrendatario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="rut" class="form-label">RUT</label>
+                            <input type="text" class="form-control" name="rut" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="apellido" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" name="apellido" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="licencia" class="form-label">Licencia</label>
+                            <input type="text" class="form-control" name="licencia" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" name="telefono" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="correo" class="form-label">Correo</label>
+                            <input type="email" class="form-control" name="correo" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Agregar</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre</label>
-            <input type="text" class="form-control" id="nombre" name="Nombre" required>
+    </div>
+
+    <!-- Modal para Editar Arrendatario -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" action="{% url 'editar_arrendatario' id=0 %}" id="edit-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="id" id="edit-id">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Arrendatario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label for="edit-rut" class="form-label">Rut</label>
+                            <input type="text" class="form-control" name="rut" id="edit-rut" readonly>
+                        </div>
+
+
+                        <div class="mb-3">
+                            <label for="edit-nombre" class="form-label">Nombre</label>
+                            <input type="text" class="form-control" name="nombre" id="edit-nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-apellido" class="form-label">Apellido</label>
+                            <input type="text" class="form-control" name="apellido" id="edit-apellido" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-licencia" class="form-label">Licencia</label>
+                            <input type="text" class="form-control" name="licencia" id="edit-licencia" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-telefono" class="form-label">Teléfono</label>
+                            <input type="text" class="form-control" name="telefono" id="edit-telefono" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit-correo" class="form-label">Correo</label>
+                            <input type="email" class="form-control" name="correo" id="edit-correo" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="apellido" class="form-label">Apellido</label>
-            <input type="text" class="form-control" id="apellido" name="Apellido" required>
+    </div>
+
+    <!-- Modal para Eliminar Arrendatario -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Eliminar Arrendatario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar este arrendatario?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="licencia" class="form-label">Licencia de Conducir</label>
-            <input type="text" class="form-control" id="licencia" name="Licencia_Conducir" required>
-        </div>
-        <div class="mb-3">
-            <label for="telefono" class="form-label">Teléfono</label>
-            <input type="text" class="form-control" id="telefono" name="Telefono" required>
-        </div>
-        <div class="mb-3">
-            <label for="correo" class="form-label">Correo Electrónico</label>
-            <input type="email" class="form-control" id="correo" name="Correo" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Crear Arrendatario</button>
-    </form>
-    {% if result %}
-        <div class="mt-4 alert alert-success">
-            <h4>Arrendatario creado con éxito:</h4>
-            <pre>{{ result }}</pre>
-        </div>
-    {% endif %}
+    </div>
+
+
+    <script>
+    editModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget; // Botón que disparó el modal
+        const idArrendatario = button.getAttribute("data-id");
+
+        // Actualizar la acción del formulario
+        const form = document.getElementById("edit-form");
+        form.action = `/Arrendatarios/Editar/${idArrendatario}/`;
+
+    });
+    </script>
+
+
+
+
+
+    <!-- Scripts para pasar datos a los modales -->
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editModal = document.getElementById("editModal");
+        editModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget; // Botón que disparó el modal
+            const idArrendatario = button.getAttribute("data-id");
+            const rut = button.getAttribute("data-rut");
+            const nombre = button.getAttribute("data-nombre");
+            const apellido = button.getAttribute("data-apellido");
+            const licencia = button.getAttribute("data-licencia");
+            const telefono = button.getAttribute("data-telefono");
+            const correo = button.getAttribute("data-correo");
+
+            // Llenar los campos del formulario del modal
+            document.getElementById("edit-id").value = idArrendatario;
+            document.getElementById("edit-rut").value = rut;
+            document.getElementById("edit-nombre").value = nombre;
+            document.getElementById("edit-apellido").value = apellido;
+            document.getElementById("edit-licencia").value = licencia;
+            document.getElementById("edit-telefono").value = telefono;
+            document.getElementById("edit-correo").value = correo;
+        });
+    });
+</script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const deleteModal = document.getElementById("deleteModal");
+    
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget; // Botón que abrió el modal
+            const idArrendatario = button.getAttribute("data-id"); // Obtiene el ID del vehículo
+    
+            // Encuentra el formulario dentro del modal
+            const form = deleteModal.querySelector("form");
+            form.action = `/Arrendatarios/Eliminar/${idArrendatario}/`; // Actualiza dinámicamente la URL
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 {% endblock %}

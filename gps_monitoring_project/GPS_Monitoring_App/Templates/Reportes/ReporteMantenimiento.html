@@ -1,0 +1,64 @@
+{% extends 'TemplatesBase/Base.html' %}
+
+{% block content %}
+
+    <!-- Mantenimiento -->
+<div class="container">
+    <h1 class="my-4 text-center">Mantenimiento</h1>
+    
+    <h2 class="mt-4">Lista de Mantenimiento</h2>
+    <table id="tabla-mantenimiento" class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Fecha_Inicio</th>
+                <th>Fecha_Fin</th>
+                <th>ID_Vehiculo</th>
+                <th>ID_Mantenimiento</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Las filas se cargarán dinámicamente -->
+        </tbody>
+    </table>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Función para cargar datos de mantenimiento en la tabla
+        function cargarDatosMantenimiento() {
+            fetch('/reporte/obtener_mantenimiento/', { 
+                headers: { 'x-requested-with': 'XMLHttpRequest' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('#tabla-mantenimiento tbody');
+                tbody.innerHTML = ''; // Limpia las filas existentes
+
+                if (data.mantenimiento && data.mantenimiento.length > 0) {
+                    data.mantenimiento.forEach(mantenimiento => {
+                        const row = `
+                            <tr>
+                                <td>${mantenimiento.ID_Mantenimiento}</td>
+                                <td>${mantenimiento.Fecha_Mantenimiento}</td>
+                                <td>${mantenimiento.Descripcion}</td>
+                                <td>${mantenimiento.ID_Vehiculo}</td>
+                            </tr>`;
+                        tbody.innerHTML += row;
+                    });
+                } else {
+                    // Mostrar un mensaje si no hay mantenimientos
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center">No se encontraron mantenimientos.</td>
+                        </tr>`;
+                }
+            })
+            .catch(error => console.error('Error al cargar los datos:', error));
+        }
+
+        // Llama a la función al cargar la página
+        cargarDatosMantenimiento();
+    });
+</script>
+
+
+{% endblock %}

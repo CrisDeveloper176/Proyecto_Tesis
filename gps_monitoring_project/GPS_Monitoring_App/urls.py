@@ -6,7 +6,9 @@ from .Views.vehiculos import *
 from .Views.arrendatarios import *
 from .Views.login import *
 from .Views.monitoreo import *
-from .Views.reportes import *
+from .Views.ReporteViaje import *
+from .Views.ReporteVehiculo import *
+from .Views.ReporteMantenimiento import *
 
 
 
@@ -17,9 +19,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url= 'login/', permanent =False)),
     path('home/', home, name='home'),
     path('monitoring/', monitoring_view, name='monitoring'),
-    path('Reportes/', obtener_viajes, name='Reportes'),
     path('reporte/obtener_vehiculos/', obtener_modelos_y_vehiculos_reporte, name='obtener_vehiculos'),
-    path('reporte/obtener_mantenimientos/', obtener_mantenimiento, name='obtener_mantenimientos'),
     path('Arrendatarios/', obtener_arrendatarios, name='arrendatario'),
     path('Arrendatarios/Registrar', registrar_arrendatario, name='registrar_arrendatario'),
     path('Arrendatarios/Editar/<int:id>/', editar_arrendatario, name='editar_arrendatario'),
@@ -28,8 +28,9 @@ urlpatterns = [
     path('vehiculos/Registrar', registrar_vehiculo, name='registrar_vehiculo'),
     path('vehiculos/Editar/<int:ID_Vehiculo>/', editar_vehiculo , name='editar_Vehiculo'),
     path('vehiculos/Eliminar/<int:ID_Vehiculo>/', eliminar_vehiculo, name='eliminar_Vehiculo'),
+    path('ReporteViaje/', obtener_viajes, name='ReporteViaje'),
+    path('ReporteVehiculo/', Reporte_Vehiculo , name='ReporteVehiculo'),
     path('login/', login, name='login'),
-
 ]
 
 

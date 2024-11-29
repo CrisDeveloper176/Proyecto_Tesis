@@ -1,0 +1,65 @@
+{% extends 'TemplatesBase/Base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h1 class="my-4 text-center">Vehiculo</h1>
+   <!-- Listar Vehículos -->
+    <h2 class="mt-4">Lista de Vehículos</h2>
+    <table id="tabla-vehiculos" class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Matrícula</th>
+                <th>Estado</th>
+                <th>Kilometraje</th>
+                <th>Modelo</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- El contenido de la tabla se cargará dinámicamente -->
+        </tbody>
+    </table>
+    
+    <script>
+        // Ejemplo usando Fetch API para cargar datos
+        document.addEventListener('DOMContentLoaded', () => {
+        // Función para cargar datos en la tabla
+        function cargarDatosVehiculos() {
+            fetch('/reporte/obtener_vehiculos/', { 
+                headers: { 'x-requested-with': 'XMLHttpRequest' } 
+            })
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('#tabla-vehiculos tbody');
+                tbody.innerHTML = ''; // Limpia las filas existentes
+    
+                if (data.vehiculos.length > 0) {
+                    data.vehiculos.forEach(vehiculo => {
+                        const row = `
+                            <tr>
+                                <td>${vehiculo.ID_Vehiculo}</td>
+                                <td>${vehiculo.Matricula}</td>
+                                <td>${vehiculo.Estado_Vehiculo}</td>
+                                <td>${vehiculo.kilometraje}</td>
+                                <td>${vehiculo.modelo_nombre}</td>
+                            </tr>`;
+                        tbody.innerHTML += row;
+                    });
+                } else {
+                    // Mostrar un mensaje si no hay vehículos
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="text-center">No se encontraron vehículos.</td>
+                        </tr>`;
+                }
+            })
+            .catch(error => console.error('Error al cargar los datos:', error));
+        }
+    
+        // Llama a la función al cargar la página
+        cargarDatosVehiculos();
+    });
+    </script>
+
+{% endblock %}

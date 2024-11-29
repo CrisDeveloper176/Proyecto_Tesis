@@ -36,60 +36,80 @@
         </div>
     </div>
 </div>
-
 <!-- Inicialización de Google Maps -->
 <script>
+    let map; // Mapa de Google
+    let marker; // Marcador de Google Maps
+
     function initMap() {
+        // Opciones del mapa
         const mapOptions = {
             zoom: 12,
-            center: { lat: -37.4667, lng: -72.5667 }  // Coordenadas centrales entre Laja y Huepil
+            center: { lat: -37.4667, lng: -72.5667 } // Coordenadas iniciales (Laja y Huepil)
         };
-        const map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
-       
+        // Inicializar el mapa
+        map = new google.maps.Map(document.getElementById("map"), mapOptions);
 
+        // Crear marcador inicial
+        marker = new google.maps.Marker({
+            position: mapOptions.center,
+            map: map,
+            title: "Ubicación actual"
+        });
+
+        // Actualizar ubicación automáticamente
+        function sendLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    // Actualizar marcador en el mapa
+                    const newPosition = { lat, lng };
+                    marker.setPosition(newPosition);
+                    map.setCenter(newPosition);
+
+                    // Enviar ubicación al servidor
+                    fetch('/api/ubicaciones/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            latitud: lat,
+                            longitud: lng,
+                            identificador: 'ID_UNICO_TELEFONO'
+                        })
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            document.getElementById('status').innerText = "Estado: Ubicación enviada.";
+                        } else {
+                            document.getElementById('status').innerText = "Estado: Error al enviar ubicación.";
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al enviar ubicación:', error);
+                        document.getElementById('status').innerText = "Estado: Error al enviar ubicación.";
+                    });
+                }, error => {
+                    console.error('Error al obtener ubicación:', error);
+                    document.getElementById('status').innerText = "Estado: No se pudo obtener la ubicación.";
+                });
+            } else {
+                document.getElementById('status').innerText = "Estado: Geolocalización no compatible.";
+            }
+        }
+
+        // Ejecutar cada 500 ms
+        setInterval(sendLocation, 500);
     }
 </script>
 
 <!-- Cargar la API de Google Maps -->
 <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCERVqzsVAyNTs8EswdkCTgVevQtYah7HA&callback=initMap">
-</script>
-
-<script>
-    function enviarUbicacion() {
-        if (navigator.geolocation) {
-            // Obtener la ubicación del dispositivo
-            navigator.geolocation.getCurrentPosition(function(position) {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-
-                // Crear un objeto con las coordenadas
-                const datosUbicacion = {
-                    lat: lat,
-                    lon: lon
-                };
-
-                // Enviar la ubicación a la API de Django desplegada en Fly.io
-                fetch('https://tu-api.fly.dev/api/ubicacion/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(datosUbicacion)
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Ubicación enviada:', data);
-                })
-                .catch(error => {
-                    console.error('Error al enviar ubicación:', error);
-                });
-            });
-        } else {
-            alert("La geolocalización no está soportada por este navegador.");
-        }
-    }
+    src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap">
 </script>
 
 

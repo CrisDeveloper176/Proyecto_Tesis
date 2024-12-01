@@ -1,116 +1,176 @@
 {% extends 'TemplatesBase/Base.html' %}
 
 {% block content %}
-<!-- Contenedor principal que ocupa toda la pantalla para el mapa -->
 <div class="container-fluid position-relative vh-100 p-0">
-    <!-- Contenedor del mapa -->
     <div id="map" class="w-100 h-100"></div>
 
-    
+    <!-- Dropdown para vehículos -->
     <div class="position-absolute top-0 start-0 m-3">
         <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle w-100" type="button" id="vehicleDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 Vehículos disponibles
             </button>
-            <ul class="dropdown-menu" aria-labelledby="vehicleDropdown" style="max-height: 200px; overflow-y: auto;">
-                <li><a class="dropdown-item" href="#">Vehículo 1</a></li>
-                <li><a class="dropdown-item" href="#">Vehículo 2</a></li>
-                <li><a class="dropdown-item" href="#">Vehículo 3</a></li>
-                
+            <ul class="dropdown-menu" id="vehicleList" aria-labelledby="vehicleDropdown" style="max-height: 200px; overflow-y: auto;">
+                <!-- Los vehículos en circulación se cargarán aquí -->
             </ul>
         </div>
     </div>
 
-    
     <div class="position-absolute top-0 end-0 m-3">
         <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle w-100" type="button" id="infoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 Información del Vehículo
             </button>
             <div class="dropdown-menu p-3" aria-labelledby="infoDropdown" style="width: 250px;">
-                <p><strong>Velocidad:</strong> <span>-- km/h</span></p>
-                <p><strong>Tiempo de parada:</strong> <span>-- min</span></p>
-                <p><strong>Matrícula:</strong> <span>--</span></p>
-                <button class="btn btn-danger w-100 mt-2">Parar motor</button>
+                <p><strong>Velocidad:</strong> <span id="speed">-- km/h</span></p>
+                <p><strong>IMEI:</strong> <span id="imei">--</span></p>
+                <p><strong>Matrícula:</strong> <span id="plate">--</span></p>
+                <p><strong>Modelo:</strong> <span id="model">--</span></p>
+                <p><strong>Marca:</strong> <span id="brand">--</span></p>
             </div>
         </div>
     </div>
+
+    <!-- Estado -->
+    <div id="status" class="position-absolute bottom-0 start-0 m-3 p-2 bg-light">
+        Estado: Inicializando...
+    </div>
 </div>
-<!-- Inicialización de Google Maps -->
+
 <script>
-    let map; 
-    let marker; 
+    let map;
+    let marker;
 
     function initMap() {
-        
-        const mapOptions = {
-            zoom: 12,
-            center: { lat: -37.4667, lng: -72.5667 } 
-        };
-
-        
-        map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-        
-        marker = new google.maps.Marker({
-            position: mapOptions.center,
-            map: map,
-            title: "Ubicación actual"
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: -37.2758343, lng: -72.7163521 },
+            zoom: 12
         });
 
-       
-        function sendLocation() {
-           if (navigator.geolocation) {
-              navigator.geolocation.getCurrentPosition(position => {
-                   const lat = position.coords.latitude;
-                   const lng = position.coords.longitude;
+        marker = new google.maps.Marker({
+            position: map.getCenter(),
+            map: map,
+        });
 
-                   
-                   const newPosition = { lat, lng };
-                   marker.setPosition(newPosition);
-                   map.setCenter(newPosition);
+        fetchLastLocation();
+    }
 
-                   
-                   fetch('/api/ubicaciones/', {
-                       method: 'POST',
-                       headers: {
-                           'Content-Type': 'application/json',
-                       },
-                       body: JSON.stringify({
-                           latitud: lat,
-                           longitud: lng,
-                           identificador: 'ID_UNICO_TELEFONO'
-                       })
-                   })
-                   .then(response => {
-                       if (response.ok) {
-                           document.getElementById('status').innerText = "Estado: Ubicación enviada.";
-                       } else {
-                           document.getElementById('status').innerText = "Estado: Error al enviar ubicación.";
-                       }
-                   })
-                   .catch(error => {
-                       console.error('Error al enviar ubicación:', error);
-                       document.getElementById('status').innerText = "Estado: Error al enviar ubicación.";
-                   });
-               }, error => {
-                   console.error('Error al obtener ubicación:', error);
-                   document.getElementById('status').innerText = "Estado: No se pudo obtener la ubicación.";
-               });
-           } else {
-               document.getElementById('status').innerText = "Estado: Geolocalización no compatible.";
-           }
-       }
+    function fetchLastLocation() {
+        fetch('https://apitesis.fly.dev/api/v1/ubicaciones/ultima/', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.latitud && data.longitud) {
+                const lastPosition = { lat: data.latitud, lng: data.longitud };
+                marker.setPosition(lastPosition);
+                map.setCenter(lastPosition);
+    
+                document.getElementById('speed').innerText = `${data.velocidad ?? 0} km/h`;
+                document.getElementById('imei').innerText = data.imei_id ?? 'No disponible';
+    
+                // Llamar a la función para obtener información del vehículo
+                fetchVehicleInfo(data.imei_id);
+            } else {
+                document.getElementById('status').innerText = "Estado: No se encontró una ubicación registrada.";
+            }
+        })
+        .catch(error => {
+            console.error('Error al obtener la última ubicación:', error);
+            document.getElementById('status').innerText = "Estado: Error al obtener la ubicación.";
+        });
+    }
+    
+    function fetchVehicleInfo(imei) {
+        fetch(`https://apitesis.fly.dev/api/v1/GPSUsados/`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(gpsData => {
+            if (gpsData.length > 0) {
+                const gps = gpsData[0];
+                fetch(`https://apitesis.fly.dev/api/v1/vehiculo/${gps.ID_Vehiculo}/`, { method: 'GET' })
+                .then(response => response.json())
+                .then(vehicleData => {
+                    fetch(`https://apitesis.fly.dev/api/v1/Modelo/${vehicleData.ID_Modelo}/`, { method: 'GET' })
+                    .then(response => response.json())
+                    .then(modeloData => {
+                        fetch(`https://apitesis.fly.dev/api/v1/Marca/${modeloData.ID_Marca}/`, { method: 'GET' })
+                        .then(response => response.json())
+                        .then(marcaData => {
+                            // Actualizar el dropdown con la información del vehículo
+                            const { nombre: marca } = marcaData;
+                            const { nombre: modelo } = modeloData;
+                            const { matricula } = vehicleData;
+                            document.getElementById('plate').innerText = matricula ?? '--';
+                            document.getElementById('model').innerText = modelo ?? '--';
+                            document.getElementById('brand').innerText = marca ?? '--'; 
+                            document.getElementById('status').innerText = `Vehículo en circulación: ${marca} ${modelo} (${matricula})`;
+                        });
+                    });
+                });
+            } else {
+                document.getElementById('status').innerText = "Estado: No se encontró información del vehículo.";
+            }
+        })
+        .catch(error => {
+            console.error('Error al obtener información del vehículo:', error);
+        });
+    }
 
-       // Ejecutar cada 500 ms
-       setInterval(sendLocation, 500);
-   }
+    function loadActiveVehicles() {
+        fetch('https://apitesis.fly.dev/api/v1/gpsusados/', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(gpsData => {
+            const vehicleList = document.getElementById('vehicleList');
+            vehicleList.innerHTML = ''; // Limpiar lista
+    
+            gpsData.forEach(gps => {
+                fetch(`https://apitesis.fly.dev/api/v1/vehiculos/${gps.vehiculo_id}/`)
+                .then(response => response.json())
+                .then(vehicleData => {
+                    fetch(`https://apitesis.fly.dev/api/v1/modelo/${vehicleData.modelo_id}/`)
+                    .then(response => response.json())
+                    .then(modeloData => {
+                        fetch(`https://apitesis.fly.dev/api/v1/marca/${modeloData.marca_id}/`)
+                        .then(response => response.json())
+                        .then(marcaData => {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `
+                                <a class="dropdown-item" href="#" data-lat="${gps.latitud}" data-lng="${gps.longitud}">
+                                    ${marcaData.nombre} ${modeloData.nombre} (${vehicleData.matricula})
+                                </a>`;
+                            vehicleList.appendChild(listItem);
+    
+                            // Agregar evento para centrar el mapa
+                            const dropdownItem = listItem.querySelector('.dropdown-item');
+                            dropdownItem.addEventListener('click', (event) => {
+                                const lat = parseFloat(event.target.dataset.lat);
+                                const lng = parseFloat(event.target.dataset.lng);
+                                const position = { lat, lng };
+    
+                                // Centrar el mapa y mover el marcador
+                                map.setCenter(position);
+                                marker.setPosition(position);
+                            });
+                        });
+                    });
+                });
+            });
+        })
+        .catch(error => {
+            console.error('Error al cargar los vehículos:', error);
+        });
+    }
+    
+    // Cargar los vehículos disponibles al cargar la página
+    document.addEventListener('DOMContentLoaded', loadActiveVehicles);
 </script>
 
-<!-- Cargar la API de Google Maps -->
-<script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCERVqzsVAyNTs8EswdkCTgVevQtYah7HA&callback=initMap">
-</script>
-
-
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCERVqzsVAyNTs8EswdkCTgVevQtYah7HA&callback=initMap"></script>
 {% endblock %}

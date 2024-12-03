@@ -1,0 +1,128 @@
+{% extends 'TemplatesBase/Base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h1 class="text-center">Lista de Viajes</h1>
+    <table class="table table-bordered table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>ID Viaje</th>
+                <th>Punto de Origen</th>
+                <th>Destino</th>
+                <th>Distancia Recorrida (km)</th>
+                <th>Velocidad Media (km/h)</th>
+                <th>Matricula</th>
+                <th>Modelo</th>
+                <th>Marca</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="viajes-tbody">
+            <!-- Las filas serán generadas dinámicamente -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal de Google Maps -->
+<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mapModalLabel">Recorrido del Viaje</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="map" style="width: 100%; height: 400px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    const API_URL = "https://apitesis.fly.dev/api/v1/viajes_vehiculo/obtener/";
+
+    async function cargarViajes() {
+        try {
+            const response = await fetch(API_URL);
+
+            if (!response.ok) {
+                throw new Error(`Error al obtener los datos: ${response.statusText}`);
+            }
+
+            const datos = await response.json(); // Convertir la respuesta a JSON
+
+            const tbody = document.getElementById("viajes-tbody");
+
+            // Limpiar el contenido actual del tbody
+            tbody.innerHTML = "";
+
+            datos.forEach(item => {
+                const fila = document.createElement("tr");
+
+                fila.innerHTML = `
+                    <td>${item.viaje.ID_Viaje}</td>
+                    <td>${item.viaje.Punto_Origen}</td>
+                    <td>${item.viaje.Destino}</td>
+                    <td>${parseFloat(item.viaje.Distancia_Recorrida).toFixed(2)}</td>
+                    <td>${parseFloat(item.viaje.Velocidad_Media).toFixed(2)}</td>
+                    <td>${item.vehiculo.matricula}</td>
+                    <td>${item.vehiculo.modelo}</td>
+                    <td>${item.vehiculo.marca}</td>
+                    <td><button class="btn btn-primary btn-sm" onclick="visualizarMapa('${item.viaje.Punto_Origen}', '${item.viaje.Destino}')">Visualizar</button></td>
+                `;
+                tbody.appendChild(fila);
+            });
+        } catch (error) {
+            console.error("Hubo un problema al cargar los viajes:", error);
+        }
+    }
+
+    function visualizarMapa(puntoOrigen, destino) {
+        const modal = new bootstrap.Modal(document.getElementById('mapModal'));
+        modal.show();
+
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 14,
+            center: new google.maps.LatLng(parseFloat(puntoOrigen.split(",")[0]), parseFloat(puntoOrigen.split(",")[1]))
+        });
+
+        const origen = new google.maps.LatLng(parseFloat(puntoOrigen.split(",")[0]), parseFloat(puntoOrigen.split(",")[1]));
+        const destinoLatLng = new google.maps.LatLng(parseFloat(destino.split(",")[0]), parseFloat(destino.split(",")[1]));
+
+        new google.maps.Marker({
+            position: origen,
+            map: map,
+            title: "Punto de Origen"
+        });
+
+        new google.maps.Marker({
+            position: destinoLatLng,
+            map: map,
+            title: "Destino"
+        });
+
+        const directionsService = new google.maps.DirectionsService();
+        const directionsRenderer = new google.maps.DirectionsRenderer();
+        directionsRenderer.setMap(map);
+
+        const request = {
+            origin: origen,
+            destination: destinoLatLng,
+            travelMode: google.maps.TravelMode.DRIVING,
+            waypoints: []
+        };
+
+        directionsService.route(request, (result, status) => {
+            if (status === google.maps.DirectionsStatus.OK) {
+                directionsRenderer.setDirections(result);
+            } else {
+                alert("No se pudo trazar la ruta");
+            }
+        });
+    }
+
+    window.onload = cargarViajes;
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCERVqzsVAyNTs8EswdkCTgVevQtYah7HA&callback=initMap"></script>
+{% endblock %}

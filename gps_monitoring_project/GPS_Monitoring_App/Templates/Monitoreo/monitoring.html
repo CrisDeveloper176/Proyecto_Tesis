@@ -50,7 +50,13 @@
             center: { lat: -37.2758343, lng: -72.7163521 },
             zoom: 12
         });
-
+          // Cargar un ícono personalizado
+       const icon = {
+        url: "https://example.com/path_to_your_icon.png", // Cambia esta URL por el ícono que prefieras
+        scaledSize: new google.maps.Size(50, 50), // Escala el tamaño del ícono
+        origin: new google.maps.Point(0, 0), // Origen del ícono (puedes ajustarlo si es necesario)
+        anchor: new google.maps.Point(25, 50) // Ancla del ícono (ajusta para que se alinee bien con el marcador)
+    };
     }
 
     // Función para cargar los vehículos desde la API
@@ -172,15 +178,15 @@
 
             const data = await response.json();
 
-            // Verificar si la ubicación es válida
+            
             if (data && data.latitud && data.longitud) {
-                // Actualizar la ubicación del marcador
+                
                 marker.setPosition(new google.maps.LatLng(data.latitud, data.longitud));
 
-                // Centrar el mapa en la nueva ubicación
+                
                 map.setCenter(new google.maps.LatLng(data.latitud, data.longitud));
 
-                // Actualizar la velocidad
+                
                 document.getElementById('speed').textContent = `${data.velocidad} km/h`;
             }
         } catch (error) {

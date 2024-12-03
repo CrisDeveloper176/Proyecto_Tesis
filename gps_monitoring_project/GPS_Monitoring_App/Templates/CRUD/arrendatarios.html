@@ -12,7 +12,6 @@
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
             <tr>
-                <th>id</th>
                 <th>RUT</th>
                 <th>Nombre</th>
                 <th>Apellido</th>
@@ -26,7 +25,6 @@
             {% if arrendatarios %}
                 {% for arrendatario in arrendatarios %}
                 <tr>
-                    <td>{{ arrendatario.id }}</td>
                     <td>{{ arrendatario.Rut }}</td>
                     <td>{{ arrendatario.Nombre }}</td>
                     <td>{{ arrendatario.Apellido }}</td>
@@ -36,7 +34,7 @@
                     <td>
                         
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" 
-                            data-id="{{ arrendatario.id }}" data-rut="{{ arrendatario.Rut }}" data-nombre="{{ arrendatario.Nombre }}" 
+                            data-rut="{{ arrendatario.Rut }}" data-nombre="{{ arrendatario.Nombre }}" 
                             data-apellido="{{ arrendatario.Apellido }}" data-licencia="{{ arrendatario.Licencia_Conducir }}" 
                             data-telefono="{{ arrendatario.Telefono }}" data-correo="{{ arrendatario.Correo }}">
                             Editar
@@ -44,7 +42,7 @@
 
                         
                         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                                data-id="{{ arrendatario.id }}">
+                                data-rut="{{ arrendatario.Rut }}">
                             Eliminar
                         </button>
                     </td>
@@ -64,7 +62,6 @@
             <div class="modal-content">
                 <form method="post" action="{% url 'registrar_arrendatario' %}">
                     {% csrf_token %}
-                    <input type="hidden" name="action" value="create">
                     <div class="modal-header">
                         <h5 class="modal-title" id="addModalLabel">Agregar Arrendatario</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -72,7 +69,7 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="rut" class="form-label">RUT</label>
-                            <input type="text" class="form-control" name="rut" required>
+                            <input type="text" class="form-control" name="rut" id="rut" maxlength="12" required>
                         </div>
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre</label>
@@ -108,21 +105,17 @@
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form method="post" action="{% url 'editar_arrendatario' id=0 %}" id="edit-form">
+                <form method="post" action="{% url 'editar_arrendatario' rut=0 %}" id="edit-form">
                     {% csrf_token %}
-                    <input type="hidden" name="id" id="edit-id">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editModalLabel">Editar Arrendatario</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-
                         <div class="mb-3">
                             <label for="edit-rut" class="form-label">Rut</label>
                             <input type="text" class="form-control" name="rut" id="edit-rut" readonly>
                         </div>
-
-
                         <div class="mb-3">
                             <label for="edit-nombre" class="form-label">Nombre</label>
                             <input type="text" class="form-control" name="nombre" id="edit-nombre" required>
@@ -175,6 +168,9 @@
         </div>
     </div>
 
+<<<<<<< HEAD
+    <!-- Scripts para los modales -->
+=======
 
     <script>
     editModal.addEventListener("show.bs.modal", function (event) {
@@ -193,12 +189,12 @@
 
 
     <!-- Scripts para pasar datos a los modales -->
+>>>>>>> 9b5efbeb8b6537d691c3023b31c0278e04beeaaf
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         const editModal = document.getElementById("editModal");
         editModal.addEventListener("show.bs.modal", function (event) {
-            const button = event.relatedTarget; // Botón que disparó el modal
-            const idArrendatario = button.getAttribute("data-id");
+            const button = event.relatedTarget;
             const rut = button.getAttribute("data-rut");
             const nombre = button.getAttribute("data-nombre");
             const apellido = button.getAttribute("data-apellido");
@@ -206,33 +202,117 @@
             const telefono = button.getAttribute("data-telefono");
             const correo = button.getAttribute("data-correo");
 
-            // Llenar los campos del formulario del modal
-            document.getElementById("edit-id").value = idArrendatario;
             document.getElementById("edit-rut").value = rut;
             document.getElementById("edit-nombre").value = nombre;
             document.getElementById("edit-apellido").value = apellido;
             document.getElementById("edit-licencia").value = licencia;
             document.getElementById("edit-telefono").value = telefono;
             document.getElementById("edit-correo").value = correo;
+
+            const form = document.getElementById("edit-form");
+            form.action = `/Arrendatarios/Editar/${rut}/`;
         });
-    });
-</script>
 
-
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
         const deleteModal = document.getElementById("deleteModal");
-    
         deleteModal.addEventListener("show.bs.modal", function (event) {
-            const button = event.relatedTarget; // Botón que abrió el modal
-            const idArrendatario = button.getAttribute("data-id"); // Obtiene el ID del vehículo
-    
-            // Encuentra el formulario dentro del modal
+            const button = event.relatedTarget;
+            const rut = button.getAttribute("data-rut");
+
             const form = deleteModal.querySelector("form");
-            form.action = `/Arrendatarios/Eliminar/${idArrendatario}/`; // Actualiza dinámicamente la URL
+            form.action = `/Arrendatarios/Eliminar/${rut}/`;
         });
     });
+    </script>
+
+
+
+
+
+
+   <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Validación de correo
+    const correoInputs = document.querySelectorAll('input[type="email"]');
+    correoInputs.forEach(correoInput => {
+        correoInput.addEventListener("input", function () {
+            if (!this.value.includes("@")) {
+                this.setCustomValidity("El correo debe contener el símbolo '@'.");
+            } else {
+                this.setCustomValidity("");
+            }
+        });
+    });
+
+// Validación de teléfono
+const telefonoInputs = document.querySelectorAll('input[name="telefono"], input[id^="edit-telefono"]');
+telefonoInputs.forEach(telefonoInput => {
+    telefonoInput.addEventListener("input", function () {
+        this.value = this.value.replace(/\D/g, ''); // Permite solo números
+
+        // Limitar la longitud máxima a 9 dígitos
+        if (this.value.length > 9) {
+            this.value = this.value.slice(0, 9); // Recorta a los primeros 9 caracteres
+        }
+
+        // Validar longitud mínima
+        if (this.value.length < 7) {
+            this.setCustomValidity("El teléfono debe contener al menos 7 dígitos.");
+        } else {
+            this.setCustomValidity("");
+        }
+    });
+});
+
+
+   const rutInput = document.getElementById("rut");
+    rutInput.addEventListener("input", function () {
+        const rutValue = this.value.replace(/[^0-9kK]/g, ""); // Remueve caracteres no válidos
+        let formattedRut = "";
+        
+        if (rutValue.length > 1) {
+            const body = rutValue.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Agrega puntos
+            const verifier = rutValue.slice(-1).toUpperCase(); // Obtiene el dígito verificador
+            formattedRut = `${body}-${verifier}`;
+        } else {
+            formattedRut = rutValue; // Caso para un dígito o vacío
+        }
+        
+        this.value = formattedRut;
+
+        // Validación de formato
+        const rutRegex = /^[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[0-9kK]$/;
+        if (!rutRegex.test(this.value)) {
+            this.setCustomValidity("Formato inválido. El RUT debe tener el formato XX.XXX.XXX-X.");
+        } else {
+            this.setCustomValidity("");
+        }
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
+
+
+
+
+
+
 
 
 
@@ -244,3 +324,4 @@
 </div>
 
 {% endblock %}
+

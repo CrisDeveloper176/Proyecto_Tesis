@@ -32,7 +32,7 @@
                     <td>{{ arrendatario.Telefono }}</td>
                     <td>{{ arrendatario.Correo }}</td>
                     <td>
-                        <!-- Botón para editar -->
+                        
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" 
                             data-rut="{{ arrendatario.Rut }}" data-nombre="{{ arrendatario.Nombre }}" 
                             data-apellido="{{ arrendatario.Apellido }}" data-licencia="{{ arrendatario.Licencia_Conducir }}" 
@@ -40,7 +40,7 @@
                             Editar
                         </button>
 
-                        <!-- Botón para eliminar -->
+                        
                         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
                                 data-rut="{{ arrendatario.Rut }}">
                             Eliminar
@@ -56,7 +56,7 @@
         </tbody>
     </table>
 
-    <!-- Modal para Agregar Arrendatario -->
+    
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -101,7 +101,7 @@
         </div>
     </div>
 
-    <!-- Modal para Editar Arrendatario -->
+    
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -146,7 +146,7 @@
         </div>
     </div>
 
-    <!-- Modal para Eliminar Arrendatario -->
+    
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -168,7 +168,28 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <!-- Scripts para los modales -->
+=======
+
+    <script>
+    editModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget; 
+        const idArrendatario = button.getAttribute("data-id");
+
+        
+        const form = document.getElementById("edit-form");
+        form.action = `/Arrendatarios/Editar/${idArrendatario}/`;
+
+    });
+    </script>
+
+
+
+
+
+    <!-- Scripts para pasar datos a los modales -->
+>>>>>>> 9b5efbeb8b6537d691c3023b31c0278e04beeaaf
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         const editModal = document.getElementById("editModal");

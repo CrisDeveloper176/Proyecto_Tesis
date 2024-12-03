@@ -74,30 +74,40 @@
                             <label for="matricula" class="form-label">Matrícula</label>
                             <input type="text" class="form-control" name="matricula" required>
                         </div>
+
                         <div class="mb-3">
                             <label for="estado_vehiculo" class="form-label">Estado del Vehículo</label>
-                            <input type="text" class="form-control" name="estado_vehiculo" required>
+                            <select class="form-select" name="estado_vehiculo" required>
+                                <option value="" disabled selected>Selecciona un estado</option>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                                <option value="Disponible">Disponible</option>
+                            </select>
                         </div>
+
                         <div class="mb-3">
                             <label for="kilometraje" class="form-label">Kilometraje</label>
-                            <input type="text" class="form-control" name="kilometraje" required>
+                            <input type="text" class="form-control" name="kilometraje" id="add-kilometraje" required min="0" max="300000" required>
+                            <div class="invalid-feedback">
+                                El kilometraje debe ser un número entre 0 y 300,000.
+                            </div>
+                                                </div>
+                                                <label for="id_modelo" class="form-label">Modelo</label>
+                                                <select class="form-select" name="id_modelo" id="add-id-modelo" required>
+                                                    <option value="" disabled selected>Selecciona un modelo</option>
+                                                    {% for modelo in modelos %}
+                                                        <option value="{{ modelo.ID_Modelo }}">{{ modelo.Nombre_Modelo }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-primary">Agregar</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                         </div>
-                        <label for="id_modelo" class="form-label">Modelo</label>
-                        <select class="form-select" name="id_modelo" id="add-id-modelo" required>
-                            <option value="" disabled selected>Selecciona un modelo</option>
-                            {% for modelo in modelos %}
-                                <option value="{{ modelo.ID_Modelo }}">{{ modelo.Nombre_Modelo }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Agregar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -114,14 +124,22 @@
                             <label for="edit-matricula" class="form-label">Matrícula</label>
                             <input type="text" class="form-control" name="matricula" id="edit-matricula" required>
                         </div>
+
                         <div class="mb-3">
                             <label for="edit-estado" class="form-label">Estado del Vehículo</label>
-                            <input type="text" class="form-control" name="estado_vehiculo" id="edit-estado" required>
+                            <select class="form-select" name="estado_vehiculo" id="edit-estado" required>
+                                <option value="Activo" {% if vehiculo.Estado_Vehiculo == "Activo" %}selected{% endif %}>Activo</option>
+                                <option value="Inactivo" {% if vehiculo.Estado_Vehiculo == "Inactivo" %}selected{% endif %}>Inactivo</option>
+                                <option value="Disponible" {% if vehiculo.Estado_Vehiculo == "Disponible" %}selected{% endif %}>Disponible</option>
+                            </select>
                         </div>
+
+
                         <div class="mb-3">
                             <label for="edit-kilometraje" class="form-label">Kilometraje</label>
-                            <input type="number" class="form-control" name="kilometraje" id="edit-kilometraje" required>
+                            <input type="text" class="form-control" name="kilometraje" id="edit-kilometraje" required>
                         </div>
+
                         <div class="mb-3">
                             <label for="edit-modelo" class="form-label">Modelo</label>
                             <select class="form-select" name="id_modelo" id="edit-modelo">
@@ -172,29 +190,38 @@
         form.action = `/vehiculos/Editar/${idVehiculo}/`; // Asegúrate de que esta URL sea correcta en tu proyecto
     });
 </script>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const editModal = document.getElementById("editModal");
+
         editModal.addEventListener("show.bs.modal", function (event) {
             const button = event.relatedTarget; // Botón que disparó el modal
+
+            // Obtener atributos del botón
             const idVehiculo = button.getAttribute("data-id");
             const matricula = button.getAttribute("data-matricula");
             const estado = button.getAttribute("data-estado");
             const kilometraje = button.getAttribute("data-kilometraje");
-            const modelo = button.getAttribute("data-modelo");
-    
+            const modelo = button.getAttribute("data-id-modelo");
+
             // Llenar los campos del formulario del modal
             document.getElementById("edit-id").value = idVehiculo;
             document.getElementById("edit-matricula").value = matricula;
-            document.getElementById("edit-estado").value = estado;
             document.getElementById("edit-kilometraje").value = kilometraje;
-    
+
+            // Seleccionar el estado en el dropdown
+            const estadoSelect = document.getElementById("edit-estado");
+            estadoSelect.value = estado;
+
             // Seleccionar el modelo en el dropdown
             const modeloSelect = document.getElementById("edit-modelo");
             modeloSelect.value = modelo;
         });
     });
 </script>
+
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const deleteModal = document.getElementById("deleteModal");
@@ -209,5 +236,71 @@
         });
     });
 </script>
+
+
+
+<script>
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const matriculaInputs = document.querySelectorAll('input[name="matricula"], input[id^="edit-matricula"]');
+
+    matriculaInputs.forEach(input => {
+        input.addEventListener("input", function () {
+            // Limita el valor al formato de 4 letras seguidas de 2 números
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, ""); // Solo letras mayúsculas y números
+            if (this.value.length > 6) {
+                this.value = this.value.slice(0, 6); // Limita a 6 caracteres
+            }
+
+            // Validación del formato (4 letras y 2 números)
+            const isValid = /^[A-Z]{4}[0-9]{2}$/.test(this.value);
+            if (!isValid && this.value.length === 6) {
+                this.setCustomValidity("La matrícula debe tener exactamente 4 letras seguidas de 2 números (ejemplo: ABCD12).");
+            } else {
+                this.setCustomValidity(""); // Limpia el mensaje si es válido
+            }
+        });
+    });
+});
+
+
+
+  
+</script>
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const kilometrajeInputs = document.querySelectorAll('input[name="kilometraje"], input[id^="edit-kilometraje"]');
+
+    kilometrajeInputs.forEach(input => {
+        input.addEventListener("input", function () {
+            // Permitir solo números
+            this.value = this.value.replace(/\D/g, ""); // Elimina cualquier carácter no numérico
+
+            // Validación del rango (opcional)
+            const maxKilometraje = 300000;
+            if (this.value !== "" && parseInt(this.value) > maxKilometraje) {
+                this.setCustomValidity(`El kilometraje no puede ser mayor a ${maxKilometraje}.`);
+            } else {
+                this.setCustomValidity(""); // Limpia el mensaje si es válido
+            }
+        });
+    });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
 
 {% endblock %}

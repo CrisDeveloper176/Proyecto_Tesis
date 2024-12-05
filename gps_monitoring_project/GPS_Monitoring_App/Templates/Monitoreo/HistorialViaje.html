@@ -41,43 +41,55 @@
 
 <!-- Modal para registrar un nuevo viaje -->
 <div class="modal fade" id="registroModal" tabindex="-1" aria-labelledby="registroModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="registroModalLabel">Registrar Nuevo Viaje</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="registroForm">
-          <div class="mb-3">
-            <label for="imeiSelect" class="form-label">IMEI</label>
-            <select class="form-select" id="imeiSelect">
-                <option value="">Seleccione un IMEI</option>
-            </select>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary" onclick="registrarViaje()">Guardar</button>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="registroModalLabel">Registrar Nuevo Viaje</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="registroForm">
+            <div class="mb-3">
+              <label for="imeiSelect" class="form-label">IMEI</label>
+              <select class="form-select" id="imeiSelect">
+                  <option value="">Seleccione un IMEI</option>
+              </select>
+            </div>
+            <!-- Mensaje de advertencia si no hay viajes -->
+            <p id="mensajeSinViajes" class="text-danger"></p>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+          <button type="button" class="btn btn-primary" onclick="registrarViaje()">Guardar</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 <script>
     const API_URL = "https://apitesis.fly.dev/api/v1/viajes_vehiculo/obtener/";
     const API_DISPOSITIVOS_URL = "https://apitesis.fly.dev/api/v1/Dispositivo_GPS/";
-
+    
     async function cargarViajes() {
         try {
             const response = await fetch(API_URL);
             if (!response.ok) throw new Error(`Error al obtener los datos: ${response.statusText}`);
             const datos = await response.json();
-
+    
             const tbody = document.getElementById("viajes-tbody");
             tbody.innerHTML = ""; // Limpiar el contenido actual del tbody
-
+    
+            if (datos.length === 0) {
+                // Mostrar mensaje si no hay viajes
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center">No hay viajes asociados al IMEI.</td>
+                    </tr>
+                `;
+                return;
+            }
+    
             datos.forEach(item => {
                 const fila = document.createElement("tr");
                 fila.innerHTML = `
@@ -98,57 +110,84 @@
             console.error("Hubo un problema al cargar los viajes:", error);
         }
     }
-
+    
     async function cargarDispositivos() {
         try {
             const response = await fetch(API_DISPOSITIVOS_URL);
             if (!response.ok) throw new Error(`Error al obtener los dispositivos: ${response.statusText}`);
             const dispositivos = await response.json();
-
+    
             const imeiSelect = document.getElementById("imeiSelect");
             imeiSelect.innerHTML = '<option value="">Seleccione un IMEI</option>'; // Resetear opciones
-
+    
             dispositivos.forEach(dispositivo => {
                 const option = document.createElement("option");
                 option.value = dispositivo.imei;
                 option.textContent = dispositivo.imei;
                 imeiSelect.appendChild(option);
             });
+    
+            imeiSelect.addEventListener("change", verificarViajesPorIMEI); // Escuchar cambios
         } catch (error) {
             console.error("Error al cargar dispositivos GPS:", error);
         }
     }
-
+    
+    async function verificarViajesPorIMEI() {
+        const imei = document.getElementById("imeiSelect").value;
+        const mensajeSinViajes = document.getElementById("mensajeSinViajes");
+    
+        if (!imei) {
+            mensajeSinViajes.textContent = ""; // Limpiar mensaje si no hay IMEI seleccionado
+            return;
+        }
+    
+        try {
+            const response = await fetch(`${API_URL}?imei=${imei}`); // Asume que puedes filtrar viajes por IMEI en la API
+            if (!response.ok) throw new Error(`Error al obtener los viajes para el IMEI: ${response.statusText}`);
+            const datos = await response.json();
+    
+            if (datos.length === 0) {
+                // Mostrar mensaje si no hay viajes asociados
+                mensajeSinViajes.textContent = "No hay viajes asociados a este IMEI.";
+            } else {
+                mensajeSinViajes.textContent = ""; // Limpiar el mensaje si hay viajes
+            }
+        } catch (error) {
+            console.error("Error al verificar viajes por IMEI:", error);
+        }
+    }
+    
     function abrirRegistroModal() {
         const modal = new bootstrap.Modal(document.getElementById("registroModal"));
         cargarDispositivos(); // Llenar el select antes de mostrar el modal
         modal.show();
     }
-
+    
     async function registrarViaje() {
         const imei = document.getElementById("imeiSelect").value;
-
+    
         if (!imei) {
             alert("Por favor, seleccione un IMEI válido.");
             return;
         }
-
+    
         try {
             const endpoint = `https://apitesis.fly.dev/api/v1/crear_viajes/${imei}/`;
             const response = await fetch(endpoint, { method: "POST" });
-
+    
             if (!response.ok) throw new Error(`Error al registrar el viaje: ${response.statusText}`);
-
+    
             alert("Viaje registrado exitosamente.");
             const modal = bootstrap.Modal.getInstance(document.getElementById("registroModal"));
             modal.hide();
-
+    
             cargarViajes(); // Actualizar la tabla
         } catch (error) {
             console.error("Hubo un problema al registrar el viaje:", error);
         }
     }
-
+    
     window.onload = cargarViajes;
 </script>
 

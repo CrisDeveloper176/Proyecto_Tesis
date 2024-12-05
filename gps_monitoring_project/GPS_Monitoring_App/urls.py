@@ -9,14 +9,11 @@ from .Views.monitoreo import *
 from .Views.ReporteViaje import *
 from .Views.ReporteVehiculo import *
 from .Views.ReporteMantenimiento import *
-<<<<<<< HEAD
 from .Views.estado_dispositivo import *
 from .Views.dispositivogps import *
 from .Views.gpsusado import *
-
-=======
 from .Views.HistorialVIaje import *
->>>>>>> 92cd3c8d7efccfe57667b4cee4ffdad7e6b7c095
+
 
 
 

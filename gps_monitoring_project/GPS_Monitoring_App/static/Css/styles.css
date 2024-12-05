@@ -104,12 +104,7 @@ th, td {
 th {
     background-color: #f2f2f2;
 }
-.container-fluid {
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100vh;
-}
+
 .alerta-reciente {
     background-color: #f8f9fa;
     padding: 30px;
@@ -148,49 +143,4 @@ body {
     margin: 0;
 }
 
-/* Ajustar el tamaño de la barra lateral en pantallas pequeñas */
-@media (max-width: 768px) {
-    .navbar-toggler {
-        border-color: white;
-    }
 
-    .navbar-nav {
-        text-align: center;
-        width: 100%;
-    }
-
-    .navbar-nav .nav-item {
-        width: 100%;
-    }
-
-    .navbar-nav .nav-link {
-        padding: 1rem 0;
-        text-align: center;
-    }
-
-    /* Hacer el menú lateral más accesible en pantallas pequeñas */
-    .navbar {
-        padding: 0.5rem;
-    }
-
-    .navbar-collapse {
-        text-align: center;
-    }
-
-    .dropdown-menu {
-        position: static;
-        float: none;
-    }
-
-    /* Ajustes a la tabla */
-    .container-fluid {
-        padding: 0 15px;
-    }
-
-    table {
-        margin-top: 15px;
-        width: 100%;
-        overflow-x: auto;
-        display: block;
-    }
-}

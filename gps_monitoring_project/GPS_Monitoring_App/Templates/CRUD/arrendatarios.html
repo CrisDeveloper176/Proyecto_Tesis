@@ -7,55 +7,60 @@
 
     <!-- Listar Arrendatarios -->
     <h2 class="mt-4">Lista de Arrendatarios</h2>
+    
     <!-- Botón para abrir el modal de agregar -->
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Arrendatario</button>
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>RUT</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Licencia</th>
-                <th>Teléfono</th>
-                <th>Correo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if arrendatarios %}
-                {% for arrendatario in arrendatarios %}
+    
+    <!-- Contenedor responsivo para la tabla -->
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
                 <tr>
-                    <td>{{ arrendatario.Rut }}</td>
-                    <td>{{ arrendatario.Nombre }}</td>
-                    <td>{{ arrendatario.Apellido }}</td>
-                    <td>{{ arrendatario.Licencia_Conducir }}</td>
-                    <td>{{ arrendatario.Telefono }}</td>
-                    <td>{{ arrendatario.Correo }}</td>
-                    <td>
-                        
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" 
-                            data-rut="{{ arrendatario.Rut }}" data-nombre="{{ arrendatario.Nombre }}" 
-                            data-apellido="{{ arrendatario.Apellido }}" data-licencia="{{ arrendatario.Licencia_Conducir }}" 
-                            data-telefono="{{ arrendatario.Telefono }}" data-correo="{{ arrendatario.Correo }}">
-                            Editar
-                        </button>
-
-                        
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                                data-rut="{{ arrendatario.Rut }}">
-                            Eliminar
-                        </button>
-                    </td>
+                    <th>RUT</th>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Licencia</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                    <th>Acciones</th>
                 </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="7" class="text-center">No se encontraron arrendatarios.</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
-
+            </thead>
+            <tbody>
+                {% if arrendatarios %}
+                    {% for arrendatario in arrendatarios %}
+                    <tr>
+                        <td>{{ arrendatario.Rut }}</td>
+                        <td>{{ arrendatario.Nombre }}</td>
+                        <td>{{ arrendatario.Apellido }}</td>
+                        <td>{{ arrendatario.Licencia_Conducir }}</td>
+                        <td>{{ arrendatario.Telefono }}</td>
+                        <td>{{ arrendatario.Correo }}</td>
+                        <td>
+                            <!-- Botón de editar -->
+                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
+                                data-rut="{{ arrendatario.Rut }}" data-nombre="{{ arrendatario.Nombre }}" 
+                                data-apellido="{{ arrendatario.Apellido }}" data-licencia="{{ arrendatario.Licencia_Conducir }}" 
+                                data-telefono="{{ arrendatario.Telefono }}" data-correo="{{ arrendatario.Correo }}">
+                                Editar
+                            </button>
+                            
+                            <!-- Botón de eliminar -->
+                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                    data-rut="{{ arrendatario.Rut }}">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">No se encontraron arrendatarios.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>  
+</div>
     
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -169,11 +174,6 @@
     </div>
 
 
-<<<<<<< HEAD
-=======
-    <!-- Scripts para los modales -->
-
->>>>>>> d49819977a46e3a58a031b2e265951267166ff19
 
     <script>
     editModal.addEventListener("show.bs.modal", function (event) {
@@ -191,11 +191,6 @@
 
 
 
-<<<<<<< HEAD
-
-=======
-    <!-- Scripts para pasar datos a los modales -->
->>>>>>> d49819977a46e3a58a031b2e265951267166ff19
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         const editModal = document.getElementById("editModal");

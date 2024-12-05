@@ -20,21 +20,17 @@
             {% if Dispositivos %}
                 {% for dispositivo in Dispositivos %}
                 <tr>
-                    <td>{{ dispositivo.imei }}</td>
+                    <td>{{ dispositivo.ID_GPS }}</td>
                     <td>{{ dispositivo.fecha_Instalacion }}</td>
                     <td>{{ dispositivo.fecha_Deceso|default:"N/A" }}</td>
                     <td>{{ dispositivo.Vehiculo.Matricula }} (ID: {{ dispositivo.Vehiculo.ID_Vehiculo }})</td>
                     <td>
                         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
-                            data-imei="{{ dispositivo.imei }}" 
+                            data-imei="{{ dispositivo.ID_GPS }}" 
                             data-fecha-instalacion="{{ dispositivo.fecha_Instalacion }}" 
                             data-fecha-deceso="{{ dispositivo.fecha_Deceso }}" 
                             data-id-vehiculo="{{ dispositivo.ID_Vehiculo_id }}">
                             Editar
-                        </button>
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                            data-imei="{{ dispositivo.imei }}">
-                            Eliminar
                         </button>
                     </td>
                 </tr>
@@ -48,6 +44,11 @@
     </table>
 </div>
 
+<<<<<<< HEAD
+
+<!-- Modal para agregar dispositivo GPS -->
+=======
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -76,12 +77,6 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label for="fecha-instalacion" class="form-label">Fecha de Instalación</label>
-                        <input type="datetime-local" class="form-control" id="fecha-instalacion" name="fecha_Instalacion" value="{{ fecha_instalacion }}" readonly>
-                    </div>
-
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -92,31 +87,48 @@
     </div>
 </div>
 
+<<<<<<< HEAD
+
+
+
+
+
+
+
+
+
+<!-- Modal para editar dispositivo GPS -->
+=======
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" id="edit-form">
+            <form method="POST" id="edit-form">
                 {% csrf_token %}
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Editar Dispositivo GPS</h5>
+                    <h5 class="modal-title">Editar Dispositivo GPS</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <!-- IMEI (readonly) -->
                     <div class="mb-3">
-                        <label for="edit-imei" class="form-label">IMEI Existente</label>
-                        <input type="text" class="form-control" id="edit-imei" name="imei" readonly>
+                        <label for="edit-imei" class="form-label">IMEI</label>
+                        <input type="text" class="form-control" id="edit-imei" name="ID_GPS" readonly>
                     </div>
+                    <!-- Fecha de Instalación (readonly) -->
                     <div class="mb-3">
                         <label for="fecha-instalacion" class="form-label">Fecha de Instalación</label>
-                        <input type="date" class="form-control" id="fecha-instalacion" name="fecha_Instalacion" required>
+                        <input type="datetime-local" class="form-control" id="fecha-instalacion" readonly>
                     </div>
+                    <!-- Fecha de Deceso -->
                     <div class="mb-3">
                         <label for="edit-fecha-deceso" class="form-label">Fecha de Deceso</label>
                         <input type="date" class="form-control" id="edit-fecha-deceso" name="fecha_Deceso">
                     </div>
+                    <!-- Vehículo -->
                     <div class="mb-3">
                         <label for="edit-vehiculo" class="form-label">Vehículo</label>
-                        <select class="form-select" name="ID_Vehiculo_id" id="edit-vehiculo" required>
+                        <select class="form-select" name="ID_Vehiculo" id="edit-vehiculo" required>
                             {% for vehiculo in Vehiculos %}
                                 <option value="{{ vehiculo.ID_Vehiculo }}">{{ vehiculo.Matricula }}</option>
                             {% endfor %}
@@ -132,6 +144,8 @@
     </div>
 </div>
 
+<<<<<<< HEAD
+=======
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -153,26 +167,69 @@
         </div>
     </div>
 </div>
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const editModal = document.getElementById("editModal");
+    const editModal = document.getElementById("editModal");
 
+<<<<<<< HEAD
+    editModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+=======
         editModal.addEventListener("show.bs.modal", function (event) {
             const button = event.relatedTarget;
             const imei = button.getAttribute("data-imei");
             const fechaInstalacion = button.getAttribute("data-fecha-instalacion");
             const fechaDeceso = button.getAttribute("data-fecha-deceso");
             const idVehiculo = button.getAttribute("data-id-vehiculo");
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 
-            if (!imei) {
-                console.error("IMEI no proporcionado");
-                return;
-            }
+        const imei = button.getAttribute("data-imei");
+        const fechaInstalacion = button.getAttribute("data-fecha-instalacion");
+        const fechaDeceso = button.getAttribute("data-fecha-deceso");
+        const idVehiculo = button.getAttribute("data-id-vehiculo");
 
-            const form = document.getElementById("edit-form");
-            form.action = `/dispositivoGps/Editar/${imei}/`;
+        const form = document.getElementById("edit-form");
+        form.action = `/dispositivos_usados/editar/${imei}/`; // Configura la URL con el IMEI
 
+<<<<<<< HEAD
+        // Asigna valores
+        document.getElementById("edit-imei").value = imei;
+        document.getElementById("fecha-instalacion").value = fechaInstalacion;
+        document.getElementById("edit-fecha-deceso").value = fechaDeceso || '';
+        document.getElementById("edit-vehiculo").value = idVehiculo;
+
+        // Maneja el envío del formulario
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const data = {
+                fecha_Deceso: document.getElementById("edit-fecha-deceso").value,
+                ID_Vehiculo: document.getElementById("edit-vehiculo").value,
+            };
+
+            fetch(form.action, {
+                method: "PUT", // Método HTTP PUT
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify(data),
+            })
+                .then((response) => {
+                    if (response.ok) {
+                        alert("Dispositivo actualizado correctamente.");
+                        window.location.reload();
+                    } else {
+                        return response.json().then((err) => {
+                            throw new Error(err.error || "Error al actualizar el dispositivo.");
+                        });
+                    }
+                })
+                .catch((err) => alert(err.message));
+        });
+=======
             document.getElementById("edit-imei").value = imei;
             document.getElementById("edit-fecha-instalacion").value = fechaInstalacion;
             document.getElementById("edit-fecha-deceso").value = fechaDeceso || '';
@@ -209,14 +266,10 @@ document.addEventListener("DOMContentLoaded", function () {
         const formattedDate = now.toISOString().slice(0, 16);  
         
         fechaInput.value = formattedDate;  
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
     });
 });
+
+
 </script>
-
-
-
-
-
-
-
 {% endblock %}

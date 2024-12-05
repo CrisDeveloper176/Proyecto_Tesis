@@ -22,6 +22,8 @@ def listar_dispositivos_gps_usados(request):
                     dispositivo[campo_fecha] = datetime.fromisoformat(
                         dispositivo[campo_fecha].replace("Z", "+00:00")
                     ).astimezone(pytz.timezone("America/Santiago")).strftime("%Y/%m/%d %H:%M")
+                else:
+                    dispositivo[campo_fecha] = None
 
         vehiculos_response = requests.get(URL_API_VEHICULOS)
         vehiculos = vehiculos_response.json() if vehiculos_response.status_code == 200 else []
@@ -31,7 +33,7 @@ def listar_dispositivos_gps_usados(request):
         imeis = [item.get("imei") for item in imeis_data if item.get("imei")]
 
         for dispositivo in dispositivos:
-            vehiculo_id = dispositivo.get("ID_Vehiculo_id")
+            vehiculo_id = dispositivo.get("ID_Vehiculo")
             dispositivo["Vehiculo"] = next(
                 (vehiculo for vehiculo in vehiculos if vehiculo["ID_Vehiculo"] == vehiculo_id),
                 {"Matricula": "No asignado", "ID_Vehiculo": "N/A"}
@@ -46,7 +48,6 @@ def listar_dispositivos_gps_usados(request):
         'Vehiculos': vehiculos,
         'IMEIs': imeis,
     })
-
 
 def registrar_dispositivo_gps_usado(request):
     """Registrar un nuevo dispositivo GPS usado."""
@@ -73,9 +74,9 @@ def registrar_dispositivo_gps_usado(request):
             return JsonResponse({"error": "Los campos IMEI y Vehículo son obligatorios."}, status=400)
 
         data = {
-            "imei": imei,
             "fecha_Instalacion": fecha_instalacion,
-            "ID_Vehiculo_id": vehiculo_id
+            "ID_GPS": imei,
+            "ID_Vehiculo": vehiculo_id,
         }
         headers = {"Content-Type": "application/json"}
 
@@ -99,17 +100,18 @@ def registrar_dispositivo_gps_usado(request):
         'FechaInstalacion': fecha_instalacion,
     })
 
-
-
 def editar_dispositivo_gps_usado(request, imei):
     """Editar un dispositivo GPS usado existente."""
     try:
+        # Obtener información actual del dispositivo
         dispositivo_response = requests.get(f"{URL_API_GPS_USADOS}{imei}/")
         dispositivo = dispositivo_response.json() if dispositivo_response.status_code == 200 else None
 
+        # Obtener lista de vehículos
         vehiculos_response = requests.get(URL_API_VEHICULOS)
         vehiculos = vehiculos_response.json() if vehiculos_response.status_code == 200 else []
 
+        # Obtener lista de IMEIs
         imei_response = requests.get(URL_API_DISPOSITIVO_GPS)
         imeis_data = imei_response.json() if imei_response.status_code == 200 else []
         imeis = [item.get("imei") for item in imeis_data if item.get("imei")]
@@ -119,26 +121,33 @@ def editar_dispositivo_gps_usado(request, imei):
         dispositivo, vehiculos, imeis = None, [], []
 
     if request.method == "POST":
-        fecha_deceso = request.POST.get("fecha_deceso")
+        # Datos recibidos del formulario
+        fecha_deceso = request.POST.get("fecha_Deceso")
         vehiculo_id = request.POST.get("ID_Vehiculo_id")
 
+        # Validar campos obligatorios
         if not vehiculo_id:
             return JsonResponse({"error": "El campo Vehículo es obligatorio."}, status=400)
 
+        # Construir datos para el PUT
         data = {
-            "fecha_Instalacion": dispositivo["fecha_Instalacion"],  # Mantener la fecha original
-            "fecha_Deceso": fecha_deceso or None,
-            "ID_Vehiculo_id": vehiculo_id,
+            "ID_GPS": imei,  # El IMEI es obligatorio
+            "fecha_Instalacion": dispositivo["fecha_Instalacion"],  # Mantener la fecha de instalación original
+            "fecha_Deceso": fecha_deceso or None,  # Puede ser opcional
+            "ID_Vehiculo": vehiculo_id,  # Nuevo vehículo asignado
         }
+
         headers = {"Content-Type": "application/json"}
 
         try:
+            # Enviar solicitud PUT a la API
             response = requests.put(f"{URL_API_GPS_USADOS}{imei}/", json=data, headers=headers)
             if response.status_code == 200:
-                return redirect('gpsusado')
-            return JsonResponse({
-                "error": f"Error: {response.json().get('detail', 'Desconocido')}"
-            }, status=response.status_code)
+                return redirect('gpsusado')  # Redirigir al listado después de la edición
+            else:
+                # Mostrar error si la API responde con un estado diferente a 200
+                error_message = response.json().get("detail", "Error desconocido")
+                return JsonResponse({"error": error_message}, status=response.status_code)
         except requests.RequestException as e:
             return JsonResponse({"error": f"Error de conexión: {str(e)}"}, status=500)
 
@@ -147,15 +156,3 @@ def editar_dispositivo_gps_usado(request, imei):
         'Vehiculos': vehiculos,
         'IMEIs': imeis,
     })
-
-def eliminar_dispositivo_gps_usado(request, imei):
-    """Eliminar un dispositivo GPS usado."""
-    try:
-        response = requests.delete(f"{URL_API_GPS_USADOS}{imei}/")
-        if response.status_code == 204:
-            return redirect('gpsusado')
-        return JsonResponse({
-            "error": f"Error: {response.json().get('detail', 'Desconocido')}"
-        }, status=response.status_code)
-    except requests.RequestException as e:
-        return JsonResponse({"error": f"Error de conexión: {str(e)}"}, status=500)

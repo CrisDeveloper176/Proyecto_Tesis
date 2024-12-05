@@ -55,7 +55,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="imei" class="form-label">IMEI</label>
-                        <input type="text" class="form-control" name="imei" id="imei"  required pattern="\d{15}" maxlength="15" 
+                        <input type="text" class="form-control" name="imei" id="imei" required pattern="\d{15}" maxlength="15" 
                         title="El IMEI debe contener exactamente 15 dígitos">
                     </div>
                     <div class="mb-3">
@@ -82,7 +82,6 @@
         <div class="modal-content">
             <form method="post" action="" id="edit-form">
                 {% csrf_token %}
-                <input type="hidden" name="original_imei" id="original-imei">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editModalLabel">Editar Dispositivo GPS</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -90,7 +89,8 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="edit-imei" class="form-label">Nuevo IMEI</label>
-                        <input type="text" class="form-control" name="imei" id="edit-imei" required>
+                        <input type="text" class="form-control" name="imei" id="edit-imei" required pattern="\d{15}" maxlength="15" 
+                        title="El IMEI debe contener exactamente 15 dígitos">
                     </div>
                     <div class="mb-3">
                         <label for="edit-estado" class="form-label">Estado</label>
@@ -133,19 +133,32 @@
 </div>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const editModal = document.getElementById("editModal");
-        const deleteModal = document.getElementById("deleteModal");
+document.addEventListener("DOMContentLoaded", function () {
+    // Modales de edición y eliminación
+    const editModal = document.getElementById("editModal");
+    const deleteModal = document.getElementById("deleteModal");
+
+
+    // Función para configurar el modal de edición
+    editModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;  // El botón que abrió el modal
+        const imei = button.getAttribute("data-imei");
+        const estado = button.getAttribute("data-estado");
 
         editModal.addEventListener("show.bs.modal", function (event) {
             const button = event.relatedTarget;
             const imei = button.getAttribute("data-imei");
             const estado = button.getAttribute("data-estado");
 
-            if (!imei) {
-                console.error("IMEI no proporcionado");
-                return;
-            }
+
+        const form = document.getElementById("edit-form");
+        // Establecer la URL del formulario para editar el dispositivo
+        form.action = `/dispositivoGps/Editar/${imei}/`;
+
+
+        // Rellenar los campos con los datos del dispositivo
+        document.getElementById("edit-imei").value = imei;
+        document.getElementById("edit-estado").value = estado;
 
             const form = document.getElementById("edit-form");
             form.action = `/dispositivoGps/Editar/${imei}/`;
@@ -166,10 +179,32 @@
             const form = deleteModal.querySelector("form");
             form.action = `/dispositivoGps/Eliminar/${imei}/`;
         });
+
     });
-</script>
+
+    // Función para configurar el modal de eliminación
+    deleteModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+        const imei = button.getAttribute("data-imei");
+
+        const form = deleteModal.querySelector("form");
+        // Establecer la URL del formulario para eliminar el dispositivo
+        form.action = `/dispositivoGps/Eliminar/${imei}/`;
+    });
 
 
+    // Validación del IMEI en tiempo real (solo números)
+    ["imei", "edit-imei"].forEach((id) => {
+        const input = document.getElementById(id);
+        if (input) {  // Verifica que el campo existe antes de agregar el listener
+            input.addEventListener("input", function (event) {
+                const input = event.target;
+                if (!/^\d{0,15}$/.test(input.value)) {
+                    input.value = input.value.slice(0, -1);
+                }
+            });
+        }
+    });
 
 <script>
 document.getElementById("imei").addEventListener("input", function (event) {
@@ -178,11 +213,8 @@ document.getElementById("imei").addEventListener("input", function (event) {
     if (!isValid) {
         input.value = input.value.slice(0, -1); 
     }
+
 });
 </script>
-
-
-
-
 
 {% endblock %}

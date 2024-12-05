@@ -4,36 +4,62 @@
 
 <div class="container mt-4">
     <h1 class="text-center">Lista de Viajes</h1>
-    <table class="table table-bordered table-hover mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>ID Viaje</th>
-                <th>Punto de Origen</th>
-                <th>Destino</th>
-                <th>Distancia Recorrida (km)</th>
-                <th>Velocidad Media (km/h)</th>
-                <th>Matricula</th>
-                <th>Modelo</th>
-                <th>Marca</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="viajes-tbody">
-            <!-- Las filas serán generadas dinámicamente -->
-        </tbody>
-    </table>
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Tabla de viajes -->
+            <table class="table table-bordered table-hover  mt-3">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Punto de Origen</th>
+                        <th>Destino</th>
+                        <th>Distancia Recorrida (km)</th>
+                        <th>Velocidad Media (km/h)</th>
+                        <th>Matricula</th>
+                        <th>Modelo</th>
+                        <th>Marca</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="viajes-tbody">
+                    <!-- Las filas serán generadas dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Botón para registrar nuevo viaje -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Registrar Nuevo Viaje</h5>
+                    <p class="card-text">Seleccione el IMEI del vehículo para registrar un nuevo viaje.</p>
+                    <button class="btn btn-success w-100 mb-3" onclick="abrirRegistroModal()">Registrar Nuevo Viaje</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Modal de Google Maps -->
-<div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+<!-- Modal para registrar un nuevo viaje -->
+<div class="modal fade" id="registroModal" tabindex="-1" aria-labelledby="registroModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="mapModalLabel">Recorrido del Viaje</h5>
+        <h5 class="modal-title" id="registroModalLabel">Registrar Nuevo Viaje</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div id="map" style="width: 100%; height: 400px;"></div>
+        <form id="registroForm">
+          <div class="mb-3">
+            <label for="imeiSelect" class="form-label">IMEI</label>
+            <select class="form-select" id="imeiSelect">
+                <option value="">Seleccione un IMEI</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" onclick="registrarViaje()">Guardar</button>
       </div>
     </div>
   </div>
@@ -41,27 +67,20 @@
 
 <script>
     const API_URL = "https://apitesis.fly.dev/api/v1/viajes_vehiculo/obtener/";
+    const API_DISPOSITIVOS_URL = "https://apitesis.fly.dev/api/v1/Dispositivo_GPS/";
 
     async function cargarViajes() {
         try {
             const response = await fetch(API_URL);
-
-            if (!response.ok) {
-                throw new Error(`Error al obtener los datos: ${response.statusText}`);
-            }
-
-            const datos = await response.json(); // Convertir la respuesta a JSON
+            if (!response.ok) throw new Error(`Error al obtener los datos: ${response.statusText}`);
+            const datos = await response.json();
 
             const tbody = document.getElementById("viajes-tbody");
-
-            // Limpiar el contenido actual del tbody
-            tbody.innerHTML = "";
+            tbody.innerHTML = ""; // Limpiar el contenido actual del tbody
 
             datos.forEach(item => {
                 const fila = document.createElement("tr");
-
                 fila.innerHTML = `
-                    <td>${item.viaje.ID_Viaje}</td>
                     <td>${item.viaje.Punto_Origen}</td>
                     <td>${item.viaje.Destino}</td>
                     <td>${parseFloat(item.viaje.Distancia_Recorrida).toFixed(2)}</td>
@@ -69,7 +88,9 @@
                     <td>${item.vehiculo.matricula}</td>
                     <td>${item.vehiculo.modelo}</td>
                     <td>${item.vehiculo.marca}</td>
-                    <td><button class="btn btn-primary btn-sm" onclick="visualizarMapa('${item.viaje.Punto_Origen}', '${item.viaje.Destino}')">Visualizar</button></td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" onclick="visualizarMapa('${item.viaje.Punto_Origen}', '${item.viaje.Destino}')">Visualizar</button>
+                    </td>
                 `;
                 tbody.appendChild(fila);
             });
@@ -78,51 +99,57 @@
         }
     }
 
-    function visualizarMapa(puntoOrigen, destino) {
-        const modal = new bootstrap.Modal(document.getElementById('mapModal'));
+    async function cargarDispositivos() {
+        try {
+            const response = await fetch(API_DISPOSITIVOS_URL);
+            if (!response.ok) throw new Error(`Error al obtener los dispositivos: ${response.statusText}`);
+            const dispositivos = await response.json();
+
+            const imeiSelect = document.getElementById("imeiSelect");
+            imeiSelect.innerHTML = '<option value="">Seleccione un IMEI</option>'; // Resetear opciones
+
+            dispositivos.forEach(dispositivo => {
+                const option = document.createElement("option");
+                option.value = dispositivo.imei;
+                option.textContent = dispositivo.imei;
+                imeiSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error("Error al cargar dispositivos GPS:", error);
+        }
+    }
+
+    function abrirRegistroModal() {
+        const modal = new bootstrap.Modal(document.getElementById("registroModal"));
+        cargarDispositivos(); // Llenar el select antes de mostrar el modal
         modal.show();
+    }
 
-        const map = new google.maps.Map(document.getElementById("map"), {
-            zoom: 14,
-            center: new google.maps.LatLng(parseFloat(puntoOrigen.split(",")[0]), parseFloat(puntoOrigen.split(",")[1]))
-        });
+    async function registrarViaje() {
+        const imei = document.getElementById("imeiSelect").value;
 
-        const origen = new google.maps.LatLng(parseFloat(puntoOrigen.split(",")[0]), parseFloat(puntoOrigen.split(",")[1]));
-        const destinoLatLng = new google.maps.LatLng(parseFloat(destino.split(",")[0]), parseFloat(destino.split(",")[1]));
+        if (!imei) {
+            alert("Por favor, seleccione un IMEI válido.");
+            return;
+        }
 
-        new google.maps.Marker({
-            position: origen,
-            map: map,
-            title: "Punto de Origen"
-        });
+        try {
+            const endpoint = `https://apitesis.fly.dev/api/v1/crear_viajes/${imei}/`;
+            const response = await fetch(endpoint, { method: "POST" });
 
-        new google.maps.Marker({
-            position: destinoLatLng,
-            map: map,
-            title: "Destino"
-        });
+            if (!response.ok) throw new Error(`Error al registrar el viaje: ${response.statusText}`);
 
-        const directionsService = new google.maps.DirectionsService();
-        const directionsRenderer = new google.maps.DirectionsRenderer();
-        directionsRenderer.setMap(map);
+            alert("Viaje registrado exitosamente.");
+            const modal = bootstrap.Modal.getInstance(document.getElementById("registroModal"));
+            modal.hide();
 
-        const request = {
-            origin: origen,
-            destination: destinoLatLng,
-            travelMode: google.maps.TravelMode.DRIVING,
-            waypoints: []
-        };
-
-        directionsService.route(request, (result, status) => {
-            if (status === google.maps.DirectionsStatus.OK) {
-                directionsRenderer.setDirections(result);
-            } else {
-                alert("No se pudo trazar la ruta");
-            }
-        });
+            cargarViajes(); // Actualizar la tabla
+        } catch (error) {
+            console.error("Hubo un problema al registrar el viaje:", error);
+        }
     }
 
     window.onload = cargarViajes;
 </script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCERVqzsVAyNTs8EswdkCTgVevQtYah7HA&callback=initMap"></script>
+
 {% endblock %}

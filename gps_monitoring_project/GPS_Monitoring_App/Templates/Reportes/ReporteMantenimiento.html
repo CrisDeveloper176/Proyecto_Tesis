@@ -2,7 +2,6 @@
 
 {% block content %}
 
-    <!-- Mantenimiento -->
 <div class="container">
     <h1 class="my-4 text-center">Mantenimiento</h1>
     
@@ -17,13 +16,13 @@
             </tr>
         </thead>
         <tbody>
-            <!-- Las filas se cargarán dinámicamente -->
+
         </tbody>
     </table>
     
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Función para cargar datos de mantenimiento en la tabla
+
         function cargarDatosMantenimiento() {
             fetch('/reporte/obtener_mantenimiento/', { 
                 headers: { 'x-requested-with': 'XMLHttpRequest' }
@@ -31,7 +30,7 @@
             .then(response => response.json())
             .then(data => {
                 const tbody = document.querySelector('#tabla-mantenimiento tbody');
-                tbody.innerHTML = ''; // Limpia las filas existentes
+                tbody.innerHTML = '';
 
                 if (data.mantenimiento && data.mantenimiento.length > 0) {
                     data.mantenimiento.forEach(mantenimiento => {
@@ -45,7 +44,7 @@
                         tbody.innerHTML += row;
                     });
                 } else {
-                    // Mostrar un mensaje si no hay mantenimientos
+
                     tbody.innerHTML = `
                         <tr>
                             <td colspan="4" class="text-center">No se encontraron mantenimientos.</td>
@@ -55,7 +54,7 @@
             .catch(error => console.error('Error al cargar los datos:', error));
         }
 
-        // Llama a la función al cargar la página
+
         cargarDatosMantenimiento();
     });
 </script>

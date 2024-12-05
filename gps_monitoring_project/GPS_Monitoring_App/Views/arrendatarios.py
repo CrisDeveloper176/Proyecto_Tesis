@@ -10,11 +10,11 @@ def format_rut(rut):
     """
     Formatea un RUT al formato XX.XXX.XXX-X.
     """
-    rut = rut.replace(".", "").replace("-", "")  # Remover puntos y guion
+    rut = rut.replace(".", "").replace("-", "")  
     if len(rut) < 2:
-        return rut  # RUT incompleto no se formatea
-    body = f"{int(rut[:-1]):,}".replace(",", ".")  # Formatea la parte numérica con puntos
-    verifier = rut[-1].upper()  # Obtiene el dígito verificador
+        return rut  
+    body = f"{int(rut[:-1]):,}".replace(",", ".")  
+    verifier = rut[-1].upper()  
     return f"{body}-{verifier}"
 
 
@@ -36,7 +36,6 @@ def obtener_arrendatarios(request):
 
 def registrar_arrendatario(request):
     if request.method == "POST":
-        # Capturar datos del formulario
         rut = request.POST.get("rut")
         nombre = request.POST.get("nombre")
         apellido = request.POST.get("apellido")
@@ -44,7 +43,6 @@ def registrar_arrendatario(request):
         telefono = request.POST.get("telefono")
         correo = request.POST.get("correo")
 
-        # Validar campos restantes
         if not nombre or not correo or not telefono:
             return JsonResponse({"error": "Todos los campos son obligatorios"}, status=400)
 
@@ -53,7 +51,6 @@ def registrar_arrendatario(request):
         except ValueError:
             return JsonResponse({"error": "El teléfono debe ser un número entero válido."}, status=400)
 
-        # Preparar los datos para la API
         data = {
             "Rut": rut,
             "Nombre": nombre,
@@ -64,7 +61,6 @@ def registrar_arrendatario(request):
         }
         headers = {"Content-Type": "application/json"}
 
-        # Enviar la solicitud POST a la API
         URL_API = "https://apitesis.fly.dev/api/v1/arrendatarios/"
         try:
             response = requests.post(URL_API, json=data, headers=headers)
@@ -81,18 +77,15 @@ def registrar_arrendatario(request):
 
 def editar_arrendatario(request, rut):
     if request.method == "POST":
-        # Capturar datos del formulario
         nombre = request.POST.get("nombre")
         apellido = request.POST.get("apellido")
         licencia = request.POST.get("licencia")
         telefono = request.POST.get("telefono")
         correo = request.POST.get("correo")
 
-        # Validar campos
         if not nombre or not correo or not telefono:
             return JsonResponse({"error": "Todos los campos son obligatorios"}, status=400)
 
-        # Preparar datos para la API
         data = {
             "Rut": rut,
             "Nombre": nombre,
@@ -103,7 +96,6 @@ def editar_arrendatario(request, rut):
         }
         headers = {"Content-Type": "application/json"}
 
-        # Enviar solicitud PUT a la API
         URL_API = f"https://apitesis.fly.dev/api/v1/arrendatarios/{rut}/"
         try:
             response = requests.put(URL_API, json=data, headers=headers)
@@ -120,18 +112,15 @@ def editar_arrendatario(request, rut):
 
 def eliminar_arrendatario(request, rut):
     if request.method == "POST":
-        # URL de la API para eliminar arrendatarios
         URL_API = f"https://apitesis.fly.dev/api/v1/arrendatarios/{rut}/"
         headers = {"Content-Type": "application/json"}
 
-        # Enviar solicitud DELETE a la API
         try:
             response = requests.delete(URL_API, headers=headers)
         except requests.RequestException as e:
             return JsonResponse({"error": f"Error al conectar con la API: {e}"}, status=500)
 
         if response.status_code == 204:
-            # Redirigir al usuario a la lista de arrendatarios si se elimina correctamente
             return redirect("arrendatario")
         elif response.status_code == 404:
             return JsonResponse({"error": "El arrendatario no fue encontrado en la base de datos."}, status=404)

@@ -1,197 +1,134 @@
+/* Colores */
+:root {
+    --azul-oscuro: #001265;
+    --azul-claro: #001679;
+    --violeta: #651EA9;
+    --violeta-claro: #6693B3;
+    --blanco: #FFFFFF;
+    --blanco-crema: #F5F5DC; /* Nuevo color blanco crema */
+}
+
+/* Estilos generales */
 body {
-    font-family: Arial, sans-serif;
+    background: var(--blanco-crema); /* Fondo con color crema */
+    background-size: 400% 400%;
+    animation: gradient-animation 15s ease infinite;
     margin: 0;
-    padding: 0;
+    font-family: Arial, sans-serif;
 }
 
-header {
-    background-color: #333;
-    padding: 10px 0;
-    text-align: center;
+@keyframes gradient-animation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
-nav ul {
-    list-style: none;
-    padding: 0;
+/* Navbar */
+.navbar {
+    background-color: var(--violeta);
+    padding: 15px 20px;
 }
 
-nav ul li {
-    display: inline;
-    margin: 0 15px;
+.navbar-brand {
+    color: var(--blanco);
+    font-weight: bold;
+    font-size: 1.5em;
 }
 
-nav ul li a {
-    color: white;
-    text-decoration: none;
+.navbar-brand:hover {
+    color: var(--violeta);
 }
 
+.navbar-nav .nav-link {
+    color: var(--blanco);
+    margin-right: 15px;
+    font-size: 1.1em;
+}
+
+.navbar-nav .nav-link:hover {
+    color: var(--violeta-claro);
+}
+
+.navbar-toggler {
+    border-color: var(--blanco);
+}
+
+.navbar-toggler-icon {
+    background-color: var(--blanco);
+}
+
+/* Hero Section */
 .hero {
     text-align: center;
     padding: 100px 20px;
-    background-color: #f4f4f4;
+    background-color: var(--azul-claro);
+    color: var(--blanco);
 }
 
+/* Features */
 .features {
     padding: 50px;
     text-align: center;
+    background-color: var(--violeta);
+    color: var(--blanco);
 }
 
+/* Footer */
 footer {
-    background-color: #333;
-    color: white;
+    background-color: var(--azul-oscuro);
+    color: var(--blanco);
     text-align: center;
     padding: 10px;
     position: fixed;
     width: 100%;
     bottom: 0;
 }
-.login-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
 
-.login-container h2 {
-    margin-bottom: 20px;
-}
-
-.login-container label {
-    display: block;
-    margin-bottom: 10px;
-    text-align: left;
-}
-
-.login-container input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.login-container .btn-primary {
-    width: 100%;
-    padding: 10px;
-    background-color: #50C9C3;
-    border: none;
-    color: white;
-    font-size: 1.1em;
-    border-radius: 5px;
-}
-
-.login-container .btn-primary:hover {
-    background-color: #3aa69e;
-}
-
-.error-messages {
-    color: red;
-    margin-top: 20px;
-}
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
-}
-
-th {
-    background-color: #f2f2f2;
-}
-.container-fluid {
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    height: 100vh;
-}
-.alerta-reciente {
-    background-color: #f8f9fa;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 40px;
-}
-.alerta-reciente h2 {
-    color: #343a40;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-.table thead th {
-    text-transform: uppercase;
-    font-size: 0.85rem;
-}
-.badge {
-    font-size: 0.85rem;
-}
-footer {
-    background-color: #343a40;
-}
-/* Asegurar que la tabla sea desplazable horizontalmente */
-table {
-    width: 100%;
-    table-layout: auto;
-    overflow-x: auto;
-    display: block;
-}
-
-/* Configuración para que el footer solo aparezca al final */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    margin: 0;
-}
-
-/* Ajustar el tamaño de la barra lateral en pantallas pequeñas */
+/* Responsivo */
 @media (max-width: 768px) {
-    .navbar-toggler {
-        border-color: white;
+    .navbar {
+        padding: 10px;
     }
 
-    .navbar-nav {
-        text-align: center;
-        width: 100%;
-    }
-
-    .navbar-nav .nav-item {
-        width: 100%;
+    .navbar-brand {
+        font-size: 1.3em;
     }
 
     .navbar-nav .nav-link {
-        padding: 1rem 0;
-        text-align: center;
+        font-size: 1em;
+        margin-right: 10px;
     }
 
-    /* Hacer el menú lateral más accesible en pantallas pequeñas */
-    .navbar {
-        padding: 0.5rem;
+    .hero {
+        padding: 60px 20px;
     }
 
-    .navbar-collapse {
-        text-align: center;
-    }
-
-    .dropdown-menu {
-        position: static;
-        float: none;
-    }
-
-    /* Ajustes a la tabla */
-    .container-fluid {
-        padding: 0 15px;
-    }
-
-    table {
-        margin-top: 15px;
-        width: 100%;
-        overflow-x: auto;
-        display: block;
+    .features {
+        padding: 30px 20px;
     }
 }
+
+@media (max-width: 480px) {
+    .navbar-brand {
+        font-size: 1.2em;
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 0.9em;
+    }
+
+    .hero {
+        padding: 40px 10px;
+    }
+
+    .features {
+        padding: 20px 10px;
+    }
+}
+

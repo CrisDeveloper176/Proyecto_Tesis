@@ -2,22 +2,18 @@
 
 {% block content %}
 <div class="container-fluid position-relative vh-100 p-0">
-    <!-- Mapa -->
     <div id="map" class="w-100 h-100"></div>
 
-    <!-- Dropdown para vehículos -->
     <div class="position-absolute top-0 start-0 m-3">
         <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle w-100" type="button" id="vehicleDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 Vehículos disponibles
             </button>
             <ul class="dropdown-menu" id="vehicleList" aria-labelledby="vehicleDropdown" style="max-height: 200px; overflow-y: auto;">
-                <!-- Los vehículos en circulación se cargarán aquí -->
             </ul>
         </div>
     </div>
 
-    <!-- Información del vehículo -->
     <div class="position-absolute top-0 end-0 m-3">
         <div class="dropdown">
             <button class="btn btn-primary dropdown-toggle w-100" type="button" id="infoDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -33,7 +29,6 @@
         </div>
     </div>
 
-    <!-- Estado -->
     <div id="status" class="position-absolute bottom-0 start-0 m-3 p-2 bg-light">
         Estado: Inicializando...
     </div>
@@ -42,89 +37,72 @@
 <script>
     let map;
     let marker;
-    let currentVehicleData = {}; // Para almacenar la información del vehículo seleccionado
+    let currentVehicleData = {}; 
 
-    // Inicializar el mapa de Google Maps
     function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
             center: { lat: -37.2758343, lng: -72.7163521 },
             zoom: 12
         });
-          // Cargar un ícono personalizado
        const icon = {
-        url: "https://example.com/path_to_your_icon.png", // Cambia esta URL por el ícono que prefieras
-        scaledSize: new google.maps.Size(50, 50), // Escala el tamaño del ícono
-        origin: new google.maps.Point(0, 0), // Origen del ícono (puedes ajustarlo si es necesario)
-        anchor: new google.maps.Point(25, 50) // Ancla del ícono (ajusta para que se alinee bien con el marcador)
+        url: "https://example.com/path_to_your_icon.png",
+        scaledSize: new google.maps.Size(50, 50),
+        origin: new google.maps.Point(0, 0), 
+        anchor: new google.maps.Point(25, 50) 
     };
     }
 
-    // Función para cargar los vehículos desde la API
     async function cargarVehiculos() {
         try {
-            // Realiza la solicitud a la API
             const response = await fetch('https://apitesis.fly.dev/api/v1/vehiculos/gps-activo/', {
                 headers: {
                     'Content-Type': 'application/json'
                 }
             });
 
-            // Verifica si la respuesta es exitosa
             if (!response.ok) {
                 throw new Error('Error al obtener los vehículos');
             }
 
-            // Convierte la respuesta a formato JSON
             const data = await response.json();
 
-            // Obtiene el contenedor del listado de vehículos
             const vehicleList = document.getElementById('vehicleList');
 
-            // Limpia el listado antes de agregar los nuevos elementos
             vehicleList.innerHTML = '';
 
-            // Itera sobre los vehículos y agrega cada uno como un botón al dropdown
             data.forEach(vehiculo => {
                 const listItem = document.createElement('li');
                 listItem.classList.add('dropdown-item');
 
-                // Crear el botón para cada vehículo
                 const button = document.createElement('button');
                 button.classList.add('btn', 'btn-link', 'w-100');
-                button.textContent = `${vehiculo.Marca} ${vehiculo.Modelo} - ${vehiculo.Matricula}`; // Formato del texto
+                button.textContent = `${vehiculo.Marca} ${vehiculo.Modelo} - ${vehiculo.Matricula}`;
                 button.addEventListener('click', () => {
-                    mostrarUbicacion(vehiculo); // Al hacer clic en el vehículo, mostrar su ubicación
+                    mostrarUbicacion(vehiculo);
                 });
                 listItem.appendChild(button);
                 vehicleList.appendChild(listItem);
-
             });
-
         } catch (error) {
             console.error('Error al cargar los vehículos:', error);
         }
     }
 
-    // Función para mostrar la ubicación y la información del vehículo seleccionado
     async function mostrarUbicacion(vehiculo) {
-        // Verificar que el IMEI esté definido
         if (!vehiculo.IMEI_GPS) {
             console.error('IMEI no definido para el vehículo');
             alert('IMEI no disponible');
             return;
         }
 
-        // Actualizar el estado del vehículo en el dropdown
         document.getElementById('imei').textContent = vehiculo.IMEI_GPS;
         document.getElementById('plate').textContent = vehiculo.Matricula;
         document.getElementById('model').textContent = vehiculo.Modelo;
         document.getElementById('brand').textContent = vehiculo.Marca;
         document.getElementById('speed').textContent = '-- km/h';
 
-        // Actualizar la variable del vehículo seleccionado
         currentVehicleData = vehiculo;
 
-        // Llamar a la API para obtener la última ubicación del vehículo
         try {
             const response = await fetch(`https://apitesis.fly.dev/api/v1/ubicaciones/vehiculo/${vehiculo.IMEI_GPS}/`);
             if (!response.ok) {
@@ -132,9 +110,7 @@
             }
             const data = await response.json();
 
-            // Verificar si la ubicación es válida
             if (data && data.latitud && data.longitud) {
-                // Actualizar el marcador en el mapa
                 if (marker) {
                     marker.setPosition(new google.maps.LatLng(data.latitud, data.longitud));
                 } else {
@@ -144,17 +120,13 @@
                     });
                 }
 
-                // Centrar el mapa en la nueva ubicación
                 map.setCenter(new google.maps.LatLng(data.latitud, data.longitud));
 
-                // Actualizar la velocidad (puedes obtenerla de los datos de la ubicación)
                 document.getElementById('speed').textContent = `${data.velocidad} km/h`;
             }
 
-            // Actualizar estado
             document.getElementById('status').textContent = `Estado: Vehículo ${vehiculo.Matricula} cargado.`;
 
-            // Actualizar la ubicación cada 1 segundo
             setInterval(async () => {
                 await actualizarUbicacion();
             }, 1000);
@@ -165,11 +137,9 @@
         }
     }
 
-    // Función para actualizar la ubicación automáticamente
     async function actualizarUbicacion() {
         if (!currentVehicleData.IMEI_GPS) return;
 
-        // Llamar a la API para obtener la última ubicación del vehículo
         try {
             const response = await fetch(`https://apitesis.fly.dev/api/v1/ubicaciones/vehiculo/${currentVehicleData.IMEI_GPS}/`);
             if (!response.ok) {
@@ -194,7 +164,6 @@
         }
     }
 
-    // Llamar a la función cuando la página haya cargado
     document.addEventListener('DOMContentLoaded', cargarVehiculos);
 
 </script>

@@ -10,7 +10,6 @@ def obtener_viajes(request):
     """
     URL_API_VIAJES = "https://apitesis.fly.dev/api/v1/Viaje/"
 
-    # Obtener viajes
     try:
         response_viajes = requests.get(URL_API_VIAJES)
         if response_viajes.status_code == 200:

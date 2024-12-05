@@ -4,7 +4,6 @@
 <div class="container mt-5">
     <h1>Gestión de Dispositivos GPS Usados</h1>
 
-    <!-- Listar Dispositivos -->
     <h2 class="mt-4">Lista de Dispositivos GPS Usados</h2>
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDeviceModal">Agregar Dispositivo GPS Usado</button>
     <table class="table table-bordered table-striped mt-3">
@@ -45,8 +44,11 @@
     </table>
 </div>
 
+<<<<<<< HEAD
 
 <!-- Modal para agregar dispositivo GPS -->
+=======
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -85,6 +87,7 @@
     </div>
 </div>
 
+<<<<<<< HEAD
 
 
 
@@ -95,6 +98,8 @@
 
 
 <!-- Modal para editar dispositivo GPS -->
+=======
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -139,13 +144,46 @@
     </div>
 </div>
 
+<<<<<<< HEAD
+=======
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="delete-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Dispositivo GPS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar este dispositivo GPS?</p>
+                    <input type="hidden" id="delete-imei" name="imei">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
     const editModal = document.getElementById("editModal");
 
+<<<<<<< HEAD
     editModal.addEventListener("show.bs.modal", function (event) {
         const button = event.relatedTarget;
+=======
+        editModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            const imei = button.getAttribute("data-imei");
+            const fechaInstalacion = button.getAttribute("data-fecha-instalacion");
+            const fechaDeceso = button.getAttribute("data-fecha-deceso");
+            const idVehiculo = button.getAttribute("data-id-vehiculo");
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 
         const imei = button.getAttribute("data-imei");
         const fechaInstalacion = button.getAttribute("data-fecha-instalacion");
@@ -155,6 +193,7 @@
         const form = document.getElementById("edit-form");
         form.action = `/dispositivos_usados/editar/${imei}/`; // Configura la URL con el IMEI
 
+<<<<<<< HEAD
         // Asigna valores
         document.getElementById("edit-imei").value = imei;
         document.getElementById("fecha-instalacion").value = fechaInstalacion;
@@ -190,6 +229,44 @@
                 })
                 .catch((err) => alert(err.message));
         });
+=======
+            document.getElementById("edit-imei").value = imei;
+            document.getElementById("edit-fecha-instalacion").value = fechaInstalacion;
+            document.getElementById("edit-fecha-deceso").value = fechaDeceso || '';
+            document.getElementById("edit-vehiculo").value = idVehiculo;
+        });
+
+        const deleteModal = document.getElementById("deleteModal");
+
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            const imei = button.getAttribute("data-imei");
+
+            if (!imei) {
+                console.error("IMEI no proporcionado");
+                return;
+            }
+
+            const form = document.getElementById("delete-form");
+            form.action = `/dispositivoGps/Eliminar/${imei}/`;
+
+            document.getElementById("delete-imei").value = imei;
+        });
+    });
+</script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const addDeviceModal = document.getElementById("addDeviceModal");
+    addDeviceModal.addEventListener("show.bs.modal", function () {
+        const fechaInput = document.getElementById("fecha-instalacion");
+        const now = new Date();
+        
+        const formattedDate = now.toISOString().slice(0, 16);  
+        
+        fechaInput.value = formattedDate;  
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
     });
 });
 

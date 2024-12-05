@@ -4,7 +4,6 @@
 <div class="container mt-5">
     <h1>Gestión de Dispositivos GPS</h1>
 
-    <!-- Listar Dispositivos -->
     <h2 class="mt-4">Lista de Dispositivos GPS</h2>
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDeviceModal">Agregar Dispositivo GPS</button>
     <table class="table table-bordered table-striped mt-3">
@@ -22,13 +21,12 @@
                     <td>{{ dispositivo.imei }}</td>
                     <td>{{ dispositivo.Estado }}</td>
                     <td>
-                        <!-- Botón para editar -->
+
                         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
                             data-imei="{{ dispositivo.imei }}" data-estado="{{ dispositivo.Estado }}">
                             Editar
                         </button>
 
-                        <!-- Botón para eliminar -->
                         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
                             data-imei="{{ dispositivo.imei }}">
                             Eliminar
@@ -45,7 +43,6 @@
     </table>
 </div>
 
-<!-- Modal para agregar dispositivo GPS -->
 <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -80,7 +77,6 @@
     </div>
 </div>
 
-<!-- Modal para editar dispositivo GPS -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -115,7 +111,6 @@
     </div>
 </div>
 
-<!-- Modal para eliminar dispositivo GPS -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -143,19 +138,48 @@ document.addEventListener("DOMContentLoaded", function () {
     const editModal = document.getElementById("editModal");
     const deleteModal = document.getElementById("deleteModal");
 
+<<<<<<< HEAD
     // Función para configurar el modal de edición
     editModal.addEventListener("show.bs.modal", function (event) {
         const button = event.relatedTarget;  // El botón que abrió el modal
         const imei = button.getAttribute("data-imei");
         const estado = button.getAttribute("data-estado");
+=======
+        editModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            const imei = button.getAttribute("data-imei");
+            const estado = button.getAttribute("data-estado");
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 
         const form = document.getElementById("edit-form");
         // Establecer la URL del formulario para editar el dispositivo
         form.action = `/dispositivoGps/Editar/${imei}/`;
 
+<<<<<<< HEAD
         // Rellenar los campos con los datos del dispositivo
         document.getElementById("edit-imei").value = imei;
         document.getElementById("edit-estado").value = estado;
+=======
+            const form = document.getElementById("edit-form");
+            form.action = `/dispositivoGps/Editar/${imei}/`;
+
+            document.getElementById("edit-imei").value = imei;
+            document.getElementById("edit-estado").value = estado;
+        });
+
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            const imei = button.getAttribute("data-imei");
+
+            if (!imei) {
+                console.error("IMEI no proporcionado");
+                return;
+            }
+
+            const form = deleteModal.querySelector("form");
+            form.action = `/dispositivoGps/Eliminar/${imei}/`;
+        });
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
     });
 
     // Función para configurar el modal de eliminación
@@ -168,6 +192,7 @@ document.addEventListener("DOMContentLoaded", function () {
         form.action = `/dispositivoGps/Eliminar/${imei}/`;
     });
 
+<<<<<<< HEAD
     // Validación del IMEI en tiempo real (solo números)
     ["imei", "edit-imei"].forEach((id) => {
         const input = document.getElementById(id);
@@ -180,6 +205,15 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     });
+=======
+<script>
+document.getElementById("imei").addEventListener("input", function (event) {
+    const input = event.target;
+    const isValid = /^\d{0,15}$/.test(input.value);
+    if (!isValid) {
+        input.value = input.value.slice(0, -1); 
+    }
+>>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 });
 </script>
 

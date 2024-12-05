@@ -9,6 +9,10 @@ from .Views.monitoreo import *
 from .Views.ReporteViaje import *
 from .Views.ReporteVehiculo import *
 from .Views.ReporteMantenimiento import *
+from .Views.estado_dispositivo import *
+from .Views.dispositivogps import *
+from .Views.gpsusado import *
+
 
 
 
@@ -28,6 +32,28 @@ urlpatterns = [
     path('vehiculos/Registrar', registrar_vehiculo, name='registrar_vehiculo'),
     path('vehiculos/Editar/<int:ID_Vehiculo>/', editar_vehiculo , name='editar_Vehiculo'),
     path('vehiculos/Eliminar/<int:ID_Vehiculo>/', eliminar_vehiculo, name='eliminar_Vehiculo'),
+
+   # Estados GPS
+    path('estadoGps/', listar_estados_gps, name='estadoGps'),
+    path('estadoGps/Registrar/', registrar_estado_gps, name='registrar_estado_gps'),
+    path('estadoGps/Editar/<int:ID_EstadoGps>/', editar_estado_gps, name='editar_estado_gps'),
+    path('estadoGps/Eliminar/<int:ID_EstadoGps>/', eliminar_estado_gps, name='eliminar_estado_gps'),
+
+    path('dispositivos/', listar_dispositivos_gps, name='dispositivoGps'),
+    path('dispositivos/<int:ID_DispositivoGps>/estados/', obtener_estados_por_dispositivo, name='estadosPorDispositivo'),
+    path('dispositivos/registrar/', registrar_dispositivo_gps, name='registrarDispositivoGps'),
+    path('dispositivoGps/Editar/<slug:imei>/', editar_dispositivo_gps, name='editarDispositivoGps'),
+    path('dispositivoGps/Eliminar/<slug:imei>/', eliminar_dispositivo_gps, name='eliminarDispositivoGps'),
+
+
+    path('dispositivos_usados/', listar_dispositivos_gps_usados, name='gpsusado'),
+    path('dispositivos_usados/registrar/', registrar_dispositivo_gps_usado, name='registrarGpsUsado'),
+    path('dispositivos_usados/editar/<str:imei>/', editar_dispositivo_gps_usado, name='editarGpsUsado'),
+
+    # Eliminar un dispositivo GPS usado (con el IMEI como parte de la URL)
+    path('dispositivos_usados/eliminar/<str:imei>/', eliminar_dispositivo_gps_usado, name='eliminarGpsUsado'),
+
+
     path('ReporteViaje/', obtener_viajes, name='ReporteViaje'),
     path('ReporteVehiculo/', Reporte_Vehiculo , name='ReporteVehiculo'),
     path('login/', login, name='login'),

@@ -1,0 +1,182 @@
+{% extends 'TemplatesBase/Base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Gestión de EstadoGPS</h1>
+
+    <!-- Listar EstadoGPS -->
+    <h2 class="mt-4">Lista de EstadoGPS</h2>
+    <!-- Botón para abrir el modal de agregar -->
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar EstadoGPS</button>
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>ID_EstadoGps</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if Estados %}
+                {% for Estado in Estados %}
+                <tr>
+                    <td>{{ Estado.ID_EstadoGps }}</td>
+                    <td>{{ Estado.Estado }}</td>
+                    <td>
+                        <!-- Botón para editar -->
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
+                            data-id="{{ Estado.ID_EstadoGps }}" data-estado="{{ Estado.Estado }}">
+                            Editar
+                        </button>
+
+                        <!-- Botón para eliminar -->
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                            data-id="{{ Estado.ID_EstadoGps }}">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="3" class="text-center">No hay estados.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para agregar EstadoGPS -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'registrar_estado_gps' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addModalLabel">Agregar EstadoGPS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="estado" class="form-label">Estado</label>
+                        <input type="text" class="form-control" name="estado" id="estado" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar EstadoGPS -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'editar_estado_gps' ID_EstadoGps=0 %}" id="edit-form">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar EstadoGPS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="edit-id">
+                    <div class="mb-3">
+                        <label for="edit-estado" class="form-label">Estado</label>
+                        <input type="text" class="form-control" name="estado" id="edit-estado" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal para eliminar EstadoGPS -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="deleteForm" action="">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Eliminar EstadoGPS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar este estado?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editModal = document.getElementById("editModal");
+
+        editModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget; // Botón que disparó el modal
+            const idEstadoGps = button.getAttribute("data-id"); // Obtiene el ID del Estado GPS
+            const estado = button.getAttribute("data-estado"); // Obtiene el valor actual del estado
+
+            // Encuentra el formulario dentro del modal
+            const form = document.getElementById("edit-form");
+
+            // Actualiza la acción del formulario para que apunte al endpoint de edición con el ID correcto
+            form.action = `/estadoGps/Editar/${idEstadoGps}/`; 
+
+            // Rellena los campos del formulario con los valores actuales del Estado GPS
+            document.getElementById("edit-id").value = idEstadoGps;
+            document.getElementById("edit-estado").value = estado;
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const deleteModal = document.getElementById("deleteModal");
+    
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget; // Botón que abrió el modal
+            const idEstadoGps = button.getAttribute("data-id"); // Obtiene el ID del Estado GPS
+    
+            // Encuentra el formulario dentro del modal
+            const form = deleteModal.querySelector("form");
+            form.action = `/estadoGps/Eliminar/${idEstadoGps}/`; // Actualiza dinámicamente la URL de eliminación del estado GPS
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+{% endblock %}

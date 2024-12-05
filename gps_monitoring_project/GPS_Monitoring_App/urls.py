@@ -9,10 +9,14 @@ from .Views.monitoreo import *
 from .Views.ReporteViaje import *
 from .Views.ReporteVehiculo import *
 from .Views.ReporteMantenimiento import *
+<<<<<<< HEAD
 from .Views.estado_dispositivo import *
 from .Views.dispositivogps import *
 from .Views.gpsusado import *
 
+=======
+from .Views.HistorialVIaje import *
+>>>>>>> 92cd3c8d7efccfe57667b4cee4ffdad7e6b7c095
 
 
 
@@ -23,6 +27,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url= 'login/', permanent =False)),
     path('home/', home, name='home'),
     path('monitoring/', monitoring_view, name='monitoring'),
+    path('HistorialViaje/', HistorialViaje_view, name='HistorialViaje'),
     path('reporte/obtener_vehiculos/', obtener_modelos_y_vehiculos_reporte, name='obtener_vehiculos'),
     path('Arrendatarios/', obtener_arrendatarios, name='arrendatario'),
     path('Arrendatarios/Registrar', registrar_arrendatario, name='registrar_arrendatario'),

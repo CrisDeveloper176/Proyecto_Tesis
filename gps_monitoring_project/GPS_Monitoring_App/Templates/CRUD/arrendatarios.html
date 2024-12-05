@@ -169,6 +169,11 @@
     </div>
 
 
+<<<<<<< HEAD
+=======
+    <!-- Scripts para los modales -->
+
+>>>>>>> d49819977a46e3a58a031b2e265951267166ff19
 
     <script>
     editModal.addEventListener("show.bs.modal", function (event) {
@@ -186,7 +191,11 @@
 
 
 
+<<<<<<< HEAD
 
+=======
+    <!-- Scripts para pasar datos a los modales -->
+>>>>>>> d49819977a46e3a58a031b2e265951267166ff19
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         const editModal = document.getElementById("editModal");
@@ -227,19 +236,6 @@
 
 
    <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Validación de correo
-    const correoInputs = document.querySelectorAll('input[type="email"]');
-    correoInputs.forEach(correoInput => {
-        correoInput.addEventListener("input", function () {
-            if (!this.value.includes("@")) {
-                this.setCustomValidity("El correo debe contener el símbolo '@'.");
-            } else {
-                this.setCustomValidity("");
-            }
-        });
-    });
-
 // Validación de teléfono
 const telefonoInputs = document.querySelectorAll('input[name="telefono"], input[id^="edit-telefono"]');
 telefonoInputs.forEach(telefonoInput => {
@@ -258,53 +254,57 @@ telefonoInputs.forEach(telefonoInput => {
             this.setCustomValidity("");
         }
     });
-});
+
 
 
    const rutInput = document.getElementById("rut");
     rutInput.addEventListener("input", function () {
-        const rutValue = this.value.replace(/[^0-9kK]/g, ""); // Remueve caracteres no válidos
+        // Remover caracteres no válidos y formatear el RUT
+        const rutValue = this.value.replace(/[^0-9kK]/g, ""); // Solo números y k/K
         let formattedRut = "";
-        
+
         if (rutValue.length > 1) {
             const body = rutValue.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Agrega puntos
-            const verifier = rutValue.slice(-1).toUpperCase(); // Obtiene el dígito verificador
+            const verifier = rutValue.slice(-1).toUpperCase(); // Dígito verificador (último carácter)
             formattedRut = `${body}-${verifier}`;
         } else {
-            formattedRut = rutValue; // Caso para un dígito o vacío
+            formattedRut = rutValue; // Caso inicial (uno o ningún carácter)
         }
-        
+
         this.value = formattedRut;
 
-        // Validación de formato
+        // Validación del formato
         const rutRegex = /^[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[0-9kK]$/;
         if (!rutRegex.test(this.value)) {
-            this.setCustomValidity("Formato inválido. El RUT debe tener el formato XX.XXX.XXX-X.");
+            this.setCustomValidity("Formato inválido. El RUT debe tener el formato X.XXX.XXX-X o XX.XXX.XXX-X (con dígito verificador numérico o 'K').");
         } else {
             this.setCustomValidity("");
         }
     });
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
 
+
+  <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Validación de correo
+    const correoInputs = document.querySelectorAll('input[type="email"]');
+    correoInputs.forEach(correoInput => {
+        correoInput.addEventListener("input", function () {
+            // Expresión regular para validar el correo
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailRegex.test(this.value)) {
+                this.setCustomValidity("El correo debe contener '@', un dominio válido (por ejemplo, 'gmail') seguido de un '.' y una extensión como '.com' o '.cl'.");
+            } else {
+                this.setCustomValidity("");
+            }
+        });
+    });
+});
+
+</script>
 
 
 

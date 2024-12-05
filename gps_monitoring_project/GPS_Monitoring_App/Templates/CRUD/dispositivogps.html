@@ -1,0 +1,195 @@
+{% extends 'TemplatesBase/Base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Gestión de Dispositivos GPS</h1>
+
+    <!-- Listar Dispositivos -->
+    <h2 class="mt-4">Lista de Dispositivos GPS</h2>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addDeviceModal">Agregar Dispositivo GPS</button>
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>IMEI</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if Dispositivos %}
+                {% for dispositivo in Dispositivos %}
+                <tr>
+                    <td>{{ dispositivo.imei }}</td>
+                    <td>{{ dispositivo.Estado }}</td>
+                    <td>
+                        <!-- Botón para editar -->
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
+                            data-imei="{{ dispositivo.imei }}" data-estado="{{ dispositivo.Estado }}">
+                            Editar
+                        </button>
+
+                        <!-- Botón para eliminar -->
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                            data-imei="{{ dispositivo.imei }}">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="3" class="text-center">No hay dispositivos registrados.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para agregar dispositivo GPS -->
+<div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'registrarDispositivoGps' %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDeviceModalLabel">Agregar Dispositivo GPS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="imei" class="form-label">IMEI</label>
+                        <input type="text" class="form-control" name="imei" id="imei"  required pattern="\d{15}" maxlength="15" 
+                        title="El IMEI debe contener exactamente 15 dígitos">
+                    </div>
+                    <div class="mb-3">
+                        <label for="estado" class="form-label">Estado</label>
+                        <select class="form-select" name="estado_id" id="estado" required>
+                            <option value="">Seleccione un estado</option>
+                            {% for estado in Estados %}
+                                <option value="{{ estado.ID_EstadoGps }}">{{ estado.Estado }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Agregar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar dispositivo GPS -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="" id="edit-form">
+                {% csrf_token %}
+                <input type="hidden" name="original_imei" id="original-imei">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar Dispositivo GPS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit-imei" class="form-label">Nuevo IMEI</label>
+                        <input type="text" class="form-control" name="imei" id="edit-imei" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-estado" class="form-label">Estado</label>
+                        <select class="form-select" name="estado_id" id="edit-estado" required>
+                            <option value="">Seleccione un estado</option>
+                            {% for estado in Estados %}
+                                <option value="{{ estado.ID_EstadoGps }}">{{ estado.Estado }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para eliminar dispositivo GPS -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="deleteForm" action="">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Dispositivo GPS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar este dispositivo?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const editModal = document.getElementById("editModal");
+        const deleteModal = document.getElementById("deleteModal");
+
+        // Configuración del modal de edición
+        editModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            const imei = button.getAttribute("data-imei");
+            const estado = button.getAttribute("data-estado");
+
+            if (!imei) {
+                console.error("IMEI no proporcionado");
+                return;
+            }
+
+            const form = document.getElementById("edit-form");
+            form.action = `/dispositivoGps/Editar/${imei}/`;
+
+            document.getElementById("edit-imei").value = imei;
+            document.getElementById("edit-estado").value = estado;
+        });
+
+        // Configuración del modal de eliminación
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget;
+            const imei = button.getAttribute("data-imei");
+
+            if (!imei) {
+                console.error("IMEI no proporcionado");
+                return;
+            }
+
+            const form = deleteModal.querySelector("form");
+            form.action = `/dispositivoGps/Eliminar/${imei}/`;
+        });
+    });
+</script>
+
+
+
+<script>
+document.getElementById("imei").addEventListener("input", function (event) {
+    const input = event.target;
+    const isValid = /^\d{0,15}$/.test(input.value);
+    if (!isValid) {
+        input.value = input.value.slice(0, -1); // Elimina el último carácter no válido
+    }
+});
+</script>
+
+
+
+
+
+{% endblock %}

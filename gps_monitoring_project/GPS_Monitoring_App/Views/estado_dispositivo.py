@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import requests
 
-# URL base de la API (ajústala según tus necesidades)
 URL_API_ESTADO_GPS = "https://apitesis.fly.dev/api/v1/Estado_GPS/"
 
 def listar_estados_gps(request):

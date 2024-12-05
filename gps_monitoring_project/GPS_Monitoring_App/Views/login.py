@@ -13,14 +13,11 @@ def login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        # Verifica si los datos están vacíos
         if not username or not password:
             return JsonResponse({'error': 'Todos los campos son obligatorios'}, status=400)
 
-        # URL del endpoint de la API
-        url = "http://apitesis.fly.dev/api/v1/token/"  # Cambia la URL si es necesario
+        url = "http://apitesis.fly.dev/api/v1/token/"  
 
-        # Parámetros para la solicitud
         data = {
             "username": username,
             "password": password,
@@ -30,10 +27,8 @@ def login(request):
         }
 
         try:
-            # Realiza la solicitud POST
             response = requests.post(url, data=json.dumps(data), headers=headers)
             if response.status_code == 200:
-                # Guarda el token en la sesión
                 tokens = response.json()
                 access_token = tokens.get('access')
                 refresh_token = tokens.get('refresh')
@@ -44,7 +39,7 @@ def login(request):
                 request.session['access_token'] = access_token
                 request.session['refresh_token'] = refresh_token
 
-                return redirect('TemplatesBase/Home.html')  # Redirige a la página de inicio
+                return redirect('TemplatesBase/Home.html') 
             else:
                 error_message = response.json().get('detail', 'Credenciales inválidas o error desconocido.')
                 return JsonResponse({'error': error_message}, status=response.status_code)

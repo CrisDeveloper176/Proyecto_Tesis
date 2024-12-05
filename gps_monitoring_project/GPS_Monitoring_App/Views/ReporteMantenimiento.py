@@ -11,7 +11,6 @@ def obtener_mantenimiento(request):
     """
     URL_API_MANTENIMIENTO = "https://apitesis.fly.dev/api/v1/Mantenimiento_Vehiculo/"
 
-    # Obtener parámetros de la solicitud
     params = {
         "Fecha_Inicio": request.GET.get('Fecha_Inicio'),
         "Fecha_Fin": request.GET.get('Fecha_Fin'),
@@ -19,10 +18,10 @@ def obtener_mantenimiento(request):
         "ID_Mantenimiento": request.GET.get('ID_Mantenimiento'),
     }
 
-    # Limpiar los parámetros para evitar enviar None si no están presentes
+
     params = {k: v for k, v in params.items() if v is not None}
 
-    # Obtener mantenimiento
+
     try:
         response_mantenimiento = requests.get(URL_API_MANTENIMIENTO, params=params)
         if response_mantenimiento.status_code == 200:
@@ -34,9 +33,7 @@ def obtener_mantenimiento(request):
         print(f"Error al obtener mantenimiento: {e}")
         mantenimiento = []
 
-    # Verificar si la solicitud es AJAX
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'mantenimiento': mantenimiento})
 
-    # Si no es AJAX, manejar errores
     return JsonResponse({'error': 'Solo solicitudes AJAX permitidas'}, status=400)

@@ -148,20 +148,33 @@ def editar_dispositivo_gps(request, imei):
             "Content-Type": "application/json"
         }
 
+        # Verificar la existencia del dispositivo antes de editar
         try:
-            # Realizar la solicitud a la API
-            url = f"{URL_API_DISPOSITIVO_GPS}{imei}/"  # Endpoint del dispositivo usando el IMEI
-            response = requests.put(url, json=data, headers=headers)
+            url = f"{URL_API_DISPOSITIVO_GPS}{imei}/"
+            get_response = requests.get(url)  # Realizar una solicitud GET al recurso
 
-            if response.status_code == 200:
-                return redirect('dispositivoGps')  # Redirigir a la lista de dispositivos
+            if get_response.status_code == 404:
+                return JsonResponse({"error": f"El dispositivo GPS con IMEI {imei} no existe."}, status=404)
+
+            # Realizar la solicitud de edición con PUT
+            put_response = requests.put(url, json=data, headers=headers)
+
+            if put_response.status_code == 200:  # Actualización exitosa
+                return redirect('dispositivoGps')
             else:
-                error_message = response.json().get("detail", "Error desconocido")
-                return JsonResponse({"error": f"Error al editar el dispositivo GPS: {error_message}"}, status=response.status_code)
+                # Manejar errores de la API en la edición
+                try:
+                    error_message = put_response.json().get("detail", "Error desconocido")
+                except ValueError:  # Si la respuesta no es JSON
+                    error_message = "La API devolvió un cuerpo no JSON."
+                return JsonResponse({"error": f"Error al editar el dispositivo GPS: {error_message}"}, status=put_response.status_code)
+
         except requests.RequestException as e:
             return JsonResponse({"error": f"Error de conexión: {str(e)}"}, status=500)
 
     return JsonResponse({"error": "Método no permitido."}, status=405)
+
+
 
 
 

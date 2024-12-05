@@ -94,6 +94,21 @@ def registrar_vehiculo(request):
     return JsonResponse({"error": "Método no permitido"}, status=405)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
 def editar_vehiculo(request, ID_Vehiculo):
     if request.method == "POST":
         # Capturar los datos enviados desde el formulario
@@ -180,3 +195,12 @@ def eliminar_vehiculo(request,ID_Vehiculo):
             return JsonResponse({"error": error_message}, status=response.status_code)
    else:
         return JsonResponse({"error": "Método no permitido"}, status=405)
+   
+
+
+   
+   
+
+
+
+   

@@ -1,0 +1,125 @@
+{% extends 'TemplatesBase/Base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h1>Registrar Modelo</h1>
+
+    <form method="post" action="{% url 'registrar_modelo' %}" id="create-model-form">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="nombre_modelo" class="form-label">Nombre del Modelo</label>
+            <input type="text" class="form-control" id="nombre_modelo" name="Nombre_Modelo" required>
+        </div>
+
+        <div class="mb-3">
+    <label for="id_marca" class="form-label">Marca</label>
+    <select class="form-select" id="id_marca" name="Id_Marca" required>
+        <option value="" disabled selected>Selecciona una marca</option>
+        {% for marca in marcas %}
+    <option value="{{ marca.Id_Marca }}">{{ marca.Marca }}</option>
+{% endfor %}
+    </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Registrar Modelo</button>
+    </form>
+
+    <!-- Modal para Editar Modelo -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" id="edit-model-form">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Modelo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="edit-nombre-modelo" class="form-label">Nombre del Modelo</label>
+                            <input type="text" class="form-control" id="edit-nombre-modelo" name="Nombre_Modelo" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="edit-id-marca" class="form-label">Marca</label>
+                            <select class="form-select" id="edit-id-marca" name="Id_Marca" required>
+                                {% for marca in marcas %}
+                                    <option value="{{ marca.Id_Marca }}">{{ marca.Nombre_Marca }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Eliminar Modelo -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" id="delete-model-form">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Eliminar Modelo</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar este modelo?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-danger">Eliminar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+<!-- Scripts para los modales -->
+<script>
+    // Modal Editar Modelo
+    document.addEventListener("DOMContentLoaded", function () {
+        const editModal = document.getElementById("editModal");
+
+        editModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget; // Botón que disparó el modal
+
+            // Obtener atributos del botón
+            const idModelo = button.getAttribute("data-id");
+            const nombreModelo = button.getAttribute("data-nombre");
+            const idMarca = button.getAttribute("data-id-marca");
+
+            // Llenar los campos del formulario del modal
+            document.getElementById("edit-nombre-modelo").value = nombreModelo;
+            document.getElementById("edit-id-marca").value = idMarca;
+
+            // Cambiar la acción del formulario
+            const form = document.getElementById("edit-model-form");
+            form.action = `{% url 'editar_modelo' idModelo %}`; // Asegúrate de que esta URL sea correcta
+        });
+    });
+
+    // Modal Eliminar Modelo
+    document.addEventListener("DOMContentLoaded", function () {
+        const deleteModal = document.getElementById("deleteModal");
+
+        deleteModal.addEventListener("show.bs.modal", function (event) {
+            const button = event.relatedTarget; // Botón que abrió el modal
+            const idModelo = button.getAttribute("data-id"); // Obtiene el ID del modelo
+
+            // Encuentra el formulario dentro del modal
+            const form = deleteModal.querySelector("form");
+            form.action = `{% url 'eliminar_modelo' idModelo %}`; // Actualiza dinámicamente la URL
+        });
+    });
+</script>

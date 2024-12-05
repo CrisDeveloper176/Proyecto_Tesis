@@ -5,62 +5,57 @@
 <div class="container mt-5">
     <h1>Gestión de Arrendatarios</h1>
 
-    <!-- Listar Arrendatarios -->
+    <!-- Listar Arrendatario -->
     <h2 class="mt-4">Lista de Arrendatarios</h2>
-    
     <!-- Botón para abrir el modal de agregar -->
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Arrendatario</button>
-    
-    <!-- Contenedor responsivo para la tabla -->
-    <div class="table-responsive mt-4">
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>RUT</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Licencia</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if arrendatarios %}
+                {% for arrendatario in arrendatarios %}
                 <tr>
-                    <th>RUT</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Licencia</th>
-                    <th>Teléfono</th>
-                    <th>Correo</th>
-                    <th>Acciones</th>
+                    <td>{{ arrendatario.Rut }}</td>
+                    <td>{{ arrendatario.Nombre }}</td>
+                    <td>{{ arrendatario.Apellido }}</td>
+                    <td>{{ arrendatario.Licencia_Conducir }}</td>
+                    <td>{{ arrendatario.Telefono }}</td>
+                    <td>{{ arrendatario.Correo }}</td>
+                    <td>
+                        
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" 
+                            data-rut="{{ arrendatario.Rut }}" data-nombre="{{ arrendatario.Nombre }}" 
+                            data-apellido="{{ arrendatario.Apellido }}" data-licencia="{{ arrendatario.Licencia_Conducir }}" 
+                            data-telefono="{{ arrendatario.Telefono }}" data-correo="{{ arrendatario.Correo }}">
+                            Editar
+                        </button>
+
+                        
+                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                data-rut="{{ arrendatario.Rut }}">
+                            Eliminar
+                        </button>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                {% if arrendatarios %}
-                    {% for arrendatario in arrendatarios %}
-                    <tr>
-                        <td>{{ arrendatario.Rut }}</td>
-                        <td>{{ arrendatario.Nombre }}</td>
-                        <td>{{ arrendatario.Apellido }}</td>
-                        <td>{{ arrendatario.Licencia_Conducir }}</td>
-                        <td>{{ arrendatario.Telefono }}</td>
-                        <td>{{ arrendatario.Correo }}</td>
-                        <td>
-                            <!-- Botón de editar -->
-                            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
-                                data-rut="{{ arrendatario.Rut }}" data-nombre="{{ arrendatario.Nombre }}" 
-                                data-apellido="{{ arrendatario.Apellido }}" data-licencia="{{ arrendatario.Licencia_Conducir }}" 
-                                data-telefono="{{ arrendatario.Telefono }}" data-correo="{{ arrendatario.Correo }}">
-                                Editar
-                            </button>
-                            
-                            <!-- Botón de eliminar -->
-                            <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                                    data-rut="{{ arrendatario.Rut }}">
-                                Eliminar
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td colspan="7" class="text-center">No se encontraron arrendatarios.</td>
-                    </tr>
-                {% endif %}
-            </tbody>
-        </table>
-    </div>  
-</div>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="7" class="text-center">No se encontraron arrendatarios.</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
     
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -174,6 +169,8 @@
     </div>
 
 
+    <!-- Scripts para los modales -->
+
 
     <script>
     editModal.addEventListener("show.bs.modal", function (event) {
@@ -191,6 +188,7 @@
 
 
 
+    <!-- Scripts para pasar datos a los modales -->
     <script>
     document.addEventListener("DOMContentLoaded", function () {
         const editModal = document.getElementById("editModal");
@@ -231,6 +229,19 @@
 
 
    <script>
+document.addEventListener("DOMContentLoaded", function () {
+    // Validación de correo
+    const correoInputs = document.querySelectorAll('input[type="email"]');
+    correoInputs.forEach(correoInput => {
+        correoInput.addEventListener("input", function () {
+            if (!this.value.includes("@")) {
+                this.setCustomValidity("El correo debe contener el símbolo '@'.");
+            } else {
+                this.setCustomValidity("");
+            }
+        });
+    });
+
 // Validación de teléfono
 const telefonoInputs = document.querySelectorAll('input[name="telefono"], input[id^="edit-telefono"]');
 telefonoInputs.forEach(telefonoInput => {
@@ -249,57 +260,53 @@ telefonoInputs.forEach(telefonoInput => {
             this.setCustomValidity("");
         }
     });
-
+});
 
 
    const rutInput = document.getElementById("rut");
     rutInput.addEventListener("input", function () {
-        // Remover caracteres no válidos y formatear el RUT
-        const rutValue = this.value.replace(/[^0-9kK]/g, ""); // Solo números y k/K
+        const rutValue = this.value.replace(/[^0-9kK]/g, ""); // Remueve caracteres no válidos
         let formattedRut = "";
-
+        
         if (rutValue.length > 1) {
             const body = rutValue.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Agrega puntos
-            const verifier = rutValue.slice(-1).toUpperCase(); // Dígito verificador (último carácter)
+            const verifier = rutValue.slice(-1).toUpperCase(); // Obtiene el dígito verificador
             formattedRut = `${body}-${verifier}`;
         } else {
-            formattedRut = rutValue; // Caso inicial (uno o ningún carácter)
+            formattedRut = rutValue; // Caso para un dígito o vacío
         }
-
+        
         this.value = formattedRut;
 
-        // Validación del formato
+        // Validación de formato
         const rutRegex = /^[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[0-9kK]$/;
         if (!rutRegex.test(this.value)) {
-            this.setCustomValidity("Formato inválido. El RUT debe tener el formato X.XXX.XXX-X o XX.XXX.XXX-X (con dígito verificador numérico o 'K').");
+            this.setCustomValidity("Formato inválido. El RUT debe tener el formato XX.XXX.XXX-X.");
         } else {
             this.setCustomValidity("");
         }
     });
 });
 
-</script>
 
 
-  <script>
-document.addEventListener("DOMContentLoaded", function () {
-    // Validación de correo
-    const correoInputs = document.querySelectorAll('input[type="email"]');
-    correoInputs.forEach(correoInput => {
-        correoInput.addEventListener("input", function () {
-            // Expresión regular para validar el correo
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            if (!emailRegex.test(this.value)) {
-                this.setCustomValidity("El correo debe contener '@', un dominio válido (por ejemplo, 'gmail') seguido de un '.' y una extensión como '.com' o '.cl'.");
-            } else {
-                this.setCustomValidity("");
-            }
-        });
-    });
-});
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </script>
+
 
 
 

@@ -5,10 +5,8 @@
 <div class="container mt-5">
     <h1>Gestión de Vehículos</h1>
 
-    
-    <!-- Listar Vehículos -->
+
     <h2 class="mt-4">Lista de Vehículos</h2>
-<!-- Botón para abrir el modal de agregar -->
 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Vehículo</button>
     <table class="table table-bordered table-striped">
         <thead class="table-dark">
@@ -31,7 +29,6 @@
                     <td>{{ vehiculo.kilometraje }}</td>
                     <td>{{ vehiculo.modelo_nombre }}</td> 
                     <td>
-                        <!-- Botón para editar -->
                         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" 
                             data-id="{{ vehiculo.ID_Vehiculo }}" data-matricula="{{ vehiculo.Matricula }}" 
                             data-estado="{{ vehiculo.Estado_Vehiculo }}" data-kilometraje="{{ vehiculo.kilometraje }}" 
@@ -39,7 +36,6 @@
                             Editar
                        </button>
 
-                        <!-- Botón para eliminar -->
                         <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
                                 data-id="{{ vehiculo.ID_Vehiculo }}">
                             Eliminar
@@ -58,7 +54,6 @@
 
     
 
-    <!-- Modal para Agregar Vehículo -->
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -159,7 +154,6 @@
     </div>
     
 
- <!-- Modal para Eliminar Vehículo -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -182,12 +176,12 @@
 </div>
 <script>
     editModal.addEventListener("show.bs.modal", function (event) {
-        const button = event.relatedTarget; // Botón que disparó el modal
+        const button = event.relatedTarget;
         const idVehiculo = button.getAttribute("data-id");
     
-        // Actualizar la acción del formulario
+
         const form = document.getElementById("edit-form");
-        form.action = `/vehiculos/Editar/${idVehiculo}/`; // Asegúrate de que esta URL sea correcta en tu proyecto
+        form.action = `/vehiculos/Editar/${idVehiculo}/`;
     });
 </script>
 
@@ -196,25 +190,21 @@
         const editModal = document.getElementById("editModal");
 
         editModal.addEventListener("show.bs.modal", function (event) {
-            const button = event.relatedTarget; // Botón que disparó el modal
+            const button = event.relatedTarget;
 
-            // Obtener atributos del botón
             const idVehiculo = button.getAttribute("data-id");
             const matricula = button.getAttribute("data-matricula");
             const estado = button.getAttribute("data-estado");
             const kilometraje = button.getAttribute("data-kilometraje");
             const modelo = button.getAttribute("data-id-modelo");
 
-            // Llenar los campos del formulario del modal
             document.getElementById("edit-id").value = idVehiculo;
             document.getElementById("edit-matricula").value = matricula;
             document.getElementById("edit-kilometraje").value = kilometraje;
 
-            // Seleccionar el estado en el dropdown
             const estadoSelect = document.getElementById("edit-estado");
             estadoSelect.value = estado;
 
-            // Seleccionar el modelo en el dropdown
             const modeloSelect = document.getElementById("edit-modelo");
             modeloSelect.value = modelo;
         });
@@ -227,12 +217,11 @@
         const deleteModal = document.getElementById("deleteModal");
     
         deleteModal.addEventListener("show.bs.modal", function (event) {
-            const button = event.relatedTarget; // Botón que abrió el modal
-            const idVehiculo = button.getAttribute("data-id"); // Obtiene el ID del vehículo
-    
-            // Encuentra el formulario dentro del modal
+            const button = event.relatedTarget;
+            const idVehiculo = button.getAttribute("data-id"); 
+
             const form = deleteModal.querySelector("form");
-            form.action = `/vehiculos/Eliminar/${idVehiculo}/`; // Actualiza dinámicamente la URL
+            form.action = `/vehiculos/Eliminar/${idVehiculo}/`; 
         });
     });
 </script>
@@ -247,29 +236,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
     matriculaInputs.forEach(input => {
         input.addEventListener("input", function () {
-            // Limita el valor al formato de 4 letras seguidas de 2 números
-            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, ""); // Solo letras mayúsculas y números
+
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, ""); 
             if (this.value.length > 6) {
-                this.value = this.value.slice(0, 6); // Limita a 6 caracteres
+                this.value = this.value.slice(0, 6);
             }
 
-            // Validación del formato (4 letras y 2 números)
             const isValid = /^[A-Z]{4}[0-9]{2}$/.test(this.value);
             if (!isValid && this.value.length === 6) {
                 this.setCustomValidity("La matrícula debe tener exactamente 4 letras seguidas de 2 números (ejemplo: ABCD12).");
             } else {
-                this.setCustomValidity(""); // Limpia el mensaje si es válido
+                this.setCustomValidity("");
             }
         });
     });
 });
-
-
-
-  
 </script>
-
-
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -277,30 +259,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     kilometrajeInputs.forEach(input => {
         input.addEventListener("input", function () {
-            // Permitir solo números
-            this.value = this.value.replace(/\D/g, ""); // Elimina cualquier carácter no numérico
 
-            // Validación del rango (opcional)
+            this.value = this.value.replace(/\D/g, ""); 
+
             const maxKilometraje = 300000;
             if (this.value !== "" && parseInt(this.value) > maxKilometraje) {
                 this.setCustomValidity(`El kilometraje no puede ser mayor a ${maxKilometraje}.`);
             } else {
-                this.setCustomValidity(""); // Limpia el mensaje si es válido
+                this.setCustomValidity(""); 
             }
         });
     });
 });
 </script>
-
-
-
-
-
-
-
-
-
-
-
 
 {% endblock %}

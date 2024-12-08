@@ -15,7 +15,7 @@ from .Views.gpsusado import *
 from .Views.HistorialVIaje import *
 from .Views.registrarmodelos import *
 
-
+from .Views.registrarmodelos import *
 
 
 

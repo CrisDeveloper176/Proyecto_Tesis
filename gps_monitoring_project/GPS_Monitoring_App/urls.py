@@ -13,14 +13,8 @@ from .Views.estado_dispositivo import *
 from .Views.dispositivogps import *
 from .Views.gpsusado import *
 from .Views.HistorialVIaje import *
-<<<<<<< HEAD
 from .Views.registrarmodelos import *
-=======
-<<<<<<< HEAD
 from .Views.registrarmodelos import *
-=======
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
->>>>>>> e8615f954ba3ed3c602680920e5d05c7758e4fbb
 
 
 

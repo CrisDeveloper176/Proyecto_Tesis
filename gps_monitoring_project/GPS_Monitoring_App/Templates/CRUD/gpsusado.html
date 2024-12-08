@@ -44,11 +44,8 @@
     </table>
 </div>
 
-<<<<<<< HEAD
 
 <!-- Modal para agregar dispositivo GPS -->
-=======
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -87,7 +84,6 @@
     </div>
 </div>
 
-<<<<<<< HEAD
 
 
 
@@ -98,8 +94,6 @@
 
 
 <!-- Modal para editar dispositivo GPS -->
-=======
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -144,8 +138,8 @@
     </div>
 </div>
 
-<<<<<<< HEAD
-=======
+
+
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -167,23 +161,23 @@
         </div>
     </div>
 </div>
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
+
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
     const editModal = document.getElementById("editModal");
 
-<<<<<<< HEAD
+
     editModal.addEventListener("show.bs.modal", function (event) {
         const button = event.relatedTarget;
-=======
+
         editModal.addEventListener("show.bs.modal", function (event) {
             const button = event.relatedTarget;
             const imei = button.getAttribute("data-imei");
             const fechaInstalacion = button.getAttribute("data-fecha-instalacion");
             const fechaDeceso = button.getAttribute("data-fecha-deceso");
             const idVehiculo = button.getAttribute("data-id-vehiculo");
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
+
 
         const imei = button.getAttribute("data-imei");
         const fechaInstalacion = button.getAttribute("data-fecha-instalacion");
@@ -193,7 +187,7 @@
         const form = document.getElementById("edit-form");
         form.action = `/dispositivos_usados/editar/${imei}/`; // Configura la URL con el IMEI
 
-<<<<<<< HEAD
+
         // Asigna valores
         document.getElementById("edit-imei").value = imei;
         document.getElementById("fecha-instalacion").value = fechaInstalacion;
@@ -229,7 +223,7 @@
                 })
                 .catch((err) => alert(err.message));
         });
-=======
+
             document.getElementById("edit-imei").value = imei;
             document.getElementById("edit-fecha-instalacion").value = fechaInstalacion;
             document.getElementById("edit-fecha-deceso").value = fechaDeceso || '';

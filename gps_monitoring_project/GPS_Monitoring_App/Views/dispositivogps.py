@@ -137,7 +137,7 @@ def editar_dispositivo_gps(request, imei):
 
         # Verificar la existencia del dispositivo antes de editar
         try:
-<<<<<<< HEAD
+
             url = f"{URL_API_DISPOSITIVO_GPS}{imei}/"
             get_response = requests.get(url)  # Realizar una solicitud GET al recurso
 
@@ -149,13 +149,13 @@ def editar_dispositivo_gps(request, imei):
 
             if put_response.status_code == 200:  # Actualización exitosa
                 return redirect('dispositivoGps')
-=======
+
             url = f"{URL_API_DISPOSITIVO_GPS}{imei}/"  
             response = requests.put(url, json=data, headers=headers)
 
             if response.status_code == 200:
                 return redirect('dispositivoGps') 
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
+
             else:
                 # Manejar errores de la API en la edición
                 try:

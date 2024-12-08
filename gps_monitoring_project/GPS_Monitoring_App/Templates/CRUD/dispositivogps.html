@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Modales de edición y eliminación
     const editModal = document.getElementById("editModal");
     const deleteModal = document.getElementById("deleteModal");
-<<<<<<< HEAD
+
 
 
     // Función para configurar el modal de edición
@@ -145,23 +145,21 @@ document.addEventListener("DOMContentLoaded", function () {
         const button = event.relatedTarget;  // El botón que abrió el modal
         const imei = button.getAttribute("data-imei");
         const estado = button.getAttribute("data-estado");
-=======
->>>>>>> e8615f954ba3ed3c602680920e5d05c7758e4fbb
 
-<<<<<<< HEAD
+
+
+
     // Función para configurar el modal de edición
     editModal.addEventListener("show.bs.modal", function (event) {
         const button = event.relatedTarget;  // El botón que abrió el modal
         const imei = button.getAttribute("data-imei");
         const estado = button.getAttribute("data-estado");
-=======
+
         editModal.addEventListener("show.bs.modal", function (event) {
             const button = event.relatedTarget;
             const imei = button.getAttribute("data-imei");
             const estado = button.getAttribute("data-estado");
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 
-<<<<<<< HEAD
 
         const form = document.getElementById("edit-form");
         // Establecer la URL del formulario para editar el dispositivo
@@ -171,17 +169,17 @@ document.addEventListener("DOMContentLoaded", function () {
         // Rellenar los campos con los datos del dispositivo
         document.getElementById("edit-imei").value = imei;
         document.getElementById("edit-estado").value = estado;
-=======
+
         const form = document.getElementById("edit-form");
         // Establecer la URL del formulario para editar el dispositivo
         form.action = `/dispositivoGps/Editar/${imei}/`;
->>>>>>> e8615f954ba3ed3c602680920e5d05c7758e4fbb
 
-<<<<<<< HEAD
+
+
         // Rellenar los campos con los datos del dispositivo
         document.getElementById("edit-imei").value = imei;
         document.getElementById("edit-estado").value = estado;
-=======
+
             const form = document.getElementById("edit-form");
             form.action = `/dispositivoGps/Editar/${imei}/`;
 
@@ -201,7 +199,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const form = deleteModal.querySelector("form");
             form.action = `/dispositivoGps/Eliminar/${imei}/`;
         });
-<<<<<<< HEAD
+
 
     });
 
@@ -213,9 +211,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const form = deleteModal.querySelector("form");
         // Establecer la URL del formulario para eliminar el dispositivo
         form.action = `/dispositivoGps/Eliminar/${imei}/`;
-=======
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
->>>>>>> e8615f954ba3ed3c602680920e5d05c7758e4fbb
+
     });
 
     // Función para configurar el modal de eliminación
@@ -223,7 +219,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const button = event.relatedTarget;
         const imei = button.getAttribute("data-imei");
 
-<<<<<<< HEAD
+
     // Validación del IMEI en tiempo real (solo números)
     ["imei", "edit-imei"].forEach((id) => {
         const input = document.getElementById(id);
@@ -235,14 +231,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         }
-=======
+
         const form = deleteModal.querySelector("form");
         // Establecer la URL del formulario para eliminar el dispositivo
         form.action = `/dispositivoGps/Eliminar/${imei}/`;
->>>>>>> e8615f954ba3ed3c602680920e5d05c7758e4fbb
+
     });
 
-<<<<<<< HEAD
+
     // Validación del IMEI en tiempo real (solo números)
     ["imei", "edit-imei"].forEach((id) => {
         const input = document.getElementById(id);
@@ -255,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     });
-=======
+
 <script>
 document.getElementById("imei").addEventListener("input", function (event) {
     const input = event.target;
@@ -263,11 +259,10 @@ document.getElementById("imei").addEventListener("input", function (event) {
     if (!isValid) {
         input.value = input.value.slice(0, -1); 
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
->>>>>>> e8615f954ba3ed3c602680920e5d05c7758e4fbb
+
+
+
 });
 </script>
 

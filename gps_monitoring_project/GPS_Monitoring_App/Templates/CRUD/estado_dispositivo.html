@@ -4,6 +4,14 @@
 <div class="container mt-5">
     <h1>Gestión de EstadoGPS</h1>
 
+
+    
+
+
+
+
+
+
     <h2 class="mt-4">Lista de EstadoGPS</h2>
     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar EstadoGPS</button>
     <table class="table table-bordered table-striped mt-3">
@@ -147,16 +155,155 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const deleteModal = document.getElementById("deleteModal");
-    
+
         deleteModal.addEventListener("show.bs.modal", function (event) {
-            const button = event.relatedTarget; 
-            const idEstadoGps = button.getAttribute("data-id"); 
-    
+            const button = event.relatedTarget;
+            const idEstadoGps = button.getAttribute("data-id");
+
+            // Configurar la acción del formulario de eliminación
             const form = deleteModal.querySelector("form");
             form.action = `/estadoGps/Eliminar/${idEstadoGps}/`;
+
+            // Manejar la respuesta al enviar el formulario
+            form.addEventListener("submit", function (e) {
+                e.preventDefault(); // Evitar el envío estándar del formulario
+
+                fetch(form.action, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "Content-Type": "application/json"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.error,
+                            confirmButtonText: 'Entendido'
+                        });
+                    } else if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Éxito',
+                            text: data.success,
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            window.location.reload(); // Recargar la página para actualizar la tabla
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Hubo un problema con la solicitud.',
+                        confirmButtonText: 'Entendido'
+                    });
+                });
+            });
         });
     });
 </script>
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Obtener los estados actuales de la tabla
+        const existingStates = Array.from(document.querySelectorAll("tbody tr td:nth-child(2)"))
+            .map(td => td.textContent.trim().toLowerCase());
+
+        // Verificar duplicados al agregar un nuevo estado
+        const addForm = document.querySelector("#addModal form");
+        const addEstadoInput = document.querySelector("#estado");
+
+        addForm.addEventListener("submit", function (event) {
+            const newEstado = addEstadoInput.value.trim().toLowerCase();
+
+            // Validar longitud máxima de caracteres
+            if (newEstado.length > 15) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'El estado no puede tener más de 15 caracteres.'
+                });
+                return;
+            }
+
+            // Verificar si es un duplicado exacto o una extensión
+            const isDuplicate = existingStates.some(existingState =>
+                existingState === newEstado || 
+                existingState.startsWith(newEstado) || 
+                newEstado.startsWith(existingState)
+            );
+
+            if (isDuplicate) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `El estado "${addEstadoInput.value}" ya existe o es una variante de otro estado.`
+                });
+            }
+        });
+
+        // Verificar duplicados al editar un estado
+        const editForm = document.querySelector("#edit-form");
+        const editEstadoInput = document.querySelector("#edit-estado");
+        const editIdInput = document.querySelector("#edit-id");
+
+        editForm.addEventListener("submit", function (event) {
+            const editedEstado = editEstadoInput.value.trim().toLowerCase();
+            const editedId = editIdInput.value;
+
+            // Validar longitud máxima de caracteres
+            if (editedEstado.length > 15) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'El estado no puede tener más de 15 caracteres.'
+                });
+                return;
+            }
+
+            // Verificar si es un duplicado exacto o una extensión
+            const isDuplicate = Array.from(document.querySelectorAll("tbody tr")).some(row => {
+                const id = row.querySelector("td:first-child").textContent.trim(); // ID de la fila
+                const estado = row.querySelector("td:nth-child(2)").textContent.trim().toLowerCase(); // Estado de la fila
+                // Excluir la fila que se está editando
+                return id !== editedId && 
+                    (estado === editedEstado || 
+                     estado.startsWith(editedEstado) || 
+                     editedEstado.startsWith(estado));
+            });
+
+            if (isDuplicate) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: `El estado "${editEstadoInput.value}" ya existe o es una variante de otro estado.`
+                });
+            }
+        });
+    });
+</script>
+
+<script>
+    const estadosConectados = {{ EstadosConectados|safe }};
+</script>
+
+
+
+
 
 
 

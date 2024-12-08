@@ -172,8 +172,6 @@ def editar_dispositivo_gps(request, imei):
 
 
 
-
-
 def eliminar_dispositivo_gps(request, imei):
     """Eliminar un dispositivo GPS existente."""
     if request.method == "POST":

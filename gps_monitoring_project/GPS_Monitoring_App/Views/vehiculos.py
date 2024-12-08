@@ -50,16 +50,25 @@ def registrar_vehiculo(request):
         id_modelo = request.POST.get("id_modelo")
 
         if not matricula or not estado_vehiculo or not kilometraje or not id_modelo:
-            return JsonResponse({"error": "Todos los campos son obligatorios"}, status=400)
+            return JsonResponse({"success": False, "message": "Todos los campos son obligatorios"}, status=400)
+        
+        # Verificar si la matrícula ya está registrada
+        URL_API = "https://apitesis.fly.dev/api/v1/vehiculo/"
+        response = requests.get(URL_API)
+        if response.status_code == 200:
+            vehiculos = response.json()
+            if any(vehiculo["Matricula"] == matricula for vehiculo in vehiculos):
+                return JsonResponse({"success": False, "message": "La matrícula ya está registrada."}, status=400)
+
         try:
             kilometraje = int(kilometraje)
         except ValueError:
-            return JsonResponse({"error": "El kilometraje debe ser un número entero válido."}, status=400)
+            return JsonResponse({"success": False, "message": "El kilometraje debe ser un número entero válido."}, status=400)
 
         try:
             id_modelo = int(id_modelo)
         except ValueError:
-            return JsonResponse({"error": "El ID del modelo debe ser un número entero válido."}, status=400)
+            return JsonResponse({"success": False, "message": "El ID del modelo debe ser un número entero válido."}, status=400)
 
         data = {
             "Matricula": matricula,
@@ -71,18 +80,17 @@ def registrar_vehiculo(request):
             "Content-Type": "application/json",
         }
         
-        URL_API = "https://apitesis.fly.dev/api/v1/vehiculo/"
-        response = requests.post(URL_API, json=data,headers=headers)
-        response_data = response.json()  
-        print("Respuesta de la API:", response_data)  
+        response = requests.post(URL_API, json=data, headers=headers)
+        response_data = response.json()
+        print("Respuesta de la API:", response_data)
         if response.status_code == 201:
-
-            return redirect("vehiculos")  
+            return JsonResponse({"success": True, "message": "Vehículo registrado exitosamente."})
         else:
             error_message = response.json().get("detail", "Error al registrar el vehículo")
-            return JsonResponse({"error": error_message}, status=response.status_code)
+            return JsonResponse({"success": False, "message": error_message}, status=response.status_code)
 
-    return JsonResponse({"error": "Método no permitido"}, status=405)
+    return JsonResponse({"success": False, "message": "Método no permitido"}, status=405)
+
 
 
 
@@ -109,11 +117,15 @@ def editar_vehiculo(request, ID_Vehiculo):
 
         if not matricula or not estado_vehiculo or not kilometraje or not id_modelo:
             return JsonResponse({"error": "Todos los campos son obligatorios"}, status=400)
-        try:
-           ID_Vehiculo = int(ID_Vehiculo)
-        except ValueError:
-           return JsonResponse({"error": "El ID del vehículo debe ser un número válido"}, status=400)
-       
+        
+        # Verificar si la matrícula ya está registrada en otro vehículo
+        URL_API = "https://apitesis.fly.dev/api/v1/vehiculo/"
+        response = requests.get(URL_API)
+        if response.status_code == 200:
+            vehiculos = response.json()
+            if any(vehiculo["Matricula"] == matricula and vehiculo["ID_Vehiculo"] != ID_Vehiculo for vehiculo in vehiculos):
+                return JsonResponse({"error": "La matrícula ya está registrada en otro vehículo."}, status=400)
+
         try:
             kilometraje = int(kilometraje)
         except ValueError:
@@ -134,24 +146,18 @@ def editar_vehiculo(request, ID_Vehiculo):
             "Content-Type": "application/json",
         }
         
-        URL_API = f"https://apitesis.fly.dev/api/v1/vehiculo/{ID_Vehiculo}/"  
-        response = requests.put(URL_API, json=data, headers=headers)  
-        response_data = response.json()  
-        print("Respuesta de la API:", response_data)  
-
+        URL_API = f"https://apitesis.fly.dev/api/v1/vehiculo/{ID_Vehiculo}/"
+        response = requests.put(URL_API, json=data, headers=headers)
+        response_data = response.json()
+        print("Respuesta de la API:", response_data)
         if response.status_code == 200:
-            return redirect("vehiculos")  
+            return redirect("vehiculos")
         else:
             error_message = response.json().get("detail", "Error al editar el vehículo")
             return JsonResponse({"error": error_message}, status=response.status_code)
 
-    URL_API = f"https://apitesis.fly.dev/api/v1/vehiculo/{ID_Vehiculo}/"
-    response = requests.get(URL_API)
-    if response.status_code == 200:
-        vehiculo_data = response.json()
-        return JsonResponse({"vehiculos": vehiculo_data})
-    else:
-        return JsonResponse({"error": "Vehículo no encontrado"}, status=404)
+    return JsonResponse({"error": "Método no permitido"}, status=405)
+
     
 def eliminar_vehiculo(request,ID_Vehiculo):
    if request.method == "POST": 

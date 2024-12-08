@@ -147,8 +147,11 @@ document.addEventListener("DOMContentLoaded", function () {
         const estado = button.getAttribute("data-estado");
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
     // Función para configurar el modal de edición
     editModal.addEventListener("show.bs.modal", function (event) {
         const button = event.relatedTarget;  // El botón que abrió el modal
@@ -159,6 +162,10 @@ document.addEventListener("DOMContentLoaded", function () {
             const button = event.relatedTarget;
             const imei = button.getAttribute("data-imei");
             const estado = button.getAttribute("data-estado");
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
 
 
         const form = document.getElementById("edit-form");
@@ -166,6 +173,8 @@ document.addEventListener("DOMContentLoaded", function () {
         form.action = `/dispositivoGps/Editar/${imei}/`;
 
 
+<<<<<<< HEAD
+=======
         // Rellenar los campos con los datos del dispositivo
         document.getElementById("edit-imei").value = imei;
         document.getElementById("edit-estado").value = estado;
@@ -174,8 +183,13 @@ document.addEventListener("DOMContentLoaded", function () {
         // Establecer la URL del formulario para editar el dispositivo
         form.action = `/dispositivoGps/Editar/${imei}/`;
 
+<<<<<<< HEAD
 
 
+=======
+<<<<<<< HEAD
+>>>>>>> dc812ec9c731fe87eea295af9a20c9cf7e7f4aa9
+>>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
         // Rellenar los campos con los datos del dispositivo
         document.getElementById("edit-imei").value = imei;
         document.getElementById("edit-estado").value = estado;
@@ -199,7 +213,14 @@ document.addEventListener("DOMContentLoaded", function () {
             const form = deleteModal.querySelector("form");
             form.action = `/dispositivoGps/Eliminar/${imei}/`;
         });
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> dc812ec9c731fe87eea295af9a20c9cf7e7f4aa9
+>>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
 
     });
 
@@ -251,7 +272,14 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     });
+<<<<<<< HEAD
 
+=======
+<<<<<<< HEAD
+
+=======
+=======
+>>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
 <script>
 document.getElementById("imei").addEventListener("input", function (event) {
     const input = event.target;
@@ -265,5 +293,6 @@ document.getElementById("imei").addEventListener("input", function (event) {
 
 });
 </script>
+>>>>>>> dc812ec9c731fe87eea295af9a20c9cf7e7f4aa9
 
 {% endblock %}

@@ -221,13 +221,15 @@
 
    <script>
  document.addEventListener("DOMContentLoaded", function () { 
+    // Validación de correo para que termine con @gmail.com o @gmail.cl
     const correoInputs = document.querySelectorAll('input[type="email"]');
     correoInputs.forEach(correoInput => {
         correoInput.addEventListener("input", function () {
-            if (!this.value.includes("@")) {
-                this.setCustomValidity("El correo debe contener el símbolo '@'.");
+            // Comprobamos si el correo termina con "@gmail.com" o "@gmail.cl"
+            if (!(this.value.toLowerCase().endsWith("@gmail.com") || this.value.toLowerCase().endsWith("@gmail.cl"))) {
+                this.setCustomValidity("El correo debe ser de tipo @gmail.com o @gmail.cl.");
             } else {
-                this.setCustomValidity("");
+                this.setCustomValidity(""); // Si es válido, limpiamos el mensaje
             }
         });
     });
@@ -270,6 +272,8 @@ telefonoInputs.forEach(telefonoInput => {
         const rutRegex = /^[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[0-9kK]$/;
         if (!rutRegex.test(this.value)) {
             this.setCustomValidity("Formato inválido. El RUT debe tener el formato XX.XXX.XXX-X.");
+        } else if (this.value.endsWith("-0")) {
+            this.setCustomValidity("El RUT no puede ser -0.");
         } else {
             this.setCustomValidity("");
         }
@@ -293,7 +297,63 @@ telefonoInputs.forEach(telefonoInput => {
 
 
 
+
+
+
+
 </script>
+
+
+
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const addForm = document.querySelector("#addModal form");
+    if (addForm) {
+        addForm.addEventListener("submit", function (event) {
+            event.preventDefault();  // Prevenimos el envío tradicional del formulario
+
+            const formData = new FormData(addForm);
+
+            fetch("{% url 'registrar_arrendatario' %}", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+                },
+                body: formData,
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: "success",
+                            title: "¡Arrendatario registrado!",
+                            text: data.message,
+                        }).then(() => {
+                            location.reload();  // Recarga la página después de un registro exitoso
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error",
+                            text: data.message,  // El mensaje de error enviado desde el backend
+                        });
+                    }
+                })
+                .catch(() => {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error inesperado",
+                        text: "Hubo un problema al registrar el arrendatario. Intenta nuevamente.",
+                    });
+                });
+        });
+    }
+});
+</script>
+
+
 
 
 

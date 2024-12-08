@@ -58,47 +58,62 @@ def registrar_dispositivo_gps_usado(request):
 
         vehiculos_response = requests.get(URL_API_VEHICULOS)
         vehiculos = vehiculos_response.json() if vehiculos_response.status_code == 200 else []
+
+        # Verificar si el IMEI ya está asignado a un vehículo
+        imei_asignado = None
+        if request.method == "POST":
+            imei = request.POST.get("imei")
+            vehiculo_id = request.POST.get("ID_Vehiculo_id")
+
+            # Validar si el IMEI ya está registrado en otro vehículo
+            dispositivos_response = requests.get(URL_API_GPS_USADOS)
+            dispositivos = dispositivos_response.json() if dispositivos_response.status_code == 200 else []
+            for dispositivo in dispositivos:
+                if dispositivo['ID_GPS'] == imei and dispositivo['ID_Vehiculo'] != vehiculo_id:
+                    imei_asignado = dispositivo['ID_Vehiculo']
+                    break
+
+            if imei_asignado:
+                return JsonResponse({"error": f"Este IMEI ya está asignado a otro vehículo (ID: {imei_asignado})."}, status=400)
+
+            # Obtener la fecha y hora actual en la zona horaria de Chile
+            chile_timezone = pytz.timezone('America/Santiago')
+            fecha_instalacion = datetime.now(chile_timezone).isoformat(timespec='seconds')
+
+            if not imei or not vehiculo_id:
+                return JsonResponse({"error": "Los campos IMEI y Vehículo son obligatorios."}, status=400)
+
+            data = {
+                "fecha_Instalacion": fecha_instalacion,
+                "ID_GPS": imei,
+                "ID_Vehiculo": vehiculo_id,
+            }
+            headers = {"Content-Type": "application/json"}
+
+            try:
+                response = requests.post(URL_API_GPS_USADOS, json=data, headers=headers)
+                if response.status_code == 201:
+                    return redirect('gpsusado')
+                return JsonResponse({
+                    "error": f"Error: {response.json().get('detail', 'Desconocido')}."
+                }, status=response.status_code)
+            except requests.RequestException as e:
+                return JsonResponse({"error": f"Error de conexión: {str(e)}"}, status=500)
+
+        # Calcular la fecha actual para mostrar en el modal
+        chile_timezone = pytz.timezone('America/Santiago')
+        fecha_instalacion = datetime.now(chile_timezone).strftime("%Y-%m-%dT%H:%M")
+
     except requests.RequestException as e:
         print(f"Error al cargar datos: {e}")
         imeis, vehiculos = [], []
-
-    if request.method == "POST":
-        imei = request.POST.get("imei")
-        vehiculo_id = request.POST.get("ID_Vehiculo_id")
-
-        # Obtener la fecha y hora actual en la zona horaria de Chile
-        chile_timezone = pytz.timezone('America/Santiago')
-        fecha_instalacion = datetime.now(chile_timezone).isoformat(timespec='seconds')
-
-        if not imei or not vehiculo_id:
-            return JsonResponse({"error": "Los campos IMEI y Vehículo son obligatorios."}, status=400)
-
-        data = {
-            "fecha_Instalacion": fecha_instalacion,
-            "ID_GPS": imei,
-            "ID_Vehiculo": vehiculo_id,
-        }
-        headers = {"Content-Type": "application/json"}
-
-        try:
-            response = requests.post(URL_API_GPS_USADOS, json=data, headers=headers)
-            if response.status_code == 201:
-                return redirect('gpsusado')
-            return JsonResponse({
-                "error": f"Error: {response.json().get('detail', 'Desconocido')}."
-            }, status=response.status_code)
-        except requests.RequestException as e:
-            return JsonResponse({"error": f"Error de conexión: {str(e)}"}, status=500)
-
-    # Calcular la fecha actual para mostrar en el modal
-    chile_timezone = pytz.timezone('America/Santiago')
-    fecha_instalacion = datetime.now(chile_timezone).strftime("%Y-%m-%dT%H:%M")
 
     return render(request, 'CRUD/registrar_gpsusado.html', {
         'IMEIs': imeis,
         'Vehiculos': vehiculos,
         'FechaInstalacion': fecha_instalacion,
     })
+
 
 def editar_dispositivo_gps_usado(request, imei):
     """Editar un dispositivo GPS usado existente."""
@@ -128,6 +143,13 @@ def editar_dispositivo_gps_usado(request, imei):
         # Validar campos obligatorios
         if not vehiculo_id:
             return JsonResponse({"error": "El campo Vehículo es obligatorio."}, status=400)
+
+        # Verificar si el IMEI ya está asignado a otro vehículo
+        dispositivos_response = requests.get(URL_API_GPS_USADOS)
+        dispositivos = dispositivos_response.json() if dispositivos_response.status_code == 200 else []
+        for dispositivo in dispositivos:
+            if dispositivo['ID_GPS'] == imei and dispositivo['ID_Vehiculo'] != vehiculo_id:
+                return JsonResponse({"error": f"Este IMEI ya está asignado a otro vehículo (ID: {dispositivo['ID_Vehiculo']})."}, status=400)
 
         # Construir datos para el PUT
         data = {

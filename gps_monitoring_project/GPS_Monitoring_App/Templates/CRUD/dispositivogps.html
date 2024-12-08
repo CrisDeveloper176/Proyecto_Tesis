@@ -138,28 +138,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const editModal = document.getElementById("editModal");
     const deleteModal = document.getElementById("deleteModal");
 
-<<<<<<< HEAD
+
     // Función para configurar el modal de edición
     editModal.addEventListener("show.bs.modal", function (event) {
         const button = event.relatedTarget;  // El botón que abrió el modal
         const imei = button.getAttribute("data-imei");
         const estado = button.getAttribute("data-estado");
-=======
+
         editModal.addEventListener("show.bs.modal", function (event) {
             const button = event.relatedTarget;
             const imei = button.getAttribute("data-imei");
             const estado = button.getAttribute("data-estado");
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
+
 
         const form = document.getElementById("edit-form");
         // Establecer la URL del formulario para editar el dispositivo
         form.action = `/dispositivoGps/Editar/${imei}/`;
 
-<<<<<<< HEAD
+
         // Rellenar los campos con los datos del dispositivo
         document.getElementById("edit-imei").value = imei;
         document.getElementById("edit-estado").value = estado;
-=======
+
             const form = document.getElementById("edit-form");
             form.action = `/dispositivoGps/Editar/${imei}/`;
 
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const form = deleteModal.querySelector("form");
             form.action = `/dispositivoGps/Eliminar/${imei}/`;
         });
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
+
     });
 
     // Función para configurar el modal de eliminación
@@ -192,7 +192,7 @@ document.addEventListener("DOMContentLoaded", function () {
         form.action = `/dispositivoGps/Eliminar/${imei}/`;
     });
 
-<<<<<<< HEAD
+
     // Validación del IMEI en tiempo real (solo números)
     ["imei", "edit-imei"].forEach((id) => {
         const input = document.getElementById(id);
@@ -205,16 +205,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         }
     });
-=======
-<script>
-document.getElementById("imei").addEventListener("input", function (event) {
-    const input = event.target;
-    const isValid = /^\d{0,15}$/.test(input.value);
-    if (!isValid) {
-        input.value = input.value.slice(0, -1); 
-    }
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
-});
-</script>
+
 
 {% endblock %}

@@ -44,11 +44,8 @@
     </table>
 </div>
 
-<<<<<<< HEAD
-
 <!-- Modal para agregar dispositivo GPS -->
-=======
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
+
 <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -87,19 +84,8 @@
     </div>
 </div>
 
-<<<<<<< HEAD
-
-
-
-
-
-
-
-
-
 <!-- Modal para editar dispositivo GPS -->
-=======
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
+
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -144,132 +130,66 @@
     </div>
 </div>
 
-<<<<<<< HEAD
-=======
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="post" id="delete-form">
-                {% csrf_token %}
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Dispositivo GPS</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>¿Estás seguro de que deseas eliminar este dispositivo GPS?</p>
-                    <input type="hidden" id="delete-imei" name="imei">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-    const editModal = document.getElementById("editModal");
+        const editModal = document.getElementById("editModal");
 
-<<<<<<< HEAD
-    editModal.addEventListener("show.bs.modal", function (event) {
-        const button = event.relatedTarget;
-=======
         editModal.addEventListener("show.bs.modal", function (event) {
             const button = event.relatedTarget;
             const imei = button.getAttribute("data-imei");
             const fechaInstalacion = button.getAttribute("data-fecha-instalacion");
             const fechaDeceso = button.getAttribute("data-fecha-deceso");
             const idVehiculo = button.getAttribute("data-id-vehiculo");
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
 
-        const imei = button.getAttribute("data-imei");
-        const fechaInstalacion = button.getAttribute("data-fecha-instalacion");
-        const fechaDeceso = button.getAttribute("data-fecha-deceso");
-        const idVehiculo = button.getAttribute("data-id-vehiculo");
+            const form = document.getElementById("edit-form");
+            form.action = `/dispositivos_usados/editar/${imei}/`; // Configura la URL con el IMEI
 
-        const form = document.getElementById("edit-form");
-        form.action = `/dispositivos_usados/editar/${imei}/`; // Configura la URL con el IMEI
-
-<<<<<<< HEAD
-        // Asigna valores
-        document.getElementById("edit-imei").value = imei;
-        document.getElementById("fecha-instalacion").value = fechaInstalacion;
-        document.getElementById("edit-fecha-deceso").value = fechaDeceso || '';
-        document.getElementById("edit-vehiculo").value = idVehiculo;
-
-        // Maneja el envío del formulario
-        form.addEventListener("submit", function (e) {
-            e.preventDefault();
-
-            const data = {
-                fecha_Deceso: document.getElementById("edit-fecha-deceso").value,
-                ID_Vehiculo: document.getElementById("edit-vehiculo").value,
-            };
-
-            fetch(form.action, {
-                method: "PUT", // Método HTTP PUT
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token }}",
-                },
-                body: JSON.stringify(data),
-            })
-                .then((response) => {
-                    if (response.ok) {
-                        alert("Dispositivo actualizado correctamente.");
-                        window.location.reload();
-                    } else {
-                        return response.json().then((err) => {
-                            throw new Error(err.error || "Error al actualizar el dispositivo.");
-                        });
-                    }
-                })
-                .catch((err) => alert(err.message));
-        });
-=======
+            // Asigna valores
             document.getElementById("edit-imei").value = imei;
             document.getElementById("edit-fecha-instalacion").value = fechaInstalacion;
             document.getElementById("edit-fecha-deceso").value = fechaDeceso || '';
             document.getElementById("edit-vehiculo").value = idVehiculo;
+
+            // Maneja el envío del formulario
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                const data = {
+                    fecha_Deceso: document.getElementById("edit-fecha-deceso").value,
+                    ID_Vehiculo: document.getElementById("edit-vehiculo").value,
+                };
+
+                fetch(form.action, {
+                    method: "PUT", // Método HTTP PUT
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}",
+                    },
+                    body: JSON.stringify(data),
+                })
+                    .then((response) => {
+                        if (response.ok) {
+                            alert("Dispositivo actualizado correctamente.");
+                            window.location.reload();
+                        } else {
+                            return response.json().then((err) => {
+                                throw new Error(err.error || "Error al actualizar el dispositivo.");
+                            });
+                        }
+                    })
+                    .catch((err) => alert(err.message));
+            });
         });
 
-        const deleteModal = document.getElementById("deleteModal");
+        const addDeviceModal = document.getElementById("addDeviceModal");
+        addDeviceModal.addEventListener("show.bs.modal", function () {
+            const fechaInput = document.getElementById("fecha-instalacion");
+            const now = new Date();
 
-        deleteModal.addEventListener("show.bs.modal", function (event) {
-            const button = event.relatedTarget;
-            const imei = button.getAttribute("data-imei");
-
-            if (!imei) {
-                console.error("IMEI no proporcionado");
-                return;
-            }
-
-            const form = document.getElementById("delete-form");
-            form.action = `/dispositivoGps/Eliminar/${imei}/`;
-
-            document.getElementById("delete-imei").value = imei;
+            const formattedDate = now.toISOString().slice(0, 16);  
+            fechaInput.value = formattedDate;  
         });
     });
 </script>
 
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const addDeviceModal = document.getElementById("addDeviceModal");
-    addDeviceModal.addEventListener("show.bs.modal", function () {
-        const fechaInput = document.getElementById("fecha-instalacion");
-        const now = new Date();
-        
-        const formattedDate = now.toISOString().slice(0, 16);  
-        
-        fechaInput.value = formattedDate;  
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
-    });
-});
-
-
-</script>
 {% endblock %}

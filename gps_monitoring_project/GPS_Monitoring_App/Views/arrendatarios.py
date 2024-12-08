@@ -44,12 +44,21 @@ def registrar_arrendatario(request):
         correo = request.POST.get("correo")
 
         if not nombre or not correo or not telefono:
-            return JsonResponse({"error": "Todos los campos son obligatorios"}, status=400)
+            return JsonResponse({"success": False, "message": "Todos los campos son obligatorios"}, status=400)
+
+        # Verifica si el RUT ya existe en la base de datos
+        URL_API_VERIFICAR_RUT = f"https://apitesis.fly.dev/api/v1/arrendatarios/{rut}/"
+        try:
+            response_rut = requests.get(URL_API_VERIFICAR_RUT)
+            if response_rut.status_code == 200:  # Si el RUT existe, devolver error
+                return JsonResponse({"success": False, "message": "El RUT ya está registrado"}, status=400)
+        except requests.RequestException as e:
+            return JsonResponse({"success": False, "message": f"Error al conectar con la API: {e}"}, status=500)
 
         try:
             telefono = int(telefono)
         except ValueError:
-            return JsonResponse({"error": "El teléfono debe ser un número entero válido."}, status=400)
+            return JsonResponse({"success": False, "message": "El teléfono debe ser un número entero válido."}, status=400)
 
         data = {
             "Rut": rut,
@@ -65,15 +74,16 @@ def registrar_arrendatario(request):
         try:
             response = requests.post(URL_API, json=data, headers=headers)
         except requests.RequestException as e:
-            return JsonResponse({"error": f"Error al conectar con la API: {e}"}, status=500)
+            return JsonResponse({"success": False, "message": f"Error al conectar con la API: {e}"}, status=500)
 
         if response.status_code == 201:
-            return redirect("arrendatario")
+            return JsonResponse({"success": True, "message": "Arrendatario registrado exitosamente"})
         else:
             error_message = response.json().get("detail", "Error al registrar el arrendatario")
-            return JsonResponse({"error": error_message}, status=response.status_code)
+            return JsonResponse({"success": False, "message": error_message}, status=response.status_code)
 
-    return JsonResponse({"error": "Método no permitido"}, status=405)
+    return JsonResponse({"success": False, "message": "Método no permitido"}, status=405)
+
 
 def editar_arrendatario(request, rut):
     if request.method == "POST":

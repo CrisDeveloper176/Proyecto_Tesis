@@ -44,13 +44,8 @@
     </table>
 </div>
 
-<<<<<<< HEAD
 
 <!-- Modal para agregar dispositivo GPS -->
-=======
-<!-- Modal para agregar dispositivo GPS -->
-
->>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
 <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -89,21 +84,8 @@
     </div>
 </div>
 
-<<<<<<< HEAD
-
-
-
-
-
-
-
-
 
 <!-- Modal para editar dispositivo GPS -->
-=======
-<!-- Modal para editar dispositivo GPS -->
-
->>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -148,7 +130,6 @@
     </div>
 </div>
 
-<<<<<<< HEAD
 
 
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
@@ -174,34 +155,24 @@
 </div>
 
 
-=======
->>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const editModal = document.getElementById("editModal");
 
-<<<<<<< HEAD
 
     editModal.addEventListener("show.bs.modal", function (event) {
         const button = event.relatedTarget;
 
-=======
->>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
         editModal.addEventListener("show.bs.modal", function (event) {
             const button = event.relatedTarget;
             const imei = button.getAttribute("data-imei");
             const fechaInstalacion = button.getAttribute("data-fecha-instalacion");
             const fechaDeceso = button.getAttribute("data-fecha-deceso");
             const idVehiculo = button.getAttribute("data-id-vehiculo");
-<<<<<<< HEAD
-
-=======
->>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
 
             const form = document.getElementById("edit-form");
             form.action = `/dispositivos_usados/editar/${imei}/`; // Configura la URL con el IMEI
 
-<<<<<<< HEAD
         const form = document.getElementById("edit-form");
         form.action = `/dispositivos_usados/editar/${imei}/`; // Configura la URL con el IMEI
 
@@ -242,9 +213,6 @@
                 .catch((err) => alert(err.message));
         });
 
-=======
-            // Asigna valores
->>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
             document.getElementById("edit-imei").value = imei;
             document.getElementById("edit-fecha-instalacion").value = fechaInstalacion;
             document.getElementById("edit-fecha-deceso").value = fechaDeceso || '';

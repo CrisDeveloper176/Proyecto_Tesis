@@ -2,7 +2,6 @@ from django.urls import path
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView
-from .Views.vehiculos import *
 from .Views.arrendatarios import *
 from .Views.login import *
 from .Views.monitoreo import *
@@ -15,6 +14,7 @@ from .Views.gpsusado import *
 from .Views.HistorialVIaje import *
 from .Views.RegistrarMarca import *
 from .Views.RegistrarModelo import *
+from .Views.RegistrarVehiculo import *
 
 
 
@@ -32,10 +32,7 @@ urlpatterns = [
     path('Arrendatarios/Registrar', registrar_arrendatario, name='registrar_arrendatario'),
     path('Arrendatarios/Editar/<str:rut>/', editar_arrendatario, name='editar_arrendatario'),
     path('Arrendatarios/Eliminar/<str:rut>/', eliminar_arrendatario, name='eliminar_arrendatario'),
-    path("vehiculos/", obtener_modelos_y_vehiculos, name="vehiculos"),
-    path('vehiculos/Registrar', registrar_vehiculo, name='registrar_vehiculo'),
-    path('vehiculos/Editar/<int:ID_Vehiculo>/', editar_vehiculo , name='editar_Vehiculo'),
-    path('vehiculos/Eliminar/<int:ID_Vehiculo>/', eliminar_vehiculo, name='eliminar_Vehiculo'),
+ 
 
    # Estados GPS
     path('estadoGps/', listar_estados_gps, name='estadoGps'),
@@ -58,6 +55,7 @@ urlpatterns = [
 
     path('registrar-marca/', visualizar_marca, name='registrar_marca'),
     path('registrar-modelo/', visualizar_modelo, name='registrar_modelo'),
+    path('registrar-vehiculo/', visualizar_vehiculo, name='registrar_vehiculo'),
    
 
 

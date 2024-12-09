@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 import requests
-
+import django
 
 URL_API_DISPOSITIVO_GPS = "https://apitesis.fly.dev/api/v1/Dispositivo_GPS/"
 URL_API_ESTADO_GPS = "https://apitesis.fly.dev/api/v1/Estado_GPS/"

@@ -13,10 +13,8 @@ from .Views.estado_dispositivo import *
 from .Views.dispositivogps import *
 from .Views.gpsusado import *
 from .Views.HistorialVIaje import *
-from .Views.registrarmodelos import *
-
-from .Views.registrarmodelos import *
-
+from .Views.RegistrarMarca import *
+from .Views.RegistrarModelo import *
 
 
 
@@ -57,13 +55,11 @@ urlpatterns = [
 
     
 
-
-    path('modelos-marcas/', obtener_modelos_y_marcas, name='modelos_marcas'),
-    path('modelos-marcas/registrar-modelo/', registrar_modelo, name='registrar_modelo'),
-    path('modelos-marcas/editar-modelo/<int:ID_Modelo>/', editar_modelo, name='editar_modelo'),
-    path('modelos-marcas/eliminar-modelo/<int:ID_Modelo>/', eliminar_modelo, name='eliminar_modelo'),
-    path('modelos-marcas/registrar-marca/', registrar_marca, name='registrar_marca'),
+    path('registrar-marca/', visualizar_marca, name='registrar_marca'),
+    path('registrar-modelo/', visualizar_modelo, name='registrar_modelo'),
    
+
+
 
 
 

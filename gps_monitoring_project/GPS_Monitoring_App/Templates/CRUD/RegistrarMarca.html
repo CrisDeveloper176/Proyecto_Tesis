@@ -1,0 +1,213 @@
+{% extends 'TemplatesBase/Base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Gestión de Marcas de Autos</h1>
+
+    <button class="btn btn-success mt-4" data-bs-toggle="modal" data-bs-target="#addMarcaModal">Agregar Marca</button>
+
+    <!-- Tabla para mostrar marcas -->
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Marca</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="marca-list">
+            <!-- Aquí se llenarán las marcas con JavaScript -->
+        </tbody>
+    </table>
+
+    <!-- Modal para Agregar Marca -->
+    <div class="modal fade" id="addMarcaModal" tabindex="-1" aria-labelledby="addMarcaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addMarcaModalLabel">Agregar Nueva Marca</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="marca" class="form-label">Marca</label>
+                        <input type="text" class="form-control" id="marca" placeholder="Ingrese la marca del auto" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveMarca">Agregar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Marca -->
+    <div class="modal fade" id="editMarcaModal" tabindex="-1" aria-labelledby="editMarcaModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editMarcaModalLabel">Editar Marca</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit-marca" class="form-label">Marca</label>
+                        <input type="text" class="form-control" id="edit-marca" placeholder="Ingrese la nueva marca del auto" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="updateMarca">Actualizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    const API_URL = 'https://apitesis.fly.dev/api/v1/Marca/';
+    let selectedMarcaId = null;
+
+    const loadMarcas = async () => {
+        const tbody = document.getElementById('marca-list');
+        tbody.innerHTML = '';
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error('Error al cargar las marcas');
+            const marcas = await response.json();
+
+            marcas.forEach((marca) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${marca.ID_Marca}</td>
+                    <td>${marca.Marca}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="openEditModal(${marca.ID_Marca}, '${marca.Marca}')">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMarca(${marca.ID_Marca})">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            Swal.fire('Error', 'No se pudieron cargar las marcas.', 'error');
+        }
+    };
+
+    const checkDuplicate = async (nombre, id = null) => {
+        try {
+            const response = await fetch(API_URL);
+            const marcas = await response.json();
+            return marcas.some(marca => 
+                marca.Marca.toLowerCase() === nombre.toLowerCase() && marca.ID_Marca !== id
+            );
+        } catch (error) {
+            console.error('Error al verificar duplicados:', error);
+            return false;
+        }
+    };
+
+    const saveMarca = async () => {
+        const marcaInput = document.getElementById('marca');
+        const nuevaMarca = marcaInput.value.trim();
+
+        if (!nuevaMarca) {
+            Swal.fire('Advertencia', 'El campo Marca no puede estar vacío.', 'warning');
+            return;
+        }
+
+        if (await checkDuplicate(nuevaMarca)) {
+            Swal.fire('Advertencia', 'Ya existe una marca con ese nombre.', 'warning');
+            return;
+        }
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ Marca: nuevaMarca }),
+            });
+
+            if (!response.ok) throw new Error('Error al guardar la marca');
+            Swal.fire('Éxito', 'Marca agregada exitosamente.', 'success');
+            marcaInput.value = '';
+            loadMarcas();
+            document.querySelector('#addMarcaModal .btn-close').click();
+        } catch (error) {
+            Swal.fire('Error', 'No se pudo guardar la marca.', 'error');
+        }
+    };
+
+    const editMarca = async (id, nombre) => {
+        if (!nombre) {
+            Swal.fire('Advertencia', 'El campo Marca no puede estar vacío.', 'warning');
+            return;
+        }
+
+        if (await checkDuplicate(nombre, id)) {
+            Swal.fire('Advertencia', 'Ya existe una marca con ese nombre.', 'warning');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}${id}/`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ Marca: nombre }),
+            });
+
+            if (!response.ok) throw new Error('Error al actualizar la marca');
+            Swal.fire('Éxito', 'Marca actualizada exitosamente.', 'success');
+            loadMarcas();
+            document.querySelector('#editMarcaModal .btn-close').click();
+        } catch (error) {
+            Swal.fire('Error', 'No se pudo actualizar la marca.', 'error');
+        }
+    };
+
+    const deleteMarca = async (id) => {
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Esta acción no se puede deshacer.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`${API_URL}${id}/`, {
+                    method: 'DELETE',
+                });
+
+                if (!response.ok) throw new Error('Error al eliminar la marca');
+                Swal.fire('Éxito', 'Marca eliminada exitosamente.', 'success');
+                loadMarcas();
+            } catch (error) {
+                Swal.fire('Error', 'No se pudo eliminar la marca.', 'error');
+            }
+        }
+    };
+
+    const openEditModal = (id, nombre) => {
+        selectedMarcaId = id;
+        document.getElementById('edit-marca').value = nombre;
+        const editModal = new bootstrap.Modal(document.getElementById('editMarcaModal'));
+        editModal.show();
+    };
+
+    document.getElementById('saveMarca').addEventListener('click', saveMarca);
+    document.getElementById('updateMarca').addEventListener('click', () => {
+        const nuevoNombre = document.getElementById('edit-marca').value.trim();
+        editMarca(selectedMarcaId, nuevoNombre);
+    });
+
+    document.addEventListener('DOMContentLoaded', loadMarcas);
+</script>
+{% endblock %}

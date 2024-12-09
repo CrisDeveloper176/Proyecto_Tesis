@@ -116,7 +116,7 @@ def editar_vehiculo(request, ID_Vehiculo):
         id_modelo = request.POST.get("id_modelo")
 
         if not matricula or not estado_vehiculo or not kilometraje or not id_modelo:
-            return JsonResponse({"error": "Todos los campos son obligatorios"}, status=400)
+            return JsonResponse({"success": False, "message": "Todos los campos son obligatorios"}, status=400)
         
         # Verificar si la matrícula ya está registrada en otro vehículo
         URL_API = "https://apitesis.fly.dev/api/v1/vehiculo/"
@@ -124,17 +124,17 @@ def editar_vehiculo(request, ID_Vehiculo):
         if response.status_code == 200:
             vehiculos = response.json()
             if any(vehiculo["Matricula"] == matricula and vehiculo["ID_Vehiculo"] != ID_Vehiculo for vehiculo in vehiculos):
-                return JsonResponse({"error": "La matrícula ya está registrada en otro vehículo."}, status=400)
+                return JsonResponse({"success": False, "message": "La matrícula ya está registrada en otro vehículo."}, status=400)
 
         try:
             kilometraje = int(kilometraje)
         except ValueError:
-            return JsonResponse({"error": "El kilometraje debe ser un número entero válido."}, status=400)
+            return JsonResponse({"success": False, "message": "El kilometraje debe ser un número entero válido."}, status=400)
 
         try:
             id_modelo = int(id_modelo)
         except ValueError:
-            return JsonResponse({"error": "El ID del modelo debe ser un número entero válido."}, status=400)
+            return JsonResponse({"success": False, "message": "El ID del modelo debe ser un número entero válido."}, status=400)
 
         data = {
             "Matricula": matricula,
@@ -150,13 +150,16 @@ def editar_vehiculo(request, ID_Vehiculo):
         response = requests.put(URL_API, json=data, headers=headers)
         response_data = response.json()
         print("Respuesta de la API:", response_data)
+        
         if response.status_code == 200:
-            return redirect("vehiculos")
+            # Enviar una respuesta JSON exitosa
+            return JsonResponse({"success": True, "message": "Vehículo actualizado exitosamente."})
         else:
             error_message = response.json().get("detail", "Error al editar el vehículo")
-            return JsonResponse({"error": error_message}, status=response.status_code)
+            return JsonResponse({"success": False, "message": error_message}, status=response.status_code)
 
-    return JsonResponse({"error": "Método no permitido"}, status=405)
+    return JsonResponse({"success": False, "message": "Método no permitido"}, status=405)
+
 
     
 def eliminar_vehiculo(request,ID_Vehiculo):

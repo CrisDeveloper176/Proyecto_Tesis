@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Modales de edición y eliminación
     const editModal = document.getElementById("editModal");
     const deleteModal = document.getElementById("deleteModal");
-<<<<<<< HEAD
+
 
 
     // Función para configurar el modal de edición
@@ -145,10 +145,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const button = event.relatedTarget;  // El botón que abrió el modal
         const imei = button.getAttribute("data-imei");
         const estado = button.getAttribute("data-estado");
+
+
+<<<<<<< HEAD
+
+
 =======
->>>>>>> e8615f954ba3ed3c602680920e5d05c7758e4fbb
-
-
+>>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
     // Función para configurar el modal de edición
     editModal.addEventListener("show.bs.modal", function (event) {
         const button = event.relatedTarget;  // El botón que abrió el modal
@@ -159,9 +162,11 @@ document.addEventListener("DOMContentLoaded", function () {
             const button = event.relatedTarget;
             const imei = button.getAttribute("data-imei");
             const estado = button.getAttribute("data-estado");
-
-
 <<<<<<< HEAD
+=======
+
+>>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
+
 
         const form = document.getElementById("edit-form");
         // Establecer la URL del formulario para editar el dispositivo
@@ -173,14 +178,18 @@ document.addEventListener("DOMContentLoaded", function () {
         // Rellenar los campos con los datos del dispositivo
         document.getElementById("edit-imei").value = imei;
         document.getElementById("edit-estado").value = estado;
-=======
+
         const form = document.getElementById("edit-form");
         // Establecer la URL del formulario para editar el dispositivo
         form.action = `/dispositivoGps/Editar/${imei}/`;
->>>>>>> e8615f954ba3ed3c602680920e5d05c7758e4fbb
 
 <<<<<<< HEAD
+
+
+=======
+<<<<<<< HEAD
 >>>>>>> dc812ec9c731fe87eea295af9a20c9cf7e7f4aa9
+>>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
         // Rellenar los campos con los datos del dispositivo
         document.getElementById("edit-imei").value = imei;
         document.getElementById("edit-estado").value = estado;
@@ -205,9 +214,13 @@ document.addEventListener("DOMContentLoaded", function () {
             form.action = `/dispositivoGps/Eliminar/${imei}/`;
         });
 <<<<<<< HEAD
+
+=======
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> dc812ec9c731fe87eea295af9a20c9cf7e7f4aa9
+>>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
 
     });
 
@@ -219,34 +232,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const form = deleteModal.querySelector("form");
         // Establecer la URL del formulario para eliminar el dispositivo
         form.action = `/dispositivoGps/Eliminar/${imei}/`;
-=======
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
->>>>>>> e8615f954ba3ed3c602680920e5d05c7758e4fbb
+
     });
 
     // Función para configurar el modal de eliminación
     deleteModal.addEventListener("show.bs.modal", function (event) {
         const button = event.relatedTarget;
         const imei = button.getAttribute("data-imei");
-
-<<<<<<< HEAD
-    // Validación del IMEI en tiempo real (solo números)
-    ["imei", "edit-imei"].forEach((id) => {
-        const input = document.getElementById(id);
-        if (input) {  // Verifica que el campo existe antes de agregar el listener
-            input.addEventListener("input", function (event) {
-                const input = event.target;
-                if (!/^\d{0,15}$/.test(input.value)) {
-                    input.value = input.value.slice(0, -1);
-                }
-            });
-        }
-=======
-        const form = deleteModal.querySelector("form");
-        // Establecer la URL del formulario para eliminar el dispositivo
-        form.action = `/dispositivoGps/Eliminar/${imei}/`;
->>>>>>> e8615f954ba3ed3c602680920e5d05c7758e4fbb
-    });
 
 
     // Validación del IMEI en tiempo real (solo números)
@@ -260,11 +252,34 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
         }
+
+        const form = deleteModal.querySelector("form");
+        // Establecer la URL del formulario para eliminar el dispositivo
+        form.action = `/dispositivoGps/Eliminar/${imei}/`;
+
+    });
+
+
+    // Validación del IMEI en tiempo real (solo números)
+    ["imei", "edit-imei"].forEach((id) => {
+        const input = document.getElementById(id);
+        if (input) {  // Verifica que el campo existe antes de agregar el listener
+            input.addEventListener("input", function (event) {
+                const input = event.target;
+                if (!/^\d{0,15}$/.test(input.value)) {
+                    input.value = input.value.slice(0, -1);
+                }
+            });
+        }
     });
 <<<<<<< HEAD
 
 =======
+<<<<<<< HEAD
+
 =======
+=======
+>>>>>>> 7127ca231e68a8fb1639be3b026eac2f30bbf6b6
 <script>
 document.getElementById("imei").addEventListener("input", function (event) {
     const input = event.target;
@@ -272,11 +287,10 @@ document.getElementById("imei").addEventListener("input", function (event) {
     if (!isValid) {
         input.value = input.value.slice(0, -1); 
     }
-<<<<<<< HEAD
 
-=======
->>>>>>> d5452171a69aebcac85d7998b6eedb2cc2529e25
->>>>>>> e8615f954ba3ed3c602680920e5d05c7758e4fbb
+
+
+
 });
 </script>
 >>>>>>> dc812ec9c731fe87eea295af9a20c9cf7e7f4aa9

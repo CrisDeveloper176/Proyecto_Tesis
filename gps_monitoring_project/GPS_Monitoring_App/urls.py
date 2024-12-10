@@ -29,6 +29,7 @@ urlpatterns = [
     path('home/', home, name='home'),
     path('monitoring/', monitoring_view, name='monitoring'),
     path('TipoAlerta/', TipoAlerta_view , name='TipoAlerta'),
+    path('mantenimientoreport/', mantenimientoreport_view , name='mantenimientoreport'),
     path('Alerta/', Alerta_view , name='Alerta'),
     path('HistorialViaje/', HistorialViaje_view, name='HistorialViaje'),
     path('reporte/obtener_vehiculos/', obtener_modelos_y_vehiculos_reporte, name='obtener_vehiculos'),

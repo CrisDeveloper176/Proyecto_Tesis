@@ -2,26 +2,44 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-center">Lista de Viajes</h1>
-    <div class="row">
-        <div class="col-md-8">
-            <table class="table table-bordered table-hover  mt-3">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Punto de Origen</th>
-                        <th>Destino</th>
-                        <th>Distancia Recorrida (km)</th>
-                        <th>Velocidad Media (km/h)</th>
-                        <th>Matricula</th>
-                        <th>Modelo</th>
-                        <th>Marca</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody id="viajes-tbody">
-                </tbody>
-            </table>
+    <h1 class="text-center mb-4">Lista de Viajes</h1>
+    
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Viajes Registrados</h5>
+                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addViajeModal">
+                    <i class="fas fa-plus-circle"></i> Agregar Viaje
+                </button>
+            </div>
         </div>
+        <div class="card-body">
+            <p class="text-muted">Aquí puedes visualizar y gestionar los viajes registrados en el sistema.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover mt-3">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Punto de Origen</th>
+                            <th>Destino</th>
+                            <th>Distancia Recorrida (km)</th>
+                            <th>Velocidad Media (km/h)</th>
+                            <th>Matrícula</th>
+                            <th>Modelo</th>
+                            <th>Marca</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="viajes-tbody">
+                        <!-- Los viajes se llenarán dinámicamente -->
+                        <tr>
+                            <td colspan="8" class="text-center">Cargando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">

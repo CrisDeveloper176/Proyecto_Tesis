@@ -2,22 +2,42 @@
 
 {% block content %}
 
-<div class="container">
-    <h1 class="my-4 text-center">Vehiculo</h1>
-    <h2 class="mt-4">Lista de Vehículos</h2>
-    <table id="tabla-vehiculos" class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Matrícula</th>
-                <th>Estado</th>
-                <th>Kilometraje</th>
-                <th>Modelo</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+<div class="container my-5">
+    <h1 class="my-4 text-center">Vehículo</h1>
+    <h2 class="mt-4 text-center">Lista de Vehículos</h2>
+
+    <div class="card shadow-lg mt-4">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Vehículos Registrados</h5>
+                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addVehiculoModal">
+                    <i class="fas fa-plus-circle"></i> Agregar Vehículo
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tabla-vehiculos" class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Matrícula</th>
+                            <th>Estado</th>
+                            <th>Kilometraje</th>
+                            <th>Modelo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas de los vehículos se llenarán dinámicamente -->
+                        <tr>
+                            <td colspan="5" class="text-center">Cargando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
     
     <script>
         document.addEventListener('DOMContentLoaded', () => {

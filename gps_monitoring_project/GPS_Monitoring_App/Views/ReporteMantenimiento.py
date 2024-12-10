@@ -4,6 +4,8 @@ from django.http import JsonResponse
 import json
 import requests
 
+def mantenimientoreport_view(request):
+     return render(request, 'Reportes/ReporteMantenimiento.html')
 def obtener_mantenimiento(request):
     """
     Función para obtener los datos de mantenimiento desde la API con parámetros opcionales

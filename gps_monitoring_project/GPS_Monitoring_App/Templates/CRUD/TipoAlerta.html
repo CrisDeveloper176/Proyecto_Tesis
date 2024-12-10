@@ -2,24 +2,38 @@
 {% block content %}
 
 <div class="container mt-5">
-    <h1>Gestión de Tipos de Alerta</h1>
+    <h1 class="mb-4 text-center">Gestión de Tipos de Alerta</h1>
 
-    <h2 class="mt-4">Lista de Tipos de Alerta</h2>
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Tipo de Alerta</button>
-    <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>ID</th>
-                <th>Tipo de Alerta</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="alerta-table-body">
-            <tr>
-                <td colspan="2" class="text-center">Cargando...</td>
-            </tr>
-        </tbody>
-    </table>
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Lista de Tipos de Alerta</h5>
+                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="fas fa-plus-circle"></i> Agregar Tipo de Alerta
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Administra los tipos de alerta registrados en el sistema.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Tipo de Alerta</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alerta-table-body">
+                        <!-- Los tipos de alerta se llenarán dinámicamente -->
+                        <tr>
+                            <td colspan="3" class="text-center">Cargando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Modal para Agregar -->

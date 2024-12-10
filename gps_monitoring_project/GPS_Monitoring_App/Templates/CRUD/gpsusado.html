@@ -1,27 +1,42 @@
 {% extends 'TemplatesBase/Base.html' %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="mb-4 text-center">Gestión de Dispositivos GPS Usados</h1>
-
-
-    <button class="btn btn-success mt-4" data-bs-toggle="modal" data-bs-target="#addDeviceModal">Agregar Dispositivo GPS</button>
-
-    <!-- Tabla para mostrar dispositivos GPS usados -->
-    <table class="table table-bordered mt-4">
-        <thead>
-            <tr>
-                <th>IMEI</th>
-                <th>Fecha de Instalación</th>
-                <th>Fecha de Deceso</th>
-                <th>Vehículo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="gps-list">
-            <!-- Aquí se llenarán los dispositivos GPS con JavaScript -->
-        </tbody>
-    </table>
+    <div class="container mt-5">
+        <h1 class="mb-4 text-center">Gestión de Dispositivos GPS Usados</h1>
+    
+        <div class="card shadow-lg">
+            <div class="card-header bg-primary text-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Lista de Dispositivos GPS</h5>
+                    <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addDeviceModal">
+                        <i class="fas fa-plus-circle"></i> Agregar Dispositivo GPS
+                    </button>
+                </div>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">Administra los dispositivos GPS instalados y sus detalles.</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>IMEI</th>
+                                <th>Fecha de Instalación</th>
+                                <th>Fecha de Deceso</th>
+                                <th>Vehículo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gps-list">
+                            <!-- Aquí se llenarán los dispositivos GPS con JavaScript -->
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No se encontraron dispositivos GPS.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Modal para Agregar Dispositivo GPS -->
     <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
         <div class="modal-dialog">

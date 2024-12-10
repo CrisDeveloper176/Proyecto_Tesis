@@ -99,173 +99,133 @@
     </div>
 </div>
 
+<!-- Scripts -->
 <script>
     const API_URL = 'https://apitesis.fly.dev/api/v1/TipoMantenimiento/';
+    let tiposExistentes = [];
 
-    // Función para listar tipos de mantenimiento
+    // Función para listar los tipos de mantenimiento
     async function listarTiposMantenimiento() {
         const tbody = document.getElementById('mantenimiento-table-body');
         tbody.innerHTML = '<tr><td colspan="3" class="text-center">Cargando...</td></tr>';
-    
+
         try {
             const response = await fetch(API_URL);
             if (!response.ok) throw new Error('Error al cargar los datos');
+
             const data = await response.json();
-    
-            tbody.innerHTML = ''; // Limpia el contenido
+            tiposExistentes = data.map(m => m.Tipo_Mantenimiento.toLowerCase());
+            tbody.innerHTML = '';
+
             data.forEach(mantenimiento => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${mantenimiento.ID_Mantenimiento}</td>
-                    <td>${mantenimiento.Tipo_Mantenimiento}</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
-                            data-id="${mantenimiento.ID_Mantenimiento}" data-tipo="${mantenimiento.Tipo_Mantenimiento}">
-                            Editar
-                        </button>
-                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                            data-id="${mantenimiento.ID_Mantenimiento}">
-                            Eliminar
-                        </button>
-                    </td>
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${mantenimiento.ID_Mantenimiento}</td>
+                        <td>${mantenimiento.Tipo_Mantenimiento}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
+                                data-id="${mantenimiento.ID_Mantenimiento}" data-tipo="${mantenimiento.Tipo_Mantenimiento}">
+                                Editar
+                            </button>
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                data-id="${mantenimiento.ID_Mantenimiento}">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
                 `;
-                tbody.appendChild(row);
             });
         } catch (error) {
             console.error(error);
             tbody.innerHTML = '<tr><td colspan="3" class="text-center">Error al cargar los datos</td></tr>';
         }
     }
-    
-    // Función para registrar un nuevo tipo de mantenimiento
-    async function registrarTipoMantenimiento(tipoMantenimiento) {
-        try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ Tipo_Mantenimiento: tipoMantenimiento }),
-            });
-    
-            if (!response.ok) throw new Error('Error al registrar el tipo de mantenimiento');
-    
-            // Cierra el modal y recarga la tabla
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addModal'));
-            modal.hide();
 
-            Swal.fire('Éxito', 'Tipo de mantenimiento registrado exitosamente.', 'success');
-            listarTiposMantenimiento();
-        } catch (error) {
-            console.error(error);
-            Swal.fire('Error', 'Error al registrar el tipo de mantenimiento.', 'error');
-        }
+    // Función para validar duplicados
+    function esDuplicado(nombre) {
+        return tiposExistentes.includes(nombre.toLowerCase());
     }
-    
-    // Función para editar un tipo de mantenimiento
-    async function editarTipoMantenimiento(id, tipoMantenimiento) {
-        const editUrl = `${API_URL}${id}/`;
+
+    // Función genérica para manejar registros, ediciones y eliminaciones
+    async function manejarAccion(url, metodo, cuerpo, exitoMensaje, modalId) {
         try {
-            const response = await fetch(editUrl, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ Tipo_Mantenimiento: tipoMantenimiento }),
+            const response = await fetch(url, {
+                method: metodo,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(cuerpo),
             });
 
-            if (!response.ok) throw new Error('Error al editar el tipo de mantenimiento');
+            if (!response.ok) throw new Error('Error en la operación');
 
-            // Recarga la lista y cierra el modal
-            Swal.fire('Éxito', 'Tipo de mantenimiento actualizado exitosamente.', 'success');
+            Swal.fire('Éxito', exitoMensaje, 'success');
             listarTiposMantenimiento();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-            modal.hide();
+            if (modalId) bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
         } catch (error) {
             console.error(error);
-            Swal.fire('Error', 'Error al editar el tipo de mantenimiento.', 'error');
+            Swal.fire('Error', 'Ocurrió un error durante la operación.', 'error');
         }
     }
-    
-    // Función para eliminar un tipo de mantenimiento
-    async function eliminarTipoMantenimiento(id) {
-        const deleteUrl = `${API_URL}${id}/`;
-        try {
-            const response = await fetch(deleteUrl, {
-                method: 'DELETE',
-            });
 
-            if (!response.ok) throw new Error('Error al eliminar el tipo de mantenimiento');
-
-            // Recarga la lista y cierra el modal
-            Swal.fire('Éxito', 'Tipo de mantenimiento eliminado exitosamente.', 'success');
-            listarTiposMantenimiento();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-            modal.hide();
-        } catch (error) {
-            console.error(error);
-            Swal.fire('Error', 'Error al eliminar el tipo de mantenimiento.', 'error');
-        }
-    }
-    
-    // Inicialización de eventos
+    // Inicializar eventos y cargar datos
     document.addEventListener('DOMContentLoaded', () => {
         listarTiposMantenimiento();
 
-        // Evento para agregar un nuevo tipo de mantenimiento
         document.getElementById('add-mantenimiento-button').addEventListener('click', () => {
             const tipoMantenimientoInput = document.getElementById('tipo-mantenimiento-input');
             const tipoMantenimiento = tipoMantenimientoInput.value.trim();
 
             if (!tipoMantenimiento) {
-                alert('Por favor, ingresa un tipo de mantenimiento válido.');
+                Swal.fire('Error', 'Por favor, ingresa un tipo de mantenimiento válido.', 'error');
                 return;
             }
 
-            registrarTipoMantenimiento(tipoMantenimiento);
-            tipoMantenimientoInput.value = ''; // Limpia el campo
+            if (esDuplicado(tipoMantenimiento)) {
+                Swal.fire('Error', 'El tipo de mantenimiento ya existe.', 'error');
+                return;
+            }
+
+            manejarAccion(API_URL, 'POST', { Tipo_Mantenimiento: tipoMantenimiento }, 'Tipo de mantenimiento registrado.', 'addModal');
+            tipoMantenimientoInput.value = ''; // Limpiar campo
         });
 
-        // Manejo del modal de edición
         const editModal = document.getElementById('editModal');
         let currentEditId = null;
 
         editModal.addEventListener('show.bs.modal', (event) => {
             const button = event.relatedTarget;
             currentEditId = button.getAttribute('data-id');
-            const tipoMantenimiento = button.getAttribute('data-tipo');
-            document.getElementById('edit-tipo-mantenimiento-input').value = tipoMantenimiento;
+            document.getElementById('edit-tipo-mantenimiento-input').value = button.getAttribute('data-tipo');
         });
 
-        document.getElementById('edit-mantenimiento-button').addEventListener('click', async () => {
+        document.getElementById('edit-mantenimiento-button').addEventListener('click', () => {
             const tipoMantenimientoInput = document.getElementById('edit-tipo-mantenimiento-input');
             const tipoMantenimiento = tipoMantenimientoInput.value.trim();
 
-            if (!tipoMantenimiento || !currentEditId) {
-                alert('Por favor, ingresa un tipo de mantenimiento válido.');
+            if (!tipoMantenimiento) {
+                Swal.fire('Error', 'Por favor, ingresa un tipo de mantenimiento válido.', 'error');
                 return;
             }
 
-            await editarTipoMantenimiento(currentEditId, tipoMantenimiento);
+            if (esDuplicado(tipoMantenimiento)) {
+                Swal.fire('Error', 'El tipo de mantenimiento ya existe.', 'error');
+                return;
+            }
+
+            manejarAccion(`${API_URL}${currentEditId}/`, 'PATCH', { Tipo_Mantenimiento: tipoMantenimiento }, 'Tipo de mantenimiento actualizado.', 'editModal');
         });
 
-        // Manejo del modal de eliminación
         const deleteModal = document.getElementById('deleteModal');
         let deleteId = null;
 
         deleteModal.addEventListener('show.bs.modal', (event) => {
-            const button = event.relatedTarget;
-            deleteId = button.getAttribute('data-id');
+            deleteId = event.relatedTarget.getAttribute('data-id');
         });
 
-        document.getElementById('delete-mantenimiento-button').addEventListener('click', async () => {
-            if (deleteId) {
-                await eliminarTipoMantenimiento(deleteId);
-            } else {
-                alert('Error: ID no válido para eliminar.');
-            }
+        document.getElementById('delete-mantenimiento-button').addEventListener('click', () => {
+            manejarAccion(`${API_URL}${deleteId}/`, 'DELETE', null, 'Tipo de mantenimiento eliminado.', 'deleteModal');
         });
     });
 </script>
+
 
 {% endblock %}

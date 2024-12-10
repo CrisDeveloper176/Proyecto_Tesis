@@ -130,248 +130,42 @@
 </div>
 
 <script>
-    const API_URL_LIST = 'https://apitesis.fly.dev/api/v1/mantenimientos/';
-    const API_URL_CREATE = 'https://apitesis.fly.dev/api/v1/Mantenimiento_Vehiculo/';
-    const API_URL_UPDATE_DELETE = 'https://apitesis.fly.dev/api/v1/Mantenimiento_Vehiculo/';
 
-    // Función para listar los mantenimientos
-    async function listarMantenimientos() {
-        const tbody = document.getElementById('mantenimiento-table-body');
-        tbody.innerHTML = '<tr><td colspan="5" class="text-center">Cargando...</td></tr>';
+const VEHICULO_API_URL = 'https://apitesis.fly.dev/api/v1/vehiculo/';
 
+
+// Cargar opciones de IMEIs y Vehículos
+    const loadOptions = async (url, selectId, placeholder) => {
+        const select = document.getElementById(selectId);
+        select.innerHTML = `<option value="">${placeholder}</option>`;
         try {
-            const response = await fetch(API_URL_LIST);
-            if (!response.ok) throw new Error('Error al cargar los datos');
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Error al cargar datos de ${selectId}.`);
+
             const data = await response.json();
-
-            tbody.innerHTML = ''; // Limpia el contenido
-            data.forEach(mantenimiento => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${mantenimiento.ID_Vehiculo.Matricula}</td>
-                    <td>${mantenimiento.ID_Mantenimiento.}</td>
-                    <td>${mantenimiento.Fecha_Inicio}</td>
-                    <td>${mantenimiento.Fecha_Fin || 'Pendiente'}</td>
-                    <td>
-                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
-                            data-id="${mantenimiento.ID_Vehiculo}" data-id-mantenimiento="${mantenimiento.ID_Mantenimiento}" 
-                            data-fecha-inicio="${mantenimiento.Fecha_Inicio}" data-fecha-fin="${mantenimiento.Fecha_Fin}">
-                            Editar
-                        </button>
-                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                            data-id="${mantenimiento.ID_Vehiculo}">
-                            Eliminar
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
+            select.innerHTML += data.map(item => `<option value="${item.imei || item.ID_Vehiculo}">${item.imei || item.Matricula}</option>`).join('');
         } catch (error) {
-            console.error(error);
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center">Error al cargar los datos</td></tr>';
+            console.error(`Error al cargar ${selectId}:`, error);
         }
-    }
+    };
 
-    // Función para agregar un nuevo mantenimiento
-    async function agregarMantenimiento(vehiculo, tipoMantenimiento, fechaInicio, fechaFin) {
-        try {
-            const response = await fetch(API_URL_CREATE, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    ID_Vehiculo: vehiculo,
-                    ID_Mantenimiento: tipoMantenimiento,
-                    Fecha_Inicio: fechaInicio,
-                    Fecha_Fin: fechaFin
-                }),
-            });
 
-            if (!response.ok) throw new Error('Error al agregar el mantenimiento');
 
-            // Cierra el modal y recarga la lista
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addModal'));
-            modal.hide();
 
-            Swal.fire('Éxito', 'Mantenimiento agregado exitosamente.', 'success');
-            listarMantenimientos();
-        } catch (error) {
-            console.error(error);
-            Swal.fire('Error', 'Error al agregar el mantenimiento.', 'error');
-        }
-    }
-
-    // Función para editar un mantenimiento
-    async function editarMantenimiento(id, idMantenimiento, vehiculo, fechaInicio, fechaFin) {
-        const updateUrl = `${API_URL_UPDATE_DELETE}${id}/`;
-        try {
-            const response = await fetch(updateUrl, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ 
-                    ID_Vehiculo: vehiculo,
-                    ID_Mantenimiento: idMantenimiento,
-                    Fecha_Inicio: fechaInicio,
-                    Fecha_Fin: fechaFin
-                }),
-            });
-
-            if (!response.ok) throw new Error('Error al editar el mantenimiento');
-
-            // Recarga la lista y cierra el modal
-            Swal.fire('Éxito', 'Mantenimiento actualizado exitosamente.', 'success');
-            listarMantenimientos();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-            modal.hide();
-        } catch (error) {
-            console.error(error);
-            Swal.fire('Error', 'Error al editar el mantenimiento.', 'error');
-        }
-    }
-
-    // Función para eliminar un mantenimiento
-    async function eliminarMantenimiento(id) {
-        const deleteUrl = `${API_URL_UPDATE_DELETE}${id}/`;
-        try {
-            const response = await fetch(deleteUrl, {
-                method: 'DELETE',
-            });
-
-            if (!response.ok) throw new Error('Error al eliminar el mantenimiento');
-
-            // Recarga la lista y cierra el modal
-            Swal.fire('Éxito', 'Mantenimiento eliminado exitosamente.', 'success');
-            listarMantenimientos();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-            modal.hide();
-        } catch (error) {
-            console.error(error);
-            Swal.fire('Error', 'Error al eliminar el mantenimiento.', 'error');
-        }
-    }
-
-    // Inicialización de eventos
+    // Inicializar eventos y carga inicial
     document.addEventListener('DOMContentLoaded', () => {
-        listarMantenimientos();
-
-        // Evento para agregar un nuevo mantenimiento
-        document.getElementById('add-mantenimiento-button').addEventListener('click', () => {
-            const vehiculo = document.getElementById('vehiculo-input').value.trim();
-            const tipoMantenimiento = document.getElementById('tipo-mantenimiento-input').value.trim();
-            const fechaInicio = document.getElementById('fecha-inicio-input').value;
-            const fechaFin = document.getElementById('fecha-fin-input').value || null;
-
-            if (!vehiculo || !tipoMantenimiento || !fechaInicio) {
-                alert('Por favor, ingresa todos los datos correctamente.');
-                return;
-            }
-
-            agregarMantenimiento(vehiculo, tipoMantenimiento, fechaInicio, fechaFin);
-        });
-
-        // Evento para editar un mantenimiento
-        const editModal = document.getElementById('editModal');
-        let currentEditId = null;
-
-        editModal.addEventListener('show.bs.modal', (event) => {
-            const button = event.relatedTarget;
-            currentEditId = button.getAttribute('data-id');
-            const idMantenimiento = button.getAttribute('data-id-mantenimiento');
-            const fechaInicio = button.getAttribute('data-fecha-inicio');
-            const fechaFin = button.getAttribute('data-fecha-fin');
-
-            document.getElementById('edit-vehiculo-input').value = currentEditId;
-            document.getElementById('edit-tipo-mantenimiento-input').value = idMantenimiento;
-            document.getElementById('edit-fecha-inicio-input').value = fechaInicio;
-            document.getElementById('edit-fecha-fin-input').value = fechaFin || '';
-        });
-
-        document.getElementById('edit-mantenimiento-button').addEventListener('click', async () => {
-            const vehiculo = document.getElementById('edit-vehiculo-input').value.trim();
-            const tipoMantenimiento = document.getElementById('edit-tipo-mantenimiento-input').value.trim();
-            const fechaInicio = document.getElementById('edit-fecha-inicio-input').value;
-            const fechaFin = document.getElementById('edit-fecha-fin-input').value || null;
-
-            if (!vehiculo || !tipoMantenimiento || !fechaInicio) {
-                alert('Por favor, ingresa todos los datos correctamente.');
-                return;
-            }
-
-            await editarMantenimiento(currentEditId, tipoMantenimiento, vehiculo, fechaInicio, fechaFin);
-        });
-
-        // Evento para eliminar un mantenimiento
-        const deleteModal = document.getElementById('deleteModal');
-        let deleteId = null;
-
-        deleteModal.addEventListener('show.bs.modal', (event) => {
-            const button = event.relatedTarget;
-            deleteId = button.getAttribute('data-id');
-        });
-
-        document.getElementById('delete-mantenimiento-button').addEventListener('click', async () => {
-            if (deleteId) {
-                await eliminarMantenimiento(deleteId);
-            } else {
-                alert('Error: ID no válido para eliminar.');
-            }
-        });
+        loadGpsList();
+        loadOptions(GPS_DISPOSITIVO_API_URL, 'add-imei', 'Seleccione un IMEI');
+        loadOptions(VEHICULO_API_URL, 'add-vehiculo', 'Seleccione un vehículo');
+        document.getElementById('saveDevice').addEventListener('click', saveGps);
+        document.getElementById('updateDevice').addEventListener('click', updateGps);
     });
-   
-    // Función para llenar el selector de vehículos
-    async function cargarVehiculos() {
-        const vehiculoSelect = document.getElementById('vehiculo-select');
-        try {
-            const response = await fetch(API_VEHICULOS_URL);
-            if (!response.ok) throw new Error('Error al cargar vehículos');
-            const vehiculos = await response.json();
 
-            // Limpiar opciones actuales
-            vehiculoSelect.innerHTML = '<option value="" disabled selected>Seleccionar vehículo</option>';
 
-            // Llenar el selector con los vehículos
-            vehiculos.forEach(vehiculo => {
-                const option = document.createElement('option');
-                option.value = vehiculo.ID_Vehiculo; // Usamos el ID del vehículo
-                option.textContent = `${vehiculo.Matricula}`; 
-                vehiculoSelect.appendChild(option);
-            });
-        } catch (error) {
-            console.error('Error al cargar los vehículos:', error);
-        }
-    }
 
-    // Función para llenar el selector de tipos de mantenimiento
-    async function cargarTiposMantenimiento() {
-        const mantenimientoSelect = document.getElementById('tipomantenimiento-select');
-        try {
-            const response = await fetch(API_TIPOS_MANTENIMIENTO_URL);
-            if (!response.ok) throw new Error('Error al cargar los tipos de mantenimiento');
-            const tiposMantenimiento = await response.json();
 
-            // Limpiar opciones actuales
-            mantenimientoSelect.innerHTML = '<option value="" disabled selected>Seleccionar tipo de mantenimiento</option>';
 
-            // Llenar el selector con los tipos de mantenimiento
-            tiposMantenimiento.forEach(tipo => {
-                const option = document.createElement('option');
-                option.value = tipo.id; // Usamos el ID del tipo de mantenimiento
-                option.textContent = tipo.nombre; // Mostramos el nombre del tipo de mantenimiento
-                mantenimientoSelect.appendChild(option);
-            });
-        } catch (error) {
-            console.error('Error al cargar los tipos de mantenimiento:', error);
-        }
-    }
-
-    // Inicialización al cargar la página
-    document.addEventListener('DOMContentLoaded', () => {
-        cargarVehiculos(); // Cargar los vehículos
-        cargarTiposMantenimiento(); // Cargar los tipos de mantenimiento
-    });
+    
 </script>
 
 {% endblock %}

@@ -23,17 +23,6 @@
             </table>
         </div>
 
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Registrar Nuevo Viaje</h5>
-                    <p class="card-text">Seleccione el IMEI del vehículo para registrar un nuevo viaje.</p>
-                    <button class="btn btn-success w-100 mb-3" onclick="abrirRegistroModal()">Registrar Nuevo Viaje</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="modal fade" id="mapModal" tabindex="-1" aria-labelledby="mapModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -49,31 +38,6 @@
   </div>
 </div>
 
-<div class="modal fade" id="registroModal" tabindex="-1" aria-labelledby="registroModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="registroModalLabel">Registrar Nuevo Viaje</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <form id="registroForm">
-                <div class="mb-3">
-                    <label for="imeiSelect" class="form-label">IMEI</label>
-                    <select class="form-select" id="imeiSelect">
-                        <option value="">Seleccione un IMEI</option>
-                    </select>
-                </div>
-                <p id="mensajeSinViajes" class="text-danger"></p>
-            </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-          <button type="button" class="btn btn-primary" onclick="registrarViaje()">Guardar</button>
-        </div>
-      </div>
-    </div>
-  </div>
 <script>
     const API_URL = "https://apitesis.fly.dev/api/v1/viajes_vehiculo/obtener/";
     const API_DISPOSITIVOS_URL = "https://apitesis.fly.dev/api/v1/Dispositivo_GPS/";
@@ -185,45 +149,7 @@
             }
         });
     }
-    async function registrarViaje() {
-        const imei = document.getElementById("imeiSelect").value;
-        const mensajeSinViajes = document.getElementById("mensajeSinViajes");
-    
-        if (!imei) {
-            alert("Por favor, seleccione un IMEI válido.");
-            return;
-        }
-    
-        try {
-            const crearViajesEndpoint = `https://apitesis.fly.dev/api/v1/crear_viajes/${imei}/`;
-            const crearViajeResponse = await fetch(crearViajesEndpoint, { method: "POST" });
-    
-            if (crearViajeResponse.status === 403) {
-                mensajeSinViajes.textContent = "Este IMEI no tiene permisos para crear viajes.";
-                return;
-            }
-    
-            if (!crearViajeResponse.ok) throw new Error(`Error al registrar el viaje: ${crearViajeResponse.statusText}`);
-    
-            alert("Viaje registrado exitosamente.");
-            const modal = bootstrap.Modal.getInstance(document.getElementById("registroModal"));
-            modal.hide();
-    
-            const eliminarUbicacionesEndpoint = `https://apitesis.fly.dev/api/v1/eliminar-ubi/${imei}/`;
-            const eliminarUbicacionesResponse = await fetch(eliminarUbicacionesEndpoint, { method: "DELETE" });
-    
-            if (eliminarUbicacionesResponse.ok) {
-                console.log("Ubicaciones eliminadas exitosamente después del registro.");
-            } else {
-                console.error("Error al eliminar las ubicaciones:", eliminarUbicacionesResponse.statusText);
-            }
-    
-            cargarViajes();
-        } catch (error) {
-            console.error("Hubo un problema durante el proceso:", error);
-            mensajeSinViajes.textContent = "Error al intentar registrar o eliminar las ubicaciones.";
-        }
-    }
+   
     window.onload = cargarViajes;
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCERVqzsVAyNTs8EswdkCTgVevQtYah7HA&callback=initMap"></script>

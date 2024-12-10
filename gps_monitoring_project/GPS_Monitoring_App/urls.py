@@ -22,6 +22,7 @@ from .Views.RegistrarVehiculo import *
 
 
 
+
 urlpatterns = [
     path('login/', LoginView.as_view(template_name='TemplatesBase/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
@@ -51,11 +52,8 @@ urlpatterns = [
     path('dispositivoGps/Eliminar/<slug:imei>/', eliminar_dispositivo_gps, name='eliminarDispositivoGps'),
 
 
-    path('dispositivos_usados/', listar_dispositivos_gps_usados, name='gpsusado'),
-    path('dispositivos_usados/registrar/', registrar_dispositivo_gps_usado, name='registrarGpsUsado'),
-    path('dispositivos_usados/editar/<str:imei>/', editar_dispositivo_gps_usado, name='editarGpsUsado'),
-
-    
+ 
+    path('registrar-nuevogpsusado/', ver_gpsusado, name='registrar_nuevogpsusado'),
 
     path('registrar-marca/', visualizar_marca, name='registrar_marca'),
     path('registrar-modelo/', visualizar_modelo, name='registrar_modelo'),

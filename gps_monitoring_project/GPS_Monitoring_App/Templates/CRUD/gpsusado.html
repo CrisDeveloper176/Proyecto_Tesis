@@ -4,249 +4,273 @@
 <div class="container mt-5">
     <h1 class="mb-4 text-center">Gestión de Dispositivos GPS Usados</h1>
 
-    <div class="card shadow-lg">
-        <div class="card-header bg-primary text-white">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Lista de Dispositivos GPS Usados</h5>
-                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addDeviceModal">
-                    <i class="fas fa-plus-circle"></i> Agregar Dispositivo GPS Usado
-                </button>
-            </div>
-        </div>
-        <div class="card-body">
-            <p class="text-muted">Administra los dispositivos GPS usados registrados en el sistema.</p>
-            <div class="table-responsive">
-                <table class="table table-bordered table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>IMEI</th>
-                            <th>Fecha de Instalación</th>
-                            <th>Fecha de Deceso</th>
-                            <th>Vehículo</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% if Dispositivos %}
-                            {% for dispositivo in Dispositivos %}
-                            <tr>
-                                <td>{{ dispositivo.ID_GPS }}</td>
-                                <td>{{ dispositivo.fecha_Instalacion }}</td>
-                                <td>{{ dispositivo.fecha_Deceso|default:"N/A" }}</td>
-                                <td>{{ dispositivo.Vehiculo.Matricula }} (ID: {{ dispositivo.Vehiculo.ID_Vehiculo }})</td>
-                                <td>
-                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
-                                        data-imei="{{ dispositivo.ID_GPS }}" 
-                                        data-fecha-instalacion="{{ dispositivo.fecha_Instalacion }}" 
-                                        data-fecha-deceso="{{ dispositivo.fecha_Deceso|default:'' }}" 
-                                        data-id-vehiculo="{{ dispositivo.ID_Vehiculo_id }}">
-                                        <i class="fas fa-edit"></i> Editar
-                                    </button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        {% else %}
-                            <tr>
-                                <td colspan="5" class="text-center text-muted">No hay dispositivos registrados.</td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+
+    <button class="btn btn-success mt-4" data-bs-toggle="modal" data-bs-target="#addDeviceModal">Agregar Dispositivo GPS</button>
+
+    <!-- Tabla para mostrar dispositivos GPS usados -->
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th>IMEI</th>
+                <th>Fecha de Instalación</th>
+                <th>Fecha de Deceso</th>
+                <th>Vehículo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="gps-list">
+            <!-- Aquí se llenarán los dispositivos GPS con JavaScript -->
+        </tbody>
+    </table>
+    <!-- Modal para Agregar Dispositivo GPS -->
+    <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDeviceModalLabel">Agregar Nuevo Dispositivo GPS</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="add-imei" class="form-label">IMEI</label>
+                        <select class="form-select" id="add-imei" required>
+                            <!-- Aquí se llenarán los IMEIs disponibles con JavaScript -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="add-vehiculo" class="form-label">Vehículo</label>
+                        <select class="form-select" id="add-vehiculo" required>
+                            <!-- Aquí se llenarán los vehículos disponibles con JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveDevice">Agregar</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal para agregar dispositivo GPS -->
-<div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
+<!-- Modal para Editar Dispositivo GPS -->
+<div class="modal fade" id="editDeviceModal" tabindex="-1" aria-labelledby="editDeviceModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <form method="post" action="{% url 'registrarGpsUsado' %}">
-                {% csrf_token %}
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addDeviceModalLabel">Agregar Dispositivo GPS</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header">
+                <h5 class="modal-title" id="editDeviceModalLabel">Editar Dispositivo GPS</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-id">
+                <div class="mb-3">
+                    <label for="edit-imei" class="form-label">IMEI</label>
+                    <input type="text" class="form-control" id="edit-imei" readonly>
                 </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="imei" class="form-label">IMEI Existente</label>
-                        <select class="form-select" name="imei" id="imei" required>
-                            <option value="">Seleccione un IMEI</option>
-                            {% for imei in IMEIs %}
-                                <option value="{{ imei }}">{{ imei }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="vehiculo_id" class="form-label">Vehículo Existente</label>
-                        <select class="form-select" name="ID_Vehiculo_id" id="vehiculo_id" required>
-                            <option value="">Seleccione un Vehículo</option>
-                            {% for vehiculo in Vehiculos %}
-                                <option value="{{ vehiculo.ID_Vehiculo }}">{{ vehiculo.Matricula }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                <div class="mb-3">
+                    <label for="edit-fecha-instalacion" class="form-label">Fecha de Instalación</label>
+                    <input type="date" class="form-control" id="edit-fecha-instalacion" readonly>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Agregar</button>
+                <div class="mb-3">
+                    <label for="edit-fecha-deceso" class="form-label">Fecha de Deceso</label>
+                    <input type="date" class="form-control" id="edit-fecha-deceso" required>
                 </div>
-            </form>
+                <div class="mb-3">
+                    <label for="edit-vehiculo" class="form-label">Vehículo</label>
+                    <input type="text" class="form-control" id="edit-vehiculo" readonly>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="updateDevice">Guardar Cambios</button>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Modal para editar dispositivo GPS -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="POST" id="edit-form">
-                {% csrf_token %}
-                <div class="modal-header">
-                    <h5 class="modal-title">Editar Dispositivo GPS</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="edit-imei" class="form-label">IMEI</label>
-                        <input type="text" class="form-control" id="edit-imei" name="ID_GPS" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="fecha-instalacion" class="form-label">Fecha de Instalación</label>
-                        <input type="datetime-local" class="form-control" id="fecha-instalacion" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-fecha-deceso" class="form-label">Fecha de Deceso</label>
-                        <input type="date" class="form-control" id="edit-fecha-deceso" name="fecha_Deceso">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit-vehiculo" class="form-label">Vehículo</label>
-                        <select class="form-select" name="ID_Vehiculo" id="edit-vehiculo" required>
-                            {% for vehiculo in Vehiculos %}
-                                <option value="{{ vehiculo.ID_Vehiculo }}">{{ vehiculo.Matricula }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
-<!-- Modal para eliminar dispositivo GPS -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form method="post" id="delete-form">
-                {% csrf_token %}
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Eliminar Dispositivo GPS</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>¿Estás seguro de que deseas eliminar este dispositivo GPS?</p>
-                    <input type="hidden" id="delete-imei" name="imei">
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Modal de edición
-        const editModal = document.getElementById("editModal");
-        if (editModal) {
-            editModal.addEventListener("show.bs.modal", function (event) {
-                const button = event.relatedTarget;
-                const imei = button.getAttribute("data-imei");
-                const fechaInstalacion = button.getAttribute("data-fecha-instalacion");
-                const fechaDeceso = button.getAttribute("data-fecha-deceso");
-                const idVehiculo = button.getAttribute("data-id-vehiculo");
+    // URLs de las APIs
+    const GPS_API_URL = 'https://apitesis.fly.dev/api/v1/GPSUsados/';
+    const VEHICULO_API_URL = 'https://apitesis.fly.dev/api/v1/vehiculo/';
+    const GPS_DISPOSITIVO_API_URL = 'https://apitesis.fly.dev/api/v1/Dispositivo_GPS/';
 
-                document.getElementById("edit-imei").value = imei;
-                document.getElementById("fecha-instalacion").value = fechaInstalacion;
-                document.getElementById("edit-fecha-deceso").value = fechaDeceso || '';
-                document.getElementById("edit-vehiculo").value = idVehiculo;
 
-                const form = document.getElementById("edit-form");
-                form.action = `/dispositivos_usados/editar/${imei}/`;
-            });
+    // Formatear fecha en formato legible
+    const formatFecha = (fechaIso) => {
+    if (!fechaIso) return 'N/A';
+    const fecha = new Date(fechaIso);
+    return fecha.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+};
+
+
+
+    // Cargar lista de dispositivos GPS
+    const loadGpsList = async () => {
+    try {
+        const response = await fetch(GPS_API_URL);
+        if (!response.ok) throw new Error('Error al cargar los dispositivos GPS.');
+
+        const gpsList = await response.json();
+        const tbody = document.getElementById('gps-list');
+        tbody.innerHTML = gpsList.map(gps => `
+            <tr>
+                <td>${gps.ID_GPS}</td>
+                <td>${formatFecha(gps.fecha_Instalacion)}</td>
+                <td>${formatFecha(gps.fecha_Deceso)}</td>
+                <td>${gps.ID_Vehiculo}</td>
+                <td>
+                    <button class="btn btn-primary btn-sm" onclick="editGps('${gps.id}')">Editar</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
+    // Cargar opciones de IMEIs y Vehículos
+    const loadOptions = async (url, selectId, placeholder) => {
+        const select = document.getElementById(selectId);
+        select.innerHTML = `<option value="">${placeholder}</option>`;
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`Error al cargar datos de ${selectId}.`);
+
+            const data = await response.json();
+            select.innerHTML += data.map(item => `<option value="${item.imei || item.ID_Vehiculo}">${item.imei || item.Matricula}</option>`).join('');
+        } catch (error) {
+            console.error(`Error al cargar ${selectId}:`, error);
+        }
+    };
+
+   const saveGps = async () => {
+    const imei = document.getElementById('add-imei').value.trim();
+    const vehiculo = document.getElementById('add-vehiculo').value;
+    const fechaInstalacion = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
+
+    if (!imei || !vehiculo) {
+        Swal.fire('Advertencia', 'Los campos marcados son obligatorios.', 'warning');
+        return;
+    }
+
+    try {
+        // Verificar si el IMEI ya está asociado a un vehículo
+        const response = await fetch(GPS_API_URL);
+        if (!response.ok) throw new Error('Error al verificar los dispositivos GPS.');
+
+        const gpsList = await response.json();
+        const imeiExiste = gpsList.some(gps => gps.ID_GPS === imei && gps.fecha_Deceso === null);
+
+        if (imeiExiste) {
+            Swal.fire('Error', 'El IMEI ya está asociado a un vehículo activo.', 'error');
+            return;
         }
 
-        // Modal de eliminación
-        const deleteModal = document.getElementById("deleteModal");
-        if (deleteModal) {
-            deleteModal.addEventListener("show.bs.modal", function (event) {
-                const button = event.relatedTarget;
-                const imei = button.getAttribute("data-imei");
-                document.getElementById("delete-imei").value = imei;
+        // Crear nuevo dispositivo GPS
+        const payload = {
+            ID_GPS: imei,
+            fecha_Instalacion: fechaInstalacion,
+            ID_Vehiculo: vehiculo
+        };
 
-                const form = document.getElementById("delete-form");
-                form.action = `/dispositivos_usados/eliminar/${imei}/`;
-            });
+        const saveResponse = await fetch(GPS_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+
+        if (!saveResponse.ok) {
+            const errorData = await saveResponse.json();
+            console.error('Error al guardar el dispositivo GPS:', errorData);
+            throw new Error(errorData.message || 'Error al guardar el dispositivo GPS.');
         }
 
-        // Manejo del formulario de registro de nuevo dispositivo GPS
-        const form = document.getElementById('register-form'); // Asegúrate de que tu formulario tenga un id específico
-        if (form) {
-            form.addEventListener('submit', async function (event) {
-                event.preventDefault(); // Evitar envío tradicional del formulario
+        Swal.fire('Éxito', 'Dispositivo GPS agregado exitosamente.', 'success');
+        bootstrap.Modal.getInstance(document.getElementById('addDeviceModal')).hide();
+        loadGpsList();
+    } catch (error) {
+        console.error('Error al guardar el dispositivo GPS:', error);
+        Swal.fire('Error', 'No se pudo guardar el dispositivo GPS.', 'error');
+    }
+};
 
-                // Obtener los datos del formulario
-                const imei = document.getElementById('imei').value;
-                const vehiculoId = document.getElementById('vehiculo_id').value;
 
-                try {
-                    const response = await fetch("{% url 'registrarGpsUsado' %}", {
-                        method: 'POST',
-                        body: new FormData(form),
-                    });
 
-                    const data = await response.json();
+    const editGps = async (id) => {
+    try {
+        // Llama a la API para obtener los detalles del GPS Usado
+        const response = await fetch(`${GPS_API_URL}${id}/`);
+        if (!response.ok) throw new Error(`Error al cargar los datos del GPS Usado con ID: ${id}`);
 
-                    if (response.status === 400 && data.error) {
-                        // Si hay un error (IMEI ya asignado a otro vehículo), mostrar el mensaje con SweetAlert
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error',
-                            text: data.error
-                        });
-                    } else if (response.status === 201) {
-                        // Si el dispositivo se registra correctamente
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Dispositivo agregado',
-                            text: 'El dispositivo GPS se ha agregado correctamente.'
-                        }).then(() => {
-                            location.reload(); // Recargar la página o redirigir a la lista de dispositivos
-                        });
-                    } else {
-                        // En caso de otros errores
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Error desconocido',
-                            text: 'Hubo un problema al procesar tu solicitud.'
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error al enviar el formulario:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error de conexión',
-                        text: 'Hubo un problema al intentar enviar los datos.'
-                    });
-                }
-            });
+        const gps = await response.json();
+
+        // Llena los campos del modal de edición con los datos obtenidos
+        document.getElementById('edit-id').value = gps.ID_GPS || '';
+        document.getElementById('edit-imei').value = gps.ID_GPS || '';
+        document.getElementById('edit-fecha-instalacion').value = gps.fecha_Instalacion || '';
+        document.getElementById('edit-fecha-deceso').value = gps.fecha_Deceso || '';
+        document.getElementById('edit-vehiculo').value = gps.ID_Vehiculo || '';
+
+        // Muestra el modal de edición
+        const editModal = new bootstrap.Modal(document.getElementById('editDeviceModal'));
+        editModal.show();
+    } catch (error) {
+        console.error('Error en editGps:', error);
+        Swal.fire('Error', 'No se pudo cargar la información del dispositivo GPS Usado.', 'error');
+    }
+};
+
+
+
+    const updateGps = async () => {
+    const id = document.getElementById('edit-id').value;
+    const fechaDeceso = document.getElementById('edit-fecha-deceso').value;
+
+    if (!fechaDeceso) {
+        Swal.fire('Advertencia', 'La Fecha de Deceso es obligatoria.', 'warning');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${GPS_API_URL}${id}/`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                fecha_Deceso: fechaDeceso // Solo este campo será actualizado
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json(); // Obtén el mensaje de error de la API
+            console.error('Error al actualizar:', errorData);
+            throw new Error('Error al actualizar el dispositivo GPS Usado.');
         }
+
+        Swal.fire('Éxito', 'Fecha de Deceso actualizada exitosamente.', 'success');
+        bootstrap.Modal.getInstance(document.getElementById('editDeviceModal')).hide();
+        loadGpsList(); // Recargar la lista de dispositivos
+    } catch (error) {
+        console.error('Error al actualizar el dispositivo GPS Usado:', error);
+        Swal.fire('Error', 'No se pudo actualizar el dispositivo GPS Usado.', 'error');
+    }
+};
+
+
+
+
+ 
+
+    // Inicializar eventos y carga inicial
+    document.addEventListener('DOMContentLoaded', () => {
+        loadGpsList();
+        loadOptions(GPS_DISPOSITIVO_API_URL, 'add-imei', 'Seleccione un IMEI');
+        loadOptions(VEHICULO_API_URL, 'add-vehiculo', 'Seleccione un vehículo');
+        document.getElementById('saveDevice').addEventListener('click', saveGps);
+        document.getElementById('updateDevice').addEventListener('click', updateGps);
     });
 </script>
 {% endblock %}

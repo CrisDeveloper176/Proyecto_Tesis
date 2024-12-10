@@ -36,45 +36,38 @@ def listar_dispositivos_gps(request):
 
 
 
+from django.contrib import messages
+
 def registrar_dispositivo_gps(request):
-    """Registrar un nuevo dispositivo GPS."""
     if request.method == "POST":
         imei = request.POST.get("imei")
         estado_id = request.POST.get("estado_id")
 
         if not imei or not estado_id:
-            return JsonResponse({"error": "El campo IMEI y el Estado son obligatorios."}, status=400)
+            messages.error(request, "El campo IMEI y el Estado son obligatorios.")
+            return redirect('dispositivoGps')
 
         try:
-            estado_id = int(estado_id) 
+            estado_id = int(estado_id)
         except ValueError:
-            return JsonResponse({"error": "El ID del Estado debe ser un número entero válido."}, status=400)
+            messages.error(request, "El ID del Estado debe ser un número válido.")
+            return redirect('dispositivoGps')
 
-        data = {
-            "imei": imei,
-            "ID_EstadoGps_id": estado_id
-        }
-
-        headers = {
-            "Content-Type": "application/json"
-        }
+        data = {"imei": imei, "ID_EstadoGps_id": estado_id}
+        headers = {"Content-Type": "application/json"}
 
         try:
             response = requests.post(URL_API_DISPOSITIVO_GPS, json=data, headers=headers)
-            print("Respuesta de la API:", response.status_code, response.text)
-
             if response.status_code == 201:
-                return redirect('dispositivoGps')  
+                messages.success(request, "Dispositivo registrado exitosamente.")
             else:
-                try:
-                    error_message = response.json().get("detail", "Error desconocido")
-                except ValueError:  
-                    error_message = "La API devolvió un cuerpo no JSON."
-                return JsonResponse({"error": f"Error al registrar el dispositivo GPS: {error_message}"}, status=response.status_code)
+                error_message = response.json().get("detail", "Error desconocido")
+                messages.error(request, f"Error al registrar el dispositivo: {error_message}")
         except requests.RequestException as e:
-            return JsonResponse({"error": f"Error de conexión: {str(e)}"}, status=500)
+            messages.error(request, f"Error de conexión: {str(e)}")
 
-    return JsonResponse({"error": "Método no permitido."}, status=405)
+        return redirect('dispositivoGps')
+
 
 
 def obtener_estados_por_dispositivo(request, ID_DispositivoGps):
@@ -113,61 +106,36 @@ def obtener_dispositivos_y_estados(request):
 
 
 def editar_dispositivo_gps(request, imei):
-    """Editar un dispositivo GPS existente."""
     if request.method == "POST":
         nuevo_imei = request.POST.get("imei")
         estado_id = request.POST.get("estado_id")
 
         if not nuevo_imei or not estado_id:
-            return JsonResponse({"error": "El campo IMEI y el Estado son obligatorios."}, status=400)
+            messages.error(request, "El campo IMEI y el Estado son obligatorios.")
+            return redirect('dispositivoGps')
 
         try:
-            estado_id = int(estado_id) 
+            estado_id = int(estado_id)
         except ValueError:
-            return JsonResponse({"error": "El ID del Estado debe ser un número entero válido."}, status=400)
+            messages.error(request, "El ID del Estado debe ser un número válido.")
+            return redirect('dispositivoGps')
 
-        data = {
-            "imei": nuevo_imei,
-            "ID_EstadoGps_id": estado_id
-        }
+        data = {"imei": nuevo_imei, "ID_EstadoGps_id": estado_id}
+        headers = {"Content-Type": "application/json"}
 
-        headers = {
-            "Content-Type": "application/json"
-        }
-
-        # Verificar la existencia del dispositivo antes de editar
         try:
-
             url = f"{URL_API_DISPOSITIVO_GPS}{imei}/"
-            get_response = requests.get(url)  # Realizar una solicitud GET al recurso
-
-            if get_response.status_code == 404:
-                return JsonResponse({"error": f"El dispositivo GPS con IMEI {imei} no existe."}, status=404)
-
-            # Realizar la solicitud de edición con PUT
-            put_response = requests.put(url, json=data, headers=headers)
-
-            if put_response.status_code == 200:  # Actualización exitosa
-                return redirect('dispositivoGps')
-
-            url = f"{URL_API_DISPOSITIVO_GPS}{imei}/"  
             response = requests.put(url, json=data, headers=headers)
 
             if response.status_code == 200:
-                return redirect('dispositivoGps') 
-
+                messages.success(request, "Dispositivo actualizado correctamente.")
             else:
-                # Manejar errores de la API en la edición
-                try:
-                    error_message = put_response.json().get("detail", "Error desconocido")
-                except ValueError:  # Si la respuesta no es JSON
-                    error_message = "La API devolvió un cuerpo no JSON."
-                return JsonResponse({"error": f"Error al editar el dispositivo GPS: {error_message}"}, status=put_response.status_code)
-
+                error_message = response.json().get("detail", "Error desconocido")
+                messages.error(request, f"Error al editar el dispositivo: {error_message}")
         except requests.RequestException as e:
-            return JsonResponse({"error": f"Error de conexión: {str(e)}"}, status=500)
+            messages.error(request, f"Error de conexión: {str(e)}")
 
-    return JsonResponse({"error": "Método no permitido."}, status=405)
+        return redirect('dispositivoGps')
 
 
 
@@ -176,20 +144,22 @@ def eliminar_dispositivo_gps(request, imei):
     """Eliminar un dispositivo GPS existente."""
     if request.method == "POST":
         try:
-            url = f"{URL_API_DISPOSITIVO_GPS}{imei}/"  
+            url = f"{URL_API_DISPOSITIVO_GPS}{imei}/"
             response = requests.delete(url)
 
-            if response.status_code == 204:  
-                return redirect('dispositivoGps')  
+            if response.status_code == 204:
+                messages.success(request, f"El dispositivo IMEI fue eliminado exitosamente.")
             else:
-                error_message = response.json().get("detail", "Error desconocido")
-                return JsonResponse({"error": f"Error al eliminar el dispositivo GPS: {error_message}"}, status=response.status_code)
+                error_message = response.json().get("detail", "Ocurrió un problema inesperado al intentar eliminar el dispositivo.")
+                messages.error(request, f"No se pudo eliminar el dispositivo con IMEI {imei}: {error_message}")
         except requests.RequestException as e:
-            return JsonResponse({"error": f"Error de conexión: {str(e)}"}, status=500)
+            messages.error(request, f"No se puede eliminar IMEI que esta asignado")
+        except ValueError:
+            messages.error(request, "Se recibió una respuesta inesperada del servidor al intentar eliminar el dispositivo.")
+        return redirect('dispositivoGps')
 
-    return JsonResponse({"error": "Método no permitido."}, status=405)
-
-
+    messages.error(request, "Operación no permitida. Por favor, utiliza un método válido para realizar esta acción.")
+    return redirect('dispositivoGps')
 
 
 

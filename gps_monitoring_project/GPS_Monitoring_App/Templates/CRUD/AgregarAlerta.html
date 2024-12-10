@@ -38,7 +38,7 @@
                <div class="mb-3">
                     <label for="resuelta-select" class="form-label">Estado</label>
                     <select class="form-select" id="resuelta-select" disabled>
-                        <option value="false" selected>Sin Resolver</option>
+                        <option value="Sin Resolver" selected>Sin Resolver</option>
                     </select>
                 </div>
                 <div class="mb-3">
@@ -143,7 +143,7 @@ const alertaYaRegistrada = async (descripcion) => {
     // Función para guardar una nueva alerta
     const guardarAlerta = async () => {
         const descripcion = document.getElementById('descripcion-input').value.trim();
-        const resuelta = document.getElementById('resuelta-select').value; // Convertir a booleano
+        const resuelta = document.getElementById('resuelta-select').value;
         const tipoAlerta = document.getElementById('tipo-alerta-select').value;
         const vehiculo = document.getElementById('vehiculo-select').value;
 
@@ -205,11 +205,11 @@ const listarAlertas = async () => {
                 <tr>
                     <td>${alerta.Descripcion}</td>
                     <td>${new Date(alerta.Fecha_Alerta).toLocaleString()}</td>
-                    <td>${alerta.Resuelta ? 'Sí' : 'No'}</td>
+                    <td>${alerta.Resuelta}</td>
                     <td>${alerta.Tipo_Alerta?.Nombre_TipoAlerta || 'N/A'}</td>
                     <td>${alerta.ID_Vehiculo?.Matricula || 'N/A'}</td>
                     <td>
-                         <button class="btn btn-danger btn-sm" onclick="eliminarAlerta(${alerta.ID_Alerta})">Resolver</button>
+                        <button class="btn btn-danger btn-sm" onclick="eliminarAlerta(${alerta.ID_Alerta})">Resolver</button>
                     </td>
                 </tr>`;
             tbody.innerHTML += row;
@@ -268,6 +268,27 @@ const limpiarFormulario = () => {
 
 
 
+document.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    const alertaId = params.get('id'); // Obtener el ID de la alerta desde la URL
+
+    if (alertaId) {
+        try {
+            // Llama a la API para obtener los detalles de la alerta
+            const response = await fetch(`https://apitesis.fly.dev/api/v1/alertas/obtener/${alertaId}`);
+            if (!response.ok) throw new Error('Error al obtener los detalles de la alerta');
+            const alerta = await response.json();
+
+            // Muestra los datos en los campos de la página
+            document.getElementById('descripcion-input').value = alerta.Descripcion || '';
+            document.getElementById('tipo-alerta-select').value = alerta.ID_TipoAlerta || '';
+            document.getElementById('vehiculo-select').value = alerta.ID_Vehiculo || '';
+            document.getElementById('resuelta-select').value = alerta.Resuelta || 'Sin Resolver';
+        } catch (error) {
+            console.error('Error al cargar los detalles de la alerta:', error);
+        }
+    }
+});
 
 
 

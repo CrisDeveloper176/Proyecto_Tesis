@@ -62,8 +62,8 @@ urlpatterns = [
     path('registrar-vehiculo/', visualizar_vehiculo, name='registrar_vehiculo'),
    
 
-
-
+    
+    path('CRUD/AgregarAlerta.html', Alerta_view, name='alerta_view'),
 
 
 

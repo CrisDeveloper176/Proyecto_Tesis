@@ -19,6 +19,9 @@ def format_rut(rut):
 
 
 
+
+
+
 def obtener_arrendatarios(request):
     URL_API_ARRENDATARIOS = "https://apitesis.fly.dev/api/v1/arrendatarios/"
     try:
@@ -42,6 +45,14 @@ def registrar_arrendatario(request):
         licencia = request.POST.get("licencia")
         telefono = request.POST.get("telefono")
         correo = request.POST.get("correo")
+
+         # Asegurarse de que el RUT y la Licencia tengan el mismo formato
+        formatted_rut = format_rut(rut)
+        formatted_licencia = format_rut(licencia)
+
+        if formatted_rut != formatted_licencia:
+            return JsonResponse({"success": False, "message": "El RUT y la Licencia deben ser iguales para poder guardar."}, status=400)
+
 
         if not nombre or not correo or not telefono:
             return JsonResponse({"success": False, "message": "Todos los campos son obligatorios"}, status=400)
@@ -110,15 +121,17 @@ def editar_arrendatario(request, rut):
         try:
             response = requests.put(URL_API, json=data, headers=headers)
         except requests.RequestException as e:
-            return JsonResponse({"error": f"Error al conectar con la API: {e}"}, status=500)
+            return JsonResponse({"success": False, "message": f"Error al conectar con la API: {e}"}, status=500)
 
         if response.status_code == 200:
-            return redirect("arrendatario")
+            return JsonResponse({"success": True, "message": "Arrendatario editado correctamente"})
         elif response.status_code == 404:
-            return JsonResponse({"error": "El arrendatario no fue encontrado en la base de datos."}, status=404)
+            return JsonResponse({"success": False, "message": "El arrendatario no fue encontrado en la base de datos"}, status=404)
         else:
             error_message = response.json().get("detail", "Error al editar el arrendatario")
-            return JsonResponse({"error": error_message}, status=response.status_code)
+            return JsonResponse({"success": False, "message": error_message}, status=response.status_code)
+
+    return JsonResponse({"success": False, "message": "Método no permitido"}, status=405)
 
 def eliminar_arrendatario(request, rut):
     if request.method == "POST":
@@ -128,14 +141,14 @@ def eliminar_arrendatario(request, rut):
         try:
             response = requests.delete(URL_API, headers=headers)
         except requests.RequestException as e:
-            return JsonResponse({"error": f"Error al conectar con la API: {e}"}, status=500)
+            return JsonResponse({"success": False, "message": f"Error al conectar con la API: {e}"}, status=500)
 
         if response.status_code == 204:
-            return redirect("arrendatario")
+            return JsonResponse({"success": True, "message": "Arrendatario eliminado correctamente"})
         elif response.status_code == 404:
-            return JsonResponse({"error": "El arrendatario no fue encontrado en la base de datos."}, status=404)
+            return JsonResponse({"success": False, "message": "El arrendatario no fue encontrado en la base de datos"}, status=404)
         else:
             error_message = response.json().get("detail", "Error al eliminar el arrendatario")
-            return JsonResponse({"error": error_message}, status=response.status_code)
+            return JsonResponse({"success": False, "message": error_message}, status=response.status_code)
 
-    return JsonResponse({"error": "Método no permitido"}, status=405)
+    return JsonResponse({"success": False, "message": "Método no permitido"}, status=405)

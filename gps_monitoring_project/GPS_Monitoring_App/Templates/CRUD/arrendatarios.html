@@ -90,7 +90,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="licencia" class="form-label">Licencia</label>
-                            <input type="text" class="form-control" name="licencia" required>
+                            <input type="text" class="form-control" name="licencia" maxlength="12" required>
                         </div>
                         <div class="mb-3">
                             <label for="telefono" class="form-label">Teléfono</label>
@@ -135,7 +135,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit-licencia" class="form-label">Licencia</label>
-                            <input type="text" class="form-control" name="licencia" id="edit-licencia" required>
+                            <input type="text" class="form-control" name="licencia" id="edit-licencia" readonly>
                         </div>
                         <div class="mb-3">
                             <label for="edit-telefono" class="form-label">Teléfono</label>
@@ -220,8 +220,107 @@
             const form = deleteModal.querySelector("form");
             form.action = `/Arrendatarios/Eliminar/${rut}/`;
         });
+
+        // SweetAlert para edición
+        const editForm = document.querySelector("#editModal form");
+        if (editForm) {
+            editForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                const formData = new FormData(editForm);
+                const url = editForm.action;
+
+                fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+                    },
+                    body: formData,
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: "success",
+                                title: "¡Cambios guardados!",
+                                text: data.message,
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: data.message,
+                            });
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error inesperado",
+                            text: "Hubo un problema al guardar los cambios. Intenta nuevamente.",
+                        });
+                    });
+            });
+        }
+
+        // SweetAlert para eliminación
+        const deleteForm = document.querySelector("#deleteModal form");
+        if (deleteForm) {
+            deleteForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                Swal.fire({
+                    icon: "warning",
+                    title: "¿Estás seguro?",
+                    text: "Esta acción no se puede deshacer.",
+                    showCancelButton: true,
+                    confirmButtonColor: "#d33",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Eliminar",
+                    cancelButtonText: "Cancelar",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const url = deleteForm.action;
+
+                        fetch(url, {
+                            method: "POST",
+                            headers: {
+                                "X-CSRFToken": deleteForm.querySelector('[name="csrfmiddlewaretoken"]').value,
+                            },
+                        })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire({
+                                        icon: "success",
+                                        title: "¡Eliminado!",
+                                        text: data.message,
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: "error",
+                                        title: "Error",
+                                        text: data.message,
+                                    });
+                                }
+                            })
+                            .catch(() => {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error inesperado",
+                                    text: "Hubo un problema al eliminar el arrendatario. Intenta nuevamente.",
+                                });
+                            });
+                    }
+                });
+            });
+        }
     });
-    </script>
+</script>
 
 
 
@@ -255,7 +354,7 @@ telefonoInputs.forEach(telefonoInput => {
 
 
         if (this.value.length < 7) {
-            this.setCustomValidity("El teléfono debe contener al menos 7 dígitos.");
+            this.setCustomValidity("El teléfono debe contener al menos 9 dígitos.");
         } else {
             this.setCustomValidity("");
         }
@@ -287,6 +386,15 @@ telefonoInputs.forEach(telefonoInput => {
             this.setCustomValidity("");
         }
     });
+
+
+
+   
+
+
+
+
+
 });
 
 
@@ -310,7 +418,24 @@ telefonoInputs.forEach(telefonoInput => {
 
 
 
+
+
+
+
+
+
+
+
+
 </script>
+
+
+
+
+
+
+
+
 
 
 
@@ -362,12 +487,36 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const licenciaInputs = document.querySelectorAll('input[name="licencia"], input[id^="edit-licencia"]');
+    
+    licenciaInputs.forEach(licenciaInput => {
+        licenciaInput.addEventListener("input", function () {
+            const licenciaValue = this.value.replace(/[^0-9kK]/g, ""); // Permite solo números y "K"
+            let formattedLicencia = "";
 
+            if (licenciaValue.length > 1) {
+                const body = licenciaValue.slice(0, -1).replace(/\B(?=(\d{3})+(?!\d))/g, "."); // Añade puntos
+                const verifier = licenciaValue.slice(-1).toUpperCase(); // Toma la última letra o número
+                formattedLicencia = `${body}-${verifier}`; // Añade el guión
+            } else {
+                formattedLicencia = licenciaValue; 
+            }
+            
+            this.value = formattedLicencia;
 
+            const licenciaRegex = /^[0-9]{1,2}\.[0-9]{3}\.[0-9]{3}-[0-9kK]$/; // Formato esperado
 
-
-
-
+            if (!licenciaRegex.test(this.value)) {
+                this.setCustomValidity("Formato inválido. La licencia debe tener el formato XX.XXX.XXX-X.");
+            } else {
+                this.setCustomValidity(""); // Limpia el mensaje de error si es válido
+            }
+        });
+    });
+});
+</script>
 
 
 

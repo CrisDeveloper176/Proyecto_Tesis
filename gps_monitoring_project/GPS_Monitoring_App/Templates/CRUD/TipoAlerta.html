@@ -151,10 +151,12 @@
             // Cierra el modal y recarga la tabla
             const modal = bootstrap.Modal.getInstance(document.getElementById('addModal'));
             modal.hide();
+
+            Swal.fire('Éxito', 'Tipo de alerta registrado exitosamente.', 'success');
             listarTiposAlerta();
         } catch (error) {
             console.error(error);
-            alert('Error al registrar el tipo de alerta.');
+            Swal.fire('Error', 'Error al registrar el tipo de alerta.', 'error');
         }
     }
     
@@ -173,12 +175,13 @@
             if (!response.ok) throw new Error('Error al editar el tipo de alerta');
 
             // Recarga la lista y cierra el modal
+            Swal.fire('Éxito', 'Tipo de alerta actualizado exitosamente.', 'success');
             listarTiposAlerta();
             const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
             modal.hide();
         } catch (error) {
             console.error(error);
-            alert('Error al editar el tipo de alerta.');
+            Swal.fire('Error', 'Error al editar el tipo de alerta.', 'error');
         }
     }
     
@@ -193,12 +196,13 @@
             if (!response.ok) throw new Error('Error al eliminar el tipo de alerta');
 
             // Recarga la lista y cierra el modal
+            Swal.fire('Éxito', 'Tipo de alerta eliminado exitosamente.', 'success');
             listarTiposAlerta();
             const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
             modal.hide();
         } catch (error) {
             console.error(error);
-            alert('Error al eliminar el tipo de alerta.');
+            Swal.fire('Error', 'Error al eliminar el tipo de alerta.', 'error');
         }
     }
     

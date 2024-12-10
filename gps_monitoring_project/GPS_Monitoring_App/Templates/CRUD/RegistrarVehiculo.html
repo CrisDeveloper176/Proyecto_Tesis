@@ -2,26 +2,39 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Gestión de Vehículos</h1>
+    <h1 class="mb-4 text-center">Gestión de Vehículos</h1>
 
-    <button class="btn btn-success mt-4" data-bs-toggle="modal" data-bs-target="#addVehiculoModal">Agregar Vehículo</button>
-
-    <!-- Tabla para mostrar vehículos -->
-    <table class="table table-bordered mt-4">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Matrícula</th>
-                <th>Estado</th>
-                <th>Kilometraje</th>
-                <th>Modelo Asociado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="vehiculo-list">
-            <!-- Aquí se llenarán los vehículos con JavaScript -->
-        </tbody>
-    </table>
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Lista de Vehículos</h5>
+                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addVehiculoModal">
+                    <i class="fas fa-plus-circle"></i> Agregar Vehículo
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Administra los vehículos registrados en el sistema.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Matrícula</th>
+                            <th>Estado</th>
+                            <th>Kilometraje</th>
+                            <th>Modelo Asociado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vehiculo-list">
+                        <!-- Los vehículos se llenarán dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Modal para Agregar Vehículo -->
     <div class="modal fade" id="addVehiculoModal" tabindex="-1" aria-labelledby="addVehiculoModalLabel" aria-hidden="true">

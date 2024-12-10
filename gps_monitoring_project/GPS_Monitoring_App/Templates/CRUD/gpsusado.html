@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Gestión de Dispositivos GPS Usados</h1>
+    <h1 class="mb-4 text-center">Gestión de Dispositivos GPS Usados</h1>
 
     <button class="btn btn-success mt-4" data-bs-toggle="modal" data-bs-target="#addDeviceModal">Agregar Dispositivo GPS</button>
 
@@ -21,6 +21,59 @@
             <!-- Aquí se llenarán los dispositivos GPS con JavaScript -->
         </tbody>
     </table>
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Lista de Dispositivos GPS Usados</h5>
+                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addDeviceModal">
+                    <i class="fas fa-plus-circle"></i> Agregar Dispositivo GPS Usado
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Administra los dispositivos GPS usados registrados en el sistema.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>IMEI</th>
+                            <th>Fecha de Instalación</th>
+                            <th>Fecha de Deceso</th>
+                            <th>Vehículo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if Dispositivos %}
+                            {% for dispositivo in Dispositivos %}
+                            <tr>
+                                <td>{{ dispositivo.ID_GPS }}</td>
+                                <td>{{ dispositivo.fecha_Instalacion }}</td>
+                                <td>{{ dispositivo.fecha_Deceso|default:"N/A" }}</td>
+                                <td>{{ dispositivo.Vehiculo.Matricula }} (ID: {{ dispositivo.Vehiculo.ID_Vehiculo }})</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
+                                        data-imei="{{ dispositivo.ID_GPS }}" 
+                                        data-fecha-instalacion="{{ dispositivo.fecha_Instalacion }}" 
+                                        data-fecha-deceso="{{ dispositivo.fecha_Deceso|default:'' }}" 
+                                        data-id-vehiculo="{{ dispositivo.ID_Vehiculo_id }}">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No hay dispositivos registrados.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 
     <!-- Modal para Agregar Dispositivo GPS -->
     <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">

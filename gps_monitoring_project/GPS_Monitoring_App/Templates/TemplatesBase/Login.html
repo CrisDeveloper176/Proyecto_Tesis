@@ -6,12 +6,68 @@
     <title>Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+<style>
+    body {
+        background-image: url('/static/images/fondologin.jpg'); /* Aquí debes poner la URL de tu imagen */
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        height: 100vh;
+        margin: 0;
+    }
+    
+    /* Asegurarse que la card esté completamente centrada */
+    .container-fluid {
+        height: 100vh;
+    }
+    
+    .row {
+        height: 100vh; /* Esto asegura que la fila ocupe toda la altura de la pantalla */
+    }
+    
+    /* Estilo para la card */
+    .card {
+        border-radius: 10px;
+        background-color: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Estilo del encabezado de la card */
+    .card-header {
+        padding: 15px;
+        font-weight: bold;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .form-control {
+        border-radius: 8px;
+    }
+    
+    .btn-primary {
+        border-radius: 8px;
+        padding: 10px;
+        font-weight: bold;
+    }
+    
+    .alert {
+        border-radius: 8px;
+    }
+    
+    @media (max-width: 768px) {
+        .col-md-6 {
+            max-width: 100%;
+        }
+    }
+</style>
 <body>
-    <div class="container">
-        <div class="row justify-content-center mt-5">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header text-center">
+    <div class="container-fluid p-0">
+        <div class="row justify-content-center align-items-center g-0" style="height: 100vh;">
+            <div class="col-lg-4 col-md-6 col-sm-8">
+                <div class="card shadow-lg">
+                    <div class="card-header text-center bg-primary text-white">
                         <h3>Login</h3>
                     </div>
                     <div class="card-body">
@@ -27,7 +83,7 @@
                             </div>
                             <button type="submit" class="btn btn-primary w-100">Login</button>
                         </form>
-                
+    
                         {% if error %}
                             <div class="alert alert-danger mt-3">{{ error }}</div>
                         {% endif %}

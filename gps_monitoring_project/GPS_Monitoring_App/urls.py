@@ -17,7 +17,8 @@ from .Views.RegistrarModelo import *
 from .Views.TipoAlerta import *
 from .Views.Alertas import *
 from .Views.RegistrarVehiculo import *
-
+from .Views.TipoMantenimiento import *
+from .Views.Mantenimiento import *
 
 
 
@@ -30,6 +31,9 @@ urlpatterns = [
     path('home/', home, name='home'),
     path('monitoring/', monitoring_view, name='monitoring'),
     path('TipoAlerta/', TipoAlerta_view , name='TipoAlerta'),
+    path('TipoMantenimiento/', TipoMantenimiento_view , name='TipoMantenimiento'),
+    path('Mantenimiento/', Mantenimiento_view , name='Mantenimiento'),
+    path('mantenimientoreport/', mantenimientoreport_view , name='mantenimientoreport'),
     path('Alerta/', Alerta_view , name='Alerta'),
     path('HistorialViaje/', HistorialViaje_view, name='HistorialViaje'),
     path('reporte/obtener_vehiculos/', obtener_modelos_y_vehiculos_reporte, name='obtener_vehiculos'),

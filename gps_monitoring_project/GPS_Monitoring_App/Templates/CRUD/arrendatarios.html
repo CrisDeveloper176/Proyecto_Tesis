@@ -3,59 +3,68 @@
 {% block content %}
 
 <div class="container mt-5">
-    <h1>Gestión de Arrendatarios</h1>
+    <h1 class="mb-4 text-center">Gestión de Arrendatarios</h1>
 
-  
-    <h2 class="mt-4">Lista de Arrendatarios</h2>
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Lista de Arrendatarios</h5>
+                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="fas fa-plus-circle"></i> Agregar Arrendatario
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Administra los arrendatarios registrados en el sistema.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>RUT</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Licencia</th>
+                            <th>Teléfono</th>
+                            <th>Correo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if arrendatarios %}
+                            {% for arrendatario in arrendatarios %}
+                            <tr>
+                                <td>{{ arrendatario.Rut }}</td>
+                                <td>{{ arrendatario.Nombre }}</td>
+                                <td>{{ arrendatario.Apellido }}</td>
+                                <td>{{ arrendatario.Licencia_Conducir }}</td>
+                                <td>{{ arrendatario.Telefono }}</td>
+                                <td>{{ arrendatario.Correo }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
+                                        data-rut="{{ arrendatario.Rut }}" data-nombre="{{ arrendatario.Nombre }}" 
+                                        data-apellido="{{ arrendatario.Apellido }}" data-licencia="{{ arrendatario.Licencia_Conducir }}" 
+                                        data-telefono="{{ arrendatario.Telefono }}" data-correo="{{ arrendatario.Correo }}">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
 
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Arrendatario</button>
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>RUT</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Licencia</th>
-                <th>Teléfono</th>
-                <th>Correo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if arrendatarios %}
-                {% for arrendatario in arrendatarios %}
-                <tr>
-                    <td>{{ arrendatario.Rut }}</td>
-                    <td>{{ arrendatario.Nombre }}</td>
-                    <td>{{ arrendatario.Apellido }}</td>
-                    <td>{{ arrendatario.Licencia_Conducir }}</td>
-                    <td>{{ arrendatario.Telefono }}</td>
-                    <td>{{ arrendatario.Correo }}</td>
-                    <td>
-                        
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editModal" 
-                            data-rut="{{ arrendatario.Rut }}" data-nombre="{{ arrendatario.Nombre }}" 
-                            data-apellido="{{ arrendatario.Apellido }}" data-licencia="{{ arrendatario.Licencia_Conducir }}" 
-                            data-telefono="{{ arrendatario.Telefono }}" data-correo="{{ arrendatario.Correo }}">
-                            Editar
-                        </button>
-
-                        
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                                data-rut="{{ arrendatario.Rut }}">
-                            Eliminar
-                        </button>
-                    </td>
-                </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="7" class="text-center">No se encontraron arrendatarios.</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
-
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                            data-rut="{{ arrendatario.Rut }}">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="7" class="text-center text-muted">No se encontraron arrendatarios.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
     
     <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
         <div class="modal-dialog">

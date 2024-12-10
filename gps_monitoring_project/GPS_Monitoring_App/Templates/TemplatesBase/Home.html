@@ -5,21 +5,31 @@
     <h2 class="text-center mb-4">Alertas Recientes</h2>
     <p class="text-muted text-center mb-4">Aquí se muestran las alertas recientes del sistema de monitoreo GPS</p>
 
-    <div class="table-responsive">
-        <table class="table table-striped align-middle">
-            <thead class="background-color: #007bff; color: white;">
-                <tr>
-                    <th>Tipo de Alerta</th>
-                    <th>Fecha y Hora</th>
-                    <th>Descripcion</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="alertas-recientes-table-body">
-                <!-- Aquí se insertarán las alertas recientes dinámicamente -->
-            </tbody>
-        </table>
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Lista de Alertas Recientes</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Tipo de Alerta</th>
+                            <th>Fecha y Hora</th>
+                            <th>Ubicación</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alertas-tbody">
+                        <!-- Las alertas se llenarán dinámicamente -->
+                        <tr>
+                            <td colspan="5" class="text-center">Cargando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 

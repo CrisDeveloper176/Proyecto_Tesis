@@ -2,45 +2,57 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Gestión de EstadoGPS</h1>
-    <h2 class="mt-4">Lista de EstadoGPS</h2>
-    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar EstadoGPS</button>
-    <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
-            <tr>
-                <th>ID_EstadoGps</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% if Estados %}
-                {% for Estado in Estados %}
-                <tr>
-                    <td>{{ Estado.ID_EstadoGps }}</td>
-                    <td>{{ Estado.Estado }}</td>
-                    <td>
-                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
-                            data-id="{{ Estado.ID_EstadoGps }}" data-estado="{{ Estado.Estado }}">
-                            Editar
-                        </button>
+    <h1 class="mb-4 text-center">Gestión de EstadoGPS</h1>
 
-                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                            data-id="{{ Estado.ID_EstadoGps }}">
-                            Eliminar
-                        </button>
-                    </td>
-                </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="3" class="text-center">No hay estados.</td>
-                </tr>
-            {% endif %}
-        </tbody>
-    </table>
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Lista de EstadoGPS</h5>
+                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
+                    <i class="fas fa-plus-circle"></i> Agregar EstadoGPS
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Administra los estados GPS registrados en el sistema.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID_EstadoGps</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if Estados %}
+                            {% for Estado in Estados %}
+                            <tr>
+                                <td>{{ Estado.ID_EstadoGps }}</td>
+                                <td>{{ Estado.Estado }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
+                                        data-id="{{ Estado.ID_EstadoGps }}" data-estado="{{ Estado.Estado }}">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                                        data-id="{{ Estado.ID_EstadoGps }}">
+                                        <i class="fas fa-trash-alt"></i> Eliminar
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">No hay estados registrados.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
-
 <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

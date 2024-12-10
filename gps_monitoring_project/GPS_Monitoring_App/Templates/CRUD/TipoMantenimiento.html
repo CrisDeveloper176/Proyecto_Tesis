@@ -2,30 +2,30 @@
 {% block content %}
 
 <div class="container mt-5">
-    <h1 class="mb-4 text-center">Gestión de Tipos de Alerta</h1>
+    <h1 class="mb-4 text-center">Gestión de Tipos de Mantenimiento</h1>
 
     <div class="card shadow-lg">
         <div class="card-header bg-primary text-white">
             <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Lista de Tipos de Alerta</h5>
+                <h5 class="mb-0">Lista de Tipos de Mantenimiento</h5>
                 <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addModal">
-                    <i class="fas fa-plus-circle"></i> Agregar Tipo de Alerta
+                    <i class="fas fa-plus-circle"></i> Agregar Tipo de Mantenimiento
                 </button>
             </div>
         </div>
         <div class="card-body">
-            <p class="text-muted">Administra los tipos de alerta registrados en el sistema.</p>
+            <p class="text-muted">Administra los tipos de mantenimiento registrados en el sistema.</p>
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
                     <thead class="table-dark">
                         <tr>
                             <th>ID</th>
-                            <th>Tipo de Alerta</th>
+                            <th>Tipo de Mantenimiento</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="alerta-table-body">
-                        <!-- Los tipos de alerta se llenarán dinámicamente -->
+                    <tbody id="mantenimiento-table-body">
+                        <!-- Los tipos de mantenimiento se llenarán dinámicamente -->
                         <tr>
                             <td colspan="3" class="text-center">Cargando...</td>
                         </tr>
@@ -41,18 +41,18 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addModalLabel">Agregar Tipo de Alerta</h5>
+                <h5 class="modal-title" id="addModalLabel">Agregar Tipo de Mantenimiento</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="tipo-alerta" class="form-label">Tipo de Alerta</label>
-                    <input type="text" class="form-control" id="tipo-alerta-input" required>
+                    <label for="tipo-mantenimiento" class="form-label">Tipo de Mantenimiento</label>
+                    <input type="text" class="form-control" id="tipo-mantenimiento-input" required>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="add-alerta-button">Agregar</button>
+                <button type="button" class="btn btn-primary" id="add-mantenimiento-button">Agregar</button>
             </div>
         </div>
     </div>
@@ -63,46 +63,48 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Editar Tipo de Alerta</h5>
+                <h5 class="modal-title" id="editModalLabel">Editar Tipo de Mantenimiento</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="edit-tipo-alerta-input" class="form-label">Tipo de Alerta</label>
-                    <input type="text" class="form-control" id="edit-tipo-alerta-input" required>
+                    <label for="edit-tipo-mantenimiento-input" class="form-label">Tipo de Mantenimiento</label>
+                    <input type="text" class="form-control" id="edit-tipo-mantenimiento-input" required>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" id="edit-alerta-button">Guardar Cambios</button>
+                <button type="button" class="btn btn-primary" id="edit-mantenimiento-button">Guardar Cambios</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Modal para Eliminar -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Eliminar Tipo de Alerta</h5>
+                <h5 class="modal-title" id="deleteModalLabel">Eliminar Tipo de Mantenimiento</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>¿Estás seguro de que deseas eliminar este tipo de alerta?</p>
+                <p>¿Estás seguro de que deseas eliminar este tipo de mantenimiento?</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="delete-alerta-button">Eliminar</button>
+                <button type="button" class="btn btn-danger" id="delete-mantenimiento-button">Eliminar</button>
             </div>
         </div>
     </div>
 </div>
-<script>
-    const API_URL = 'https://apitesis.fly.dev/api/v1/TipoAlerta/';
 
-    // Función para listar tipos de alerta
-    async function listarTiposAlerta() {
-        const tbody = document.getElementById('alerta-table-body');
+<script>
+    const API_URL = 'https://apitesis.fly.dev/api/v1/TipoMantenimiento/';
+
+    // Función para listar tipos de mantenimiento
+    async function listarTiposMantenimiento() {
+        const tbody = document.getElementById('mantenimiento-table-body');
         tbody.innerHTML = '<tr><td colspan="3" class="text-center">Cargando...</td></tr>';
     
         try {
@@ -111,18 +113,18 @@
             const data = await response.json();
     
             tbody.innerHTML = ''; // Limpia el contenido
-            data.forEach(alerta => {
+            data.forEach(mantenimiento => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${alerta.ID_TipoAlerta}</td>
-                    <td>${alerta.Tipo_Alerta}</td>
+                    <td>${mantenimiento.ID_Mantenimiento}</td>
+                    <td>${mantenimiento.Tipo_Mantenimiento}</td>
                     <td>
                         <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
-                            data-id="${alerta.ID_TipoAlerta}" data-tipo="${alerta.Tipo_Alerta}">
+                            data-id="${mantenimiento.ID_Mantenimiento}" data-tipo="${mantenimiento.Tipo_Mantenimiento}">
                             Editar
                         </button>
                         <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
-                            data-id="${alerta.ID_TipoAlerta}">
+                            data-id="${mantenimiento.ID_Mantenimiento}">
                             Eliminar
                         </button>
                     </td>
@@ -135,33 +137,33 @@
         }
     }
     
-    // Función para registrar un nuevo tipo de alerta
-    async function registrarTipoAlerta(tipoAlerta) {
+    // Función para registrar un nuevo tipo de mantenimiento
+    async function registrarTipoMantenimiento(tipoMantenimiento) {
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ Tipo_Alerta: tipoAlerta }),
+                body: JSON.stringify({ Tipo_Mantenimiento: tipoMantenimiento }),
             });
     
-            if (!response.ok) throw new Error('Error al registrar el tipo de alerta');
+            if (!response.ok) throw new Error('Error al registrar el tipo de mantenimiento');
     
             // Cierra el modal y recarga la tabla
             const modal = bootstrap.Modal.getInstance(document.getElementById('addModal'));
             modal.hide();
 
-            Swal.fire('Éxito', 'Tipo de alerta registrado exitosamente.', 'success');
-            listarTiposAlerta();
+            Swal.fire('Éxito', 'Tipo de mantenimiento registrado exitosamente.', 'success');
+            listarTiposMantenimiento();
         } catch (error) {
             console.error(error);
-            Swal.fire('Error', 'Error al registrar el tipo de alerta.', 'error');
+            Swal.fire('Error', 'Error al registrar el tipo de mantenimiento.', 'error');
         }
     }
     
-    // Función para editar un tipo de alerta
-    async function editarTipoAlerta(id, tipoAlerta) {
+    // Función para editar un tipo de mantenimiento
+    async function editarTipoMantenimiento(id, tipoMantenimiento) {
         const editUrl = `${API_URL}${id}/`;
         try {
             const response = await fetch(editUrl, {
@@ -169,59 +171,59 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ Tipo_Alerta: tipoAlerta }),
+                body: JSON.stringify({ Tipo_Mantenimiento: tipoMantenimiento }),
             });
 
-            if (!response.ok) throw new Error('Error al editar el tipo de alerta');
+            if (!response.ok) throw new Error('Error al editar el tipo de mantenimiento');
 
             // Recarga la lista y cierra el modal
-            Swal.fire('Éxito', 'Tipo de alerta actualizado exitosamente.', 'success');
-            listarTiposAlerta();
+            Swal.fire('Éxito', 'Tipo de mantenimiento actualizado exitosamente.', 'success');
+            listarTiposMantenimiento();
             const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
             modal.hide();
         } catch (error) {
             console.error(error);
-            Swal.fire('Error', 'Error al editar el tipo de alerta.', 'error');
+            Swal.fire('Error', 'Error al editar el tipo de mantenimiento.', 'error');
         }
     }
     
-    // Función para eliminar un tipo de alerta
-    async function eliminarTipoAlerta(id) {
+    // Función para eliminar un tipo de mantenimiento
+    async function eliminarTipoMantenimiento(id) {
         const deleteUrl = `${API_URL}${id}/`;
         try {
             const response = await fetch(deleteUrl, {
                 method: 'DELETE',
             });
 
-            if (!response.ok) throw new Error('Error al eliminar el tipo de alerta');
+            if (!response.ok) throw new Error('Error al eliminar el tipo de mantenimiento');
 
             // Recarga la lista y cierra el modal
-            Swal.fire('Éxito', 'Tipo de alerta eliminado exitosamente.', 'success');
-            listarTiposAlerta();
+            Swal.fire('Éxito', 'Tipo de mantenimiento eliminado exitosamente.', 'success');
+            listarTiposMantenimiento();
             const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
             modal.hide();
         } catch (error) {
             console.error(error);
-            Swal.fire('Error', 'Error al eliminar el tipo de alerta.', 'error');
+            Swal.fire('Error', 'Error al eliminar el tipo de mantenimiento.', 'error');
         }
     }
     
     // Inicialización de eventos
     document.addEventListener('DOMContentLoaded', () => {
-        listarTiposAlerta();
+        listarTiposMantenimiento();
 
-        // Evento para agregar un nuevo tipo de alerta
-        document.getElementById('add-alerta-button').addEventListener('click', () => {
-            const tipoAlertaInput = document.getElementById('tipo-alerta-input');
-            const tipoAlerta = tipoAlertaInput.value.trim();
+        // Evento para agregar un nuevo tipo de mantenimiento
+        document.getElementById('add-mantenimiento-button').addEventListener('click', () => {
+            const tipoMantenimientoInput = document.getElementById('tipo-mantenimiento-input');
+            const tipoMantenimiento = tipoMantenimientoInput.value.trim();
 
-            if (!tipoAlerta) {
-                alert('Por favor, ingresa un tipo de alerta válido.');
+            if (!tipoMantenimiento) {
+                alert('Por favor, ingresa un tipo de mantenimiento válido.');
                 return;
             }
 
-            registrarTipoAlerta(tipoAlerta);
-            tipoAlertaInput.value = ''; // Limpia el campo
+            registrarTipoMantenimiento(tipoMantenimiento);
+            tipoMantenimientoInput.value = ''; // Limpia el campo
         });
 
         // Manejo del modal de edición
@@ -231,20 +233,20 @@
         editModal.addEventListener('show.bs.modal', (event) => {
             const button = event.relatedTarget;
             currentEditId = button.getAttribute('data-id');
-            const tipoAlerta = button.getAttribute('data-tipo');
-            document.getElementById('edit-tipo-alerta-input').value = tipoAlerta;
+            const tipoMantenimiento = button.getAttribute('data-tipo');
+            document.getElementById('edit-tipo-mantenimiento-input').value = tipoMantenimiento;
         });
 
-        document.getElementById('edit-alerta-button').addEventListener('click', async () => {
-            const tipoAlertaInput = document.getElementById('edit-tipo-alerta-input');
-            const tipoAlerta = tipoAlertaInput.value.trim();
+        document.getElementById('edit-mantenimiento-button').addEventListener('click', async () => {
+            const tipoMantenimientoInput = document.getElementById('edit-tipo-mantenimiento-input');
+            const tipoMantenimiento = tipoMantenimientoInput.value.trim();
 
-            if (!tipoAlerta || !currentEditId) {
-                alert('Por favor, ingresa un tipo de alerta válido.');
+            if (!tipoMantenimiento || !currentEditId) {
+                alert('Por favor, ingresa un tipo de mantenimiento válido.');
                 return;
             }
 
-            await editarTipoAlerta(currentEditId, tipoAlerta);
+            await editarTipoMantenimiento(currentEditId, tipoMantenimiento);
         });
 
         // Manejo del modal de eliminación
@@ -256,9 +258,9 @@
             deleteId = button.getAttribute('data-id');
         });
 
-        document.getElementById('delete-alerta-button').addEventListener('click', async () => {
+        document.getElementById('delete-mantenimiento-button').addEventListener('click', async () => {
             if (deleteId) {
-                await eliminarTipoAlerta(deleteId);
+                await eliminarTipoMantenimiento(deleteId);
             } else {
                 alert('Error: ID no válido para eliminar.');
             }

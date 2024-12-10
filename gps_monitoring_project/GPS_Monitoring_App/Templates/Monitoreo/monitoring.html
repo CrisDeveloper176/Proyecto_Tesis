@@ -38,18 +38,19 @@
     let map;
     let marker;
     let currentVehicleData = {}; 
-
+    let icon;
     function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
             center: { lat: -37.2758343, lng: -72.7163521 },
             zoom: 12
         });
-       const icon = {
-        url: "https://example.com/path_to_your_icon.png",
-        scaledSize: new google.maps.Size(50, 50),
-        origin: new google.maps.Point(0, 0), 
-        anchor: new google.maps.Point(25, 50) 
-    };
+        // Definir el ícono personalizado
+        const icon = {
+            url: "/static/images/ico.ico", // Ruta relativa desde el servidor
+            scaledSize: new google.maps.Size(50, 50), // Tamaño del ícono
+            origin: new google.maps.Point(0, 0), // Origen de la imagen
+            anchor: new google.maps.Point(25, 50) // Punto de anclaje
+        };
     }
 
     async function cargarVehiculos() {
@@ -116,7 +117,8 @@
                 } else {
                     marker = new google.maps.Marker({
                         position: new google.maps.LatLng(data.latitud, data.longitud),
-                        map: map
+                        map: map,
+                        icon: icon  // Aquí asignamos el ícono personalizado
                     });
                 }
 
@@ -148,15 +150,9 @@
 
             const data = await response.json();
 
-            
             if (data && data.latitud && data.longitud) {
-                
                 marker.setPosition(new google.maps.LatLng(data.latitud, data.longitud));
-
-                
                 map.setCenter(new google.maps.LatLng(data.latitud, data.longitud));
-
-                
                 document.getElementById('speed').textContent = `${data.velocidad} km/h`;
             }
         } catch (error) {
@@ -165,7 +161,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', cargarVehiculos);
-
 </script>
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCERVqzsVAyNTs8EswdkCTgVevQtYah7HA&callback=initMap"></script>

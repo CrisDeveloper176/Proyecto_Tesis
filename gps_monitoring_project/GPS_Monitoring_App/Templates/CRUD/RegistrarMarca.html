@@ -2,23 +2,36 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Gestión de Marcas de Autos</h1>
+    <h1 class="mb-4 text-center">Gestión de Marcas de Autos</h1>
 
-    <button class="btn btn-success mt-4" data-bs-toggle="modal" data-bs-target="#addMarcaModal">Agregar Marca</button>
-
-    <!-- Tabla para mostrar marcas -->
-    <table class="table table-bordered mt-4">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Marca</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="marca-list">
-            <!-- Aquí se llenarán las marcas con JavaScript -->
-        </tbody>
-    </table>
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Lista de Marcas</h5>
+                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addMarcaModal">
+                    <i class="fas fa-plus-circle"></i> Agregar Marca
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Administra las marcas de autos registradas en el sistema.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Marca</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="marca-list">
+                        <!-- Las marcas se llenarán dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Modal para Agregar Marca -->
     <div class="modal fade" id="addMarcaModal" tabindex="-1" aria-labelledby="addMarcaModalLabel" aria-hidden="true">

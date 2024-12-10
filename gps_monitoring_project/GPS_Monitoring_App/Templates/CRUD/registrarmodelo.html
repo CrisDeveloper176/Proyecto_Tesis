@@ -2,24 +2,37 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Gestión de Modelos de Autos</h1>
+    <h1 class="mb-4 text-center">Gestión de Modelos de Autos</h1>
 
-    <button class="btn btn-success mt-4" data-bs-toggle="modal" data-bs-target="#addModeloModal">Agregar Modelo</button>
-
-    <!-- Tabla para mostrar modelos -->
-    <table class="table table-bordered mt-4">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Modelo</th>
-                <th>Marca Asociada</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="modelo-list">
-            <!-- Aquí se llenarán los modelos con JavaScript -->
-        </tbody>
-    </table>
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Lista de Modelos</h5>
+                <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#addModeloModal">
+                    <i class="fas fa-plus-circle"></i> Agregar Modelo
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Administra los modelos de autos registrados en el sistema.</p>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Modelo</th>
+                            <th>Marca Asociada</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modelo-list">
+                        <!-- Los modelos se llenarán dinámicamente con JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
     <!-- Modal para Agregar Modelo -->
     <div class="modal fade" id="addModeloModal" tabindex="-1" aria-labelledby="addModeloModalLabel" aria-hidden="true">

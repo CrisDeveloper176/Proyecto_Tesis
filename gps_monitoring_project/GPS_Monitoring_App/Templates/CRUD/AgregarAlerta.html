@@ -1,0 +1,302 @@
+{% extends 'TemplatesBase/Base.html' %}
+
+{% block content %}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Gestión de Alertas</h1>
+    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Alerta</button>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Descripción</th>
+                <th>Fecha</th>
+                <th>Resuelta</th>
+                <th>Tipo de Alerta</th>
+                <th>Vehículo asociado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="alertas-table-body">
+            <!-- Contenido generado dinámicamente -->
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para Agregar -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Agregar Alerta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="descripcion-input" class="form-label">Descripción</label>
+                    <input type="text" class="form-control" id="descripcion-input">
+                </div>
+                <div class="mb-3">
+                    <label for="resuelta-select" class="form-label">Resuelta</label>
+                    <select class="form-select" id="resuelta-select">
+                        <option value="" disabled selected>Selecciona una opción</option>
+                        <option value="" disabled selected>si</option>
+                        <option value="" disabled selected>no</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="tipo-alerta-select" class="form-label">Tipo de Alerta</label>
+                    <select class="form-select" id="tipo-alerta-select">
+                        <option value="" disabled selected>Selecciona un tipo</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="vehiculo-select" class="form-label">Vehículo</label>
+                    <select class="form-select" id="vehiculo-select">
+                        <option value="" disabled selected>Selecciona un vehículo</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="add-alerta-button">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Alerta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="edit-descripcion-input" class="form-label">Descripción</label>
+                    <input type="text" class="form-control" id="edit-descripcion-input">
+                </div>
+                <div class="mb-3">
+                    <label for="edit-resuelta-input" class="form-label">Resuelta</label>
+                    <input type="text" class="form-control" id="edit-resuelta-input">
+                </div>
+                <div class="mb-3">
+                    <label for="edit-tipo-alerta-input" class="form-label">ID Tipo Alerta</label>
+                    <input type="number" class="form-control" id="edit-tipo-alerta-input">
+                </div>
+                <div class="mb-3">
+                    <label for="edit-vehiculo-input" class="form-label">ID Vehículo</label>
+                    <input type="number" class="form-control" id="edit-vehiculo-input">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="edit-alerta-button">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Eliminar -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Eliminar Alerta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar esta alerta?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="delete-alerta-button">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const ALERTAS_API_URL = 'https://apitesis.fly.dev/api/v1/Alertas/';
+
+    // Función para listar alertas
+    async function listarAlertas() {
+        const tbody = document.getElementById('alertas-table-body');
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center">Cargando...</td></tr>';
+
+        try {
+            const response = await fetch(ALERTAS_API_URL);
+            if (!response.ok) throw new Error('Error al cargar las alertas');
+            const data = await response.json();
+
+            tbody.innerHTML = ''; // Limpia el contenido
+            data.forEach(alerta => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${alerta.Descripcion}</td>
+                    <td>${new Date(alerta.Fecha_Alerta).toLocaleString()}</td>
+                    <td>${alerta.Resuelta}</td>
+                    <td>${alerta.ID_TipoAlerta}</td>
+                    <td>${alerta.ID_Vehiculo}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
+                            data-id="${alerta.ID_Alerta}" 
+                            data-descripcion="${alerta.Descripcion}" 
+                            data-resuelta="${alerta.Resuelta}" 
+                            data-tipo="${alerta.ID_TipoAlerta}" 
+                            data-vehiculo="${alerta.ID_Vehiculo}">
+                            Editar
+                        </button>
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                            data-id="${alerta.ID_Alerta}">
+                            Eliminar
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error(error);
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center">Error al cargar las alertas</td></tr>';
+        }
+    }
+
+    // Función para registrar una nueva alerta
+    async function registrarAlerta(alerta) {
+        try {
+            const response = await fetch(ALERTAS_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(alerta),
+            });
+
+            if (!response.ok) throw new Error('Error al registrar la alerta');
+
+            // Cierra el modal y recarga la tabla
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addModal'));
+            modal.hide();
+            listarAlertas();
+        } catch (error) {
+            console.error(error);
+            alert('Error al registrar la alerta.');
+        }
+    }
+
+    // Función para editar una alerta
+    async function editarAlerta(id, alerta) {
+        const editUrl = `${ALERTAS_API_URL}${id}/`;
+        try {
+            const response = await fetch(editUrl, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(alerta),
+            });
+
+            if (!response.ok) throw new Error('Error al editar la alerta');
+
+            listarAlertas();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+            modal.hide();
+        } catch (error) {
+            console.error(error);
+            alert('Error al editar la alerta.');
+        }
+    }
+
+    // Función para eliminar una alerta
+    async function eliminarAlerta(id) {
+        const deleteUrl = `${ALERTAS_API_URL}${id}/`;
+        try {
+            const response = await fetch(deleteUrl, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Error al eliminar la alerta');
+
+            listarAlertas();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+            modal.hide();
+        } catch (error) {
+            console.error(error);
+            alert('Error al eliminar la alerta.');
+        }
+    }
+
+    // Inicialización de eventos
+    document.addEventListener('DOMContentLoaded', () => {
+        listarAlertas();
+
+        // Evento para agregar una nueva alerta
+        document.getElementById('add-alerta-button').addEventListener('click', () => {
+            const descripcion = document.getElementById('descripcion-input').value.trim();
+            const resuelta = document.getElementById('resuelta-input').value.trim();
+            const tipoAlerta = document.getElementById('tipo-alerta-input').value.trim();
+            const vehiculo = document.getElementById('vehiculo-input').value.trim();
+
+            if (descripcion && resuelta && tipoAlerta && vehiculo) {
+                registrarAlerta({
+                    Descripcion: descripcion,
+                    Resuelta: resuelta,
+                    ID_TipoAlerta: tipoAlerta,
+                    ID_Vehiculo: vehiculo,
+                });
+            } else {
+                alert('Por favor, completa todos los campos.');
+            }
+        });
+
+        // Manejo del modal de edición
+        const editModal = document.getElementById('editModal');
+        let currentEditId = null;
+
+        editModal.addEventListener('show.bs.modal', (event) => {
+            const button = event.relatedTarget;
+            currentEditId = button.getAttribute('data-id');
+            document.getElementById('edit-descripcion-input').value = button.getAttribute('data-descripcion');
+            document.getElementById('edit-resuelta-input').value = button.getAttribute('data-resuelta');
+            document.getElementById('edit-tipo-alerta-input').value = button.getAttribute('data-tipo');
+            document.getElementById('edit-vehiculo-input').value = button.getAttribute('data-vehiculo');
+        });
+
+        document.getElementById('edit-alerta-button').addEventListener('click', async () => {
+            const descripcion = document.getElementById('edit-descripcion-input').value.trim();
+            const resuelta = document.getElementById('edit-resuelta-input').value.trim();
+            const tipoAlerta = document.getElementById('edit-tipo-alerta-input').value.trim();
+            const vehiculo = document.getElementById('edit-vehiculo-input').value.trim();
+
+            if (descripcion && resuelta && tipoAlerta && vehiculo && currentEditId) {
+                await editarAlerta(currentEditId, {
+                    Descripcion: descripcion,
+                    Resuelta: resuelta,
+                    ID_TipoAlerta: tipoAlerta,
+                    ID_Vehiculo: vehiculo,
+                });
+            } else {
+                alert('Por favor, completa todos los campos.');
+            }
+        });
+
+        // Manejo del modal de eliminación
+        const deleteModal = document.getElementById('deleteModal');
+        let deleteId = null;
+
+        deleteModal.addEventListener('show.bs.modal', (event) => {
+            const button = event.relatedTarget;
+            deleteId = button.getAttribute('data-id');
+        });
+
+        document.getElementById('delete-alerta-button').addEventListener('click', async () => {
+            if (deleteId) {
+                await eliminarAlerta(deleteId);
+            } else {
+                alert('Error: ID no válido para eliminar.');
+            }
+        });
+    });
+</script>
+
+{% endblock %}

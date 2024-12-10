@@ -15,7 +15,8 @@ from .Views.gpsusado import *
 from .Views.HistorialVIaje import *
 from .Views.RegistrarMarca import *
 from .Views.RegistrarModelo import *
-
+from .Views.TipoAlerta import *
+from .Views.Alertas import *
 
 
 
@@ -26,6 +27,8 @@ urlpatterns = [
     path('', RedirectView.as_view(url= 'login/', permanent =False)),
     path('home/', home, name='home'),
     path('monitoring/', monitoring_view, name='monitoring'),
+    path('TipoAlerta/', TipoAlerta_view , name='TipoAlerta'),
+    path('Alerta/', Alerta_view , name='Alerta'),
     path('HistorialViaje/', HistorialViaje_view, name='HistorialViaje'),
     path('reporte/obtener_vehiculos/', obtener_modelos_y_vehiculos_reporte, name='obtener_vehiculos'),
     path('Arrendatarios/', obtener_arrendatarios, name='arrendatario'),

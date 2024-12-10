@@ -1,0 +1,251 @@
+{% extends 'TemplatesBase/Base.html' %}
+{% block content %}
+
+<div class="container mt-5">
+    <h1>Gestión de Tipos de Alerta</h1>
+
+    <h2 class="mt-4">Lista de Tipos de Alerta</h2>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addModal">Agregar Tipo de Alerta</button>
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Tipo de Alerta</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="alerta-table-body">
+            <tr>
+                <td colspan="2" class="text-center">Cargando...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal para Agregar -->
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addModalLabel">Agregar Tipo de Alerta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="tipo-alerta" class="form-label">Tipo de Alerta</label>
+                    <input type="text" class="form-control" id="tipo-alerta-input" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="add-alerta-button">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Editar -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel">Editar Tipo de Alerta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="edit-tipo-alerta-input" class="form-label">Tipo de Alerta</label>
+                    <input type="text" class="form-control" id="edit-tipo-alerta-input" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="edit-alerta-button">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Eliminar Tipo de Alerta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este tipo de alerta?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="delete-alerta-button">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const API_URL = 'https://apitesis.fly.dev/api/v1/TipoAlerta/';
+
+    // Función para listar tipos de alerta
+    async function listarTiposAlerta() {
+        const tbody = document.getElementById('alerta-table-body');
+        tbody.innerHTML = '<tr><td colspan="3" class="text-center">Cargando...</td></tr>';
+    
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error('Error al cargar los datos');
+            const data = await response.json();
+    
+            tbody.innerHTML = ''; // Limpia el contenido
+            data.forEach(alerta => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${alerta.ID_TipoAlerta}</td>
+                    <td>${alerta.Tipo_Alerta}</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal" 
+                            data-id="${alerta.ID_TipoAlerta}" data-tipo="${alerta.Tipo_Alerta}">
+                            Editar
+                        </button>
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                            data-id="${alerta.ID_TipoAlerta}">
+                            Eliminar
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            console.error(error);
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center">Error al cargar los datos</td></tr>';
+        }
+    }
+    
+    // Función para registrar un nuevo tipo de alerta
+    async function registrarTipoAlerta(tipoAlerta) {
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ Tipo_Alerta: tipoAlerta }),
+            });
+    
+            if (!response.ok) throw new Error('Error al registrar el tipo de alerta');
+    
+            // Cierra el modal y recarga la tabla
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addModal'));
+            modal.hide();
+            listarTiposAlerta();
+        } catch (error) {
+            console.error(error);
+            alert('Error al registrar el tipo de alerta.');
+        }
+    }
+    
+    // Función para editar un tipo de alerta
+    async function editarTipoAlerta(id, tipoAlerta) {
+        const editUrl = `${API_URL}${id}/`;
+        try {
+            const response = await fetch(editUrl, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ Tipo_Alerta: tipoAlerta }),
+            });
+
+            if (!response.ok) throw new Error('Error al editar el tipo de alerta');
+
+            // Recarga la lista y cierra el modal
+            listarTiposAlerta();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+            modal.hide();
+        } catch (error) {
+            console.error(error);
+            alert('Error al editar el tipo de alerta.');
+        }
+    }
+    
+    // Función para eliminar un tipo de alerta
+    async function eliminarTipoAlerta(id) {
+        const deleteUrl = `${API_URL}${id}/`;
+        try {
+            const response = await fetch(deleteUrl, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Error al eliminar el tipo de alerta');
+
+            // Recarga la lista y cierra el modal
+            listarTiposAlerta();
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+            modal.hide();
+        } catch (error) {
+            console.error(error);
+            alert('Error al eliminar el tipo de alerta.');
+        }
+    }
+    
+    // Inicialización de eventos
+    document.addEventListener('DOMContentLoaded', () => {
+        listarTiposAlerta();
+
+        // Evento para agregar un nuevo tipo de alerta
+        document.getElementById('add-alerta-button').addEventListener('click', () => {
+            const tipoAlertaInput = document.getElementById('tipo-alerta-input');
+            const tipoAlerta = tipoAlertaInput.value.trim();
+
+            if (!tipoAlerta) {
+                alert('Por favor, ingresa un tipo de alerta válido.');
+                return;
+            }
+
+            registrarTipoAlerta(tipoAlerta);
+            tipoAlertaInput.value = ''; // Limpia el campo
+        });
+
+        // Manejo del modal de edición
+        const editModal = document.getElementById('editModal');
+        let currentEditId = null;
+
+        editModal.addEventListener('show.bs.modal', (event) => {
+            const button = event.relatedTarget;
+            currentEditId = button.getAttribute('data-id');
+            const tipoAlerta = button.getAttribute('data-tipo');
+            document.getElementById('edit-tipo-alerta-input').value = tipoAlerta;
+        });
+
+        document.getElementById('edit-alerta-button').addEventListener('click', async () => {
+            const tipoAlertaInput = document.getElementById('edit-tipo-alerta-input');
+            const tipoAlerta = tipoAlertaInput.value.trim();
+
+            if (!tipoAlerta || !currentEditId) {
+                alert('Por favor, ingresa un tipo de alerta válido.');
+                return;
+            }
+
+            await editarTipoAlerta(currentEditId, tipoAlerta);
+        });
+
+        // Manejo del modal de eliminación
+        const deleteModal = document.getElementById('deleteModal');
+        let deleteId = null;
+
+        deleteModal.addEventListener('show.bs.modal', (event) => {
+            const button = event.relatedTarget;
+            deleteId = button.getAttribute('data-id');
+        });
+
+        document.getElementById('delete-alerta-button').addEventListener('click', async () => {
+            if (deleteId) {
+                await eliminarTipoAlerta(deleteId);
+            } else {
+                alert('Error: ID no válido para eliminar.');
+            }
+        });
+    });
+</script>
+
+{% endblock %}

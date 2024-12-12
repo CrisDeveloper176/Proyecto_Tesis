@@ -27,7 +27,6 @@
                         </tr>
                     </thead>
                     <tbody id="mantenimiento-table-body">
-                        <!-- Los mantenimientos se llenarán dinámicamente -->
                         <tr>
                             <td colspan="5" class="text-center">Cargando...</td>
                         </tr>
@@ -49,23 +48,19 @@
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="vehiculo-select" class="form-label">Vehículo</label>
-                    <select class="form-select" id="vehiculo-select" required>
-                        <!-- Aquí se llenarán los vehículos con JavaScript -->
-                    </select>
+                    <select class="form-select" id="vehiculo-select" required></select>
                 </div>
                 <div class="mb-3">
                     <label for="tipomantenimiento-select" class="form-label">Tipo de Mantenimiento</label>
-                    <select class="form-select" id="tipomantenimiento-select" required>
-                        <!-- Aquí se llenarán los tipos de mantenimiento con JavaScript -->
-                    </select>
+                    <select class="form-select" id="tipomantenimiento-select" required></select>
                 </div>
                 <div class="mb-3">
                     <label for="fecha-inicio" class="form-label">Fecha de Inicio</label>
-                    <input type="datetime-local" class="form-control" id="fecha-inicio-input" required>
+                    <input type="date" class="form-control" id="fecha-inicio-input" value="" readonly>
                 </div>
                 <div class="mb-3">
                     <label for="fecha-fin" class="form-label">Fecha de Fin</label>
-                    <input type="datetime-local" class="form-control" id="fecha-fin-input">
+                    <input type="date" class="form-control" id="fecha-fin-input"  min="">
                 </div>
             </div>
             <div class="modal-footer">
@@ -76,6 +71,8 @@
     </div>
 </div>
 
+
+
 <!-- Modal para Editar -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -85,21 +82,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
+                <!-- Campo oculto para almacenar el ID del vehículo -->
+                <input type="hidden" id="edit-id-vehiculo">
+
                 <div class="mb-3">
-                    <label for="edit-vehiculo" class="form-label">Vehículo</label>
-                    <input type="text" class="form-control" id="edit-vehiculo-input" required>
+                    <label class="form-label">Matrícula</label>
+                    <input type="text" class="form-control" id="edit-matricula" readonly>
                 </div>
                 <div class="mb-3">
-                    <label for="edit-tipo-mantenimiento" class="form-label">Tipo de Mantenimiento</label>
-                    <input type="text" class="form-control" id="edit-tipo-mantenimiento-input" required>
+                    <label class="form-label">Tipo de Mantenimiento</label>
+                    <select class="form-select" id="edit-tipo-mantenimiento" required></select>
                 </div>
                 <div class="mb-3">
-                    <label for="edit-fecha-inicio" class="form-label">Fecha de Inicio</label>
-                    <input type="datetime-local" class="form-control" id="edit-fecha-inicio-input" required>
+                    <label class="form-label">Fecha de Inicio</label>
+                    <input type="date" class="form-control" id="edit-fecha-inicio" readonly>
                 </div>
                 <div class="mb-3">
-                    <label for="edit-fecha-fin" class="form-label">Fecha de Fin</label>
-                    <input type="datetime-local" class="form-control" id="edit-fecha-fin-input">
+                    <label class="form-label">Fecha de Fin</label>
+                    <input type="date" class="form-control" id="edit-fecha-fin" min="">
                 </div>
             </div>
             <div class="modal-footer">
@@ -110,63 +110,58 @@
     </div>
 </div>
 
-<!-- Modal para Eliminar -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel">Eliminar Mantenimiento</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>¿Estás seguro de que deseas eliminar este mantenimiento?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="delete-mantenimiento-button">Eliminar</button>
-            </div>
-        </div>
-    </div>
-</div>
+
+
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+    const VEHICULO_API_URL = 'https://apitesis.fly.dev/api/v1/vehiculo/';
+    const API_URL = 'https://apitesis.fly.dev/api/v1/TipoMantenimiento/';
+    const MANTENIMIENTO_API_URL = 'https://apitesis.fly.dev/api/v1/Mantenimiento_Vehiculo/';
 
+    // Formatear fecha actual al cargar el formulario de agregar mantenimiento
+    const obtenerFechaActual = () => {
+        const ahora = new Date();
+        return ahora.toISOString().split('T')[0];
+    };
 
- const VEHICULO_API_URL = 'https://apitesis.fly.dev/api/v1/vehiculo/';
- const API_URL = 'https://apitesis.fly.dev/api/v1/TipoMantenimiento/';
- const MANTENIMIENTO_API_URL = 'https://apitesis.fly.dev/api/v1/Mantenimiento_Vehiculo/';
-
-
-// Función para ajustar la fecha al formato UTC sin hora
-function ajustarFechaUTC(fecha) {
-    const fechaObj = new Date(fecha);
-    return new Date(fechaObj.getTime() + fechaObj.getTimezoneOffset() * 60000).toISOString().split('T')[0];
-}
-
-// Formatear fecha para mostrarla correctamente en la tabla
-const formatFecha = (fechaIso) => {
-    if (!fechaIso) return 'N/A';
-    const fecha = new Date(fechaIso);
-    const fechaUTC = new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000);
-    return fechaUTC.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    const formatDate = (dateString) => {
+    if (!dateString) return '';
+    return dateString.split('T')[0];
 };
 
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+    const fechaFinInput = document.getElementById('fecha-fin-input');
+    
+    const actualizarFechaMinima = () => {
+        const hoy = new Date();
+        const fechaMinima = hoy.toISOString().split('T')[0];
+        fechaFinInput.setAttribute('min', fechaMinima);
+    };
+
+    // Configurar fecha mínima al cargar
+    actualizarFechaMinima();
+
+    // Opcional: actualizar al abrir el modal
+    const addModal = document.getElementById('addModal');
+    addModal.addEventListener('show.bs.modal', actualizarFechaMinima);
+});
 
 
 
     const loadVehiculo = async () => {
         const vehiculoSelect = document.getElementById('vehiculo-select');
-        const editVehiculoSelect = document.getElementById('edit-vehiculo-input');
         vehiculoSelect.innerHTML = '<option value="">Seleccione un vehiculo</option>';
-        editVehiculoSelect.innerHTML = '<option value="">Seleccione un vehiculo</option>';
         try {
             const response = await fetch(VEHICULO_API_URL);
             const vehiculos = await response.json();
             vehiculos.forEach((vehiculo) => {
                 const option = `<option value="${vehiculo.ID_Vehiculo}">${vehiculo.Matricula}</option>`;
                 vehiculoSelect.innerHTML += option;
-                editVehiculoSelect.innerHTML += option;
             });
         } catch (error) {
             console.error('Error al cargar vehiculos:', error);
@@ -175,82 +170,333 @@ const formatFecha = (fechaIso) => {
 
     const loadTipoMantenimiento = async () => {
         const mantenimientoSelect = document.getElementById('tipomantenimiento-select');
-        const editMantenimientoSelect = document.getElementById('edit-tipo-mantenimiento-input');
         mantenimientoSelect.innerHTML = '<option value="">Seleccione un Tipo Mantenimiento</option>';
-        editMantenimientoSelect.innerHTML = '<option value="">Seleccione un Tipo Mantenimiento</option>';
         try {
             const response = await fetch(API_URL);
             const mantenimientos = await response.json();
             mantenimientos.forEach((mantenimiento) => {
-                const option = `<option value="${mantenimiento.ID_Mantenimiento }">${mantenimiento.Tipo_Mantenimiento }</option>`;
+                const option = `<option value="${mantenimiento.ID_Mantenimiento}">${mantenimiento.Tipo_Mantenimiento}</option>`;
                 mantenimientoSelect.innerHTML += option;
-                editMantenimientoSelect.innerHTML += option;
             });
         } catch (error) {
             console.error('Error al cargar Tipo Mantenimiento:', error);
         }
     };
 
+    const deleteMantenimiento = async (id) => {
+    try {
+        const response = await fetch(`${MANTENIMIENTO_API_URL}${id}/`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('Error al eliminar el mantenimiento');
 
+        Swal.fire('Eliminado', 'El mantenimiento se eliminó exitosamente.', 'success');
+        loadMantenimiento(); // Recargar la lista después de eliminar
+    } catch (error) {
+        Swal.fire('Error', 'No se pudo eliminar el mantenimiento.', 'error');
+    }
+};
 
-    const loadMantenimiento = async () => {
-        const tbody = document.getElementById('mantenimiento-table-body');
-        tbody.innerHTML = '';
-        try {
-            const response = await fetch(MANTENIMIENTO_API_URL);
-            if (!response.ok) throw new Error('Error al cargar los mantenimientos');
-            const mantenimientos = await response.json();
+const loadMantenimiento = async () => {
+    const tbody = document.getElementById('mantenimiento-table-body');
+    tbody.innerHTML = '';
+    try {
+        const response = await fetch(MANTENIMIENTO_API_URL);
+        if (!response.ok) throw new Error('Error al cargar los mantenimientos');
+        const mantenimientos = await response.json();
 
-            mantenimientos.forEach((mantenimiento) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${mantenimiento.id}</td>
-                    <td>${mantenimiento.ID_Mantenimiento}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" onclick="openEditModal(${mantenimiento.id}, '${mantenimiento.ID_Mantenimiento}')">Editar</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteMarca(${mantenimiento.id})">Eliminar</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
+        // Solicita información adicional (vehículos y tipos de mantenimiento)
+        const vehiculosResponse = await fetch(VEHICULO_API_URL);
+        const vehiculos = await vehiculosResponse.json();
+        const tiposResponse = await fetch(API_URL);
+        const tiposMantenimiento = await tiposResponse.json();
+
+        mantenimientos.forEach((mantenimiento) => {
+            // Buscar matrícula y tipo de mantenimiento
+            const vehiculo = vehiculos.find(v => v.ID_Vehiculo === mantenimiento.ID_Vehiculo);
+            const tipoMantenimiento = tiposMantenimiento.find(t => t.ID_Mantenimiento === mantenimiento.ID_Mantenimiento);
+
+            const matricula = vehiculo ? vehiculo.Matricula : 'N/A';
+            const tipo = tipoMantenimiento ? tipoMantenimiento.Tipo_Mantenimiento : 'N/A';
+
+            // Extraer fechas
+            const fechaInicio = mantenimiento.Fecha_Inicio ? mantenimiento.Fecha_Inicio.split('T')[0] : 'N/A';
+            const fechaFin = mantenimiento.Fecha_Fin ? mantenimiento.Fecha_Fin.split('T')[0] : 'N/A';
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${matricula}</td>
+                <td>${tipo}</td>
+                <td>${fechaInicio}</td>
+                <td>${fechaFin}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" data-id="${mantenimiento.id}">Editar</button>
+
+                    <button class="btn btn-danger btn-sm" data-id="${mantenimiento.id}">Eliminar</button>
+                </td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Agregar eventos al botón "Eliminar"
+        document.querySelectorAll('.btn-danger').forEach((button) => {
+            button.addEventListener('click', (event) => {
+                const mantenimientoId = event.target.getAttribute('data-id');
+                Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: 'Esta acción no se puede deshacer.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        deleteMantenimiento(mantenimientoId);
+                    }
+                });
             });
-        } catch (error) {
-            Swal.fire('Error', 'No se pudieron cargar los mantenimientos.', 'error');
-        }
-    };
+        });
+    } catch (error) {
+        Swal.fire('Error', 'No se pudieron cargar los mantenimientos.', 'error');
+    }
+};
 
 
 
 
     const saveMantenimiento = async () => {
-        const matriculaInput = document.getElementById('matricula');
-        const tipo_mantenimientoInput = document.getElementById('tipo_mantenimiento');
-        const fecha_inicioInput = document.getElementById('fecha_inicio');
-        const fecha_finInput = document.getElementById('fecha_fin');
-        
+    const vehiculoSelect = document.getElementById('vehiculo-select').value;
+    const tipoMantenimientoSelect = document.getElementById('tipomantenimiento-select').value;
+    const fechaInicioInput = document.getElementById('fecha-inicio-input').value;
+    const fechaFinInput = document.getElementById('fecha-fin-input').value;
 
-        try {
-            const response = await fetch(MANTENIMIENTO_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ID_Vehiculo: Matricula, ID_Mantenimiento: Tipo_Mantenimiento, Fecha_Inicio, Fecha_Fin }),
-            });
+    if (!vehiculoSelect || !tipoMantenimientoSelect) {
+        Swal.fire('Error', 'Por favor, completa todos los campos obligatorios.', 'warning');
+        return;
+    }
 
-            if (!response.ok) throw new Error('Error al guardar el mantenimiento');
-            Swal.fire('Éxito', 'Mantenimiento agregado exitosamente.', 'success');
-            mantenimientoInput.value = '';
-            loadMantenimiento();
-            document.querySelector('#addModal .btn-close').click();
-        } catch (error) {
-            Swal.fire('Error', 'No se pudo guardar el mantenimiento.', 'error');
+    // Validar si ya existe el mantenimiento
+    try {
+        const response = await fetch(MANTENIMIENTO_API_URL);
+        if (!response.ok) throw new Error('Error al obtener los mantenimientos');
+
+        const mantenimientos = await response.json();
+        const mantenimientoDuplicado = mantenimientos.find(
+            (mantenimiento) =>
+                mantenimiento.ID_Vehiculo === vehiculoSelect &&
+                mantenimiento.ID_Mantenimiento === tipoMantenimientoSelect
+        );
+
+        if (mantenimientoDuplicado) {
+            Swal.fire(
+                'Advertencia',
+                'Este vehículo ya tiene un mantenimiento registrado con este tipo.',
+                'warning'
+            );
+            return;
+        }
+    } catch (error) {
+        Swal.fire('Error', 'No se pudo validar el mantenimiento existente.', 'error');
+        return;
+    }
+
+    // Validar fecha de fin
+    const fechaActual = new Date().toISOString().split('T')[0];
+    if (fechaFinInput && fechaFinInput < fechaActual) {
+        Swal.fire('Error', 'La fecha de fin no puede ser anterior a hoy.', 'warning');
+        return;
+    }
+
+    // Guardar el mantenimiento
+    try {
+        const response = await fetch(MANTENIMIENTO_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                ID_Vehiculo: vehiculoSelect,
+                ID_Mantenimiento: tipoMantenimientoSelect,
+                Fecha_Inicio: fechaInicioInput,
+                Fecha_Fin: fechaFinInput || null,
+            }),
+        });
+
+        if (!response.ok) throw new Error('Error al guardar el mantenimiento');
+
+        Swal.fire('Éxito', 'Mantenimiento agregado exitosamente.', 'success');
+        loadMantenimiento();
+        document.querySelector('#addModal .btn-close').click();
+
+
+        // Limpiar el formulario de agregar mantenimiento
+        document.getElementById('vehiculo-select').value = '';
+        document.getElementById('tipomantenimiento-select').value = '';
+        document.getElementById('fecha-inicio-input').value = '';
+        document.getElementById('fecha-fin-input').value = '';
+
+
+
+    } catch (error) {
+        Swal.fire('Error', 'No se pudo guardar el mantenimiento.', 'error');
+    }
+};
+
+
+const openEditModal = async (mantenimiento) => {
+    const tipoMantenimientoSelect = document.getElementById('edit-tipo-mantenimiento');
+
+    // Llenar las opciones del select de tipo de mantenimiento
+    tipoMantenimientoSelect.innerHTML = '<option value="">Seleccione un Tipo de Mantenimiento</option>';
+    try {
+        const response = await fetch(API_URL);
+        const tiposMantenimiento = await response.json();
+        tiposMantenimiento.forEach((tipo) => {
+            const option = `<option value="${tipo.ID_Mantenimiento}">${tipo.Tipo_Mantenimiento}</option>`;
+            tipoMantenimientoSelect.innerHTML += option;
+        });
+    } catch (error) {
+        console.error('Error al cargar los tipos de mantenimiento:', error);
+    }
+
+    // Obtener vehículos para asignar la matrícula
+    try {
+        const vehiculosResponse = await fetch(VEHICULO_API_URL);
+        const vehiculos = await vehiculosResponse.json();
+        const vehiculo = vehiculos.find(v => v.ID_Vehiculo === mantenimiento.ID_Vehiculo);
+        const matricula = vehiculo ? vehiculo.Matricula : 'N/A';
+
+        // Asignar valores al modal
+        document.getElementById('edit-matricula').value = matricula;
+        document.getElementById('edit-tipo-mantenimiento').value = mantenimiento.ID_Mantenimiento || '';
+        document.getElementById('edit-fecha-inicio').value = formatDate(mantenimiento.Fecha_Inicio) || '';
+        document.getElementById('edit-fecha-fin').value = formatDate(mantenimiento.Fecha_Fin) || '';
+        document.getElementById('edit-id-vehiculo').value = mantenimiento.ID_Vehiculo || '';
+    } catch (error) {
+        console.error('Error al cargar los vehículos:', error);
+    }
+};
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    const actualizarFechaMinimaEdicion = () => {
+        const hoy = new Date();
+        const fechaMinima = hoy.toISOString().split('T')[0];
+        const fechaFinEditInput = document.getElementById('edit-fecha-fin');
+        if (fechaFinEditInput) {
+            fechaFinEditInput.setAttribute('min', fechaMinima);
         }
     };
 
+    // Actualizar fecha mínima al abrir el modal de edición
+    const editModal = document.getElementById('editModal');
+    editModal.addEventListener('show.bs.modal', actualizarFechaMinimaEdicion);
+});
 
-    document.getElementById('add-mantenimiento-button').addEventListener('click', saveMantenimiento);
-    ({
-    });
+const saveEditMantenimiento = async (id) => {
+    const tipoMantenimiento = document.getElementById('edit-tipo-mantenimiento').value;
+    const fechaFin = document.getElementById('edit-fecha-fin').value;
+    const vehiculoId = document.getElementById('edit-id-vehiculo').value;
+
+    if (!tipoMantenimiento) {
+        Swal.fire('Error', 'Por favor, completa todos los campos obligatorios.', 'warning');
+        return;
+    }
+
+    // Validar si ya existe el mantenimiento con los mismos datos
+    try {
+        const response = await fetch(MANTENIMIENTO_API_URL);
+        if (!response.ok) throw new Error('Error al obtener los mantenimientos');
+
+        const mantenimientos = await response.json();
+        const mantenimientoDuplicado = mantenimientos.find(
+            (mantenimiento) =>
+                mantenimiento.ID_Vehiculo === vehiculoId &&
+                mantenimiento.ID_Mantenimiento === tipoMantenimiento &&
+                mantenimiento.id !== id // Ignorar el mantenimiento actual que se está editando
+        );
+
+        if (mantenimientoDuplicado) {
+            Swal.fire(
+                'Advertencia',
+                'Este vehículo ya tiene un mantenimiento registrado con este tipo.',
+                'warning'
+            );
+            return;
+        }
+    } catch (error) {
+        Swal.fire('Error', 'No se pudo validar el mantenimiento existente.', 'error');
+        return;
+    }
+
+    // Validar la fecha de fin
+    const fechaActual = new Date().toISOString().split('T')[0];
+    if (fechaFin && fechaFin < fechaActual) {
+        Swal.fire('Error', 'La fecha de fin no puede ser anterior a hoy.', 'warning');
+        return;
+    }
+
+    // Guardar cambios
+    try {
+        const response = await fetch(`${MANTENIMIENTO_API_URL}${id}/`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                ID_Vehiculo: vehiculoId,
+                ID_Mantenimiento: tipoMantenimiento,
+                Fecha_Fin: fechaFin || null,
+            }),
+        });
+
+        if (!response.ok) throw new Error('Error al guardar los cambios');
+
+        Swal.fire('Éxito', 'Los cambios se guardaron exitosamente.', 'success');
+        loadMantenimiento();
+
+        
+
+
+        document.querySelector('#editModal .btn-close').click();
+    } catch (error) {
+        Swal.fire('Error', 'No se pudieron guardar los cambios.', 'error');
+    }
+};
+
+
+
+
+
+
+document.getElementById('mantenimiento-table-body').addEventListener('click', async (event) => {
+    if (event.target.classList.contains('btn-warning')) {
+        const mantenimientoId = event.target.getAttribute('data-id');
+
+        try {
+            const response = await fetch(`${MANTENIMIENTO_API_URL}${mantenimientoId}/`);
+            if (!response.ok) throw new Error('Error al obtener el mantenimiento');
+
+            const mantenimiento = await response.json();
+            openEditModal(mantenimiento);
+
+            const editButton = document.getElementById('edit-mantenimiento-button');
+            editButton.onclick = () => saveEditMantenimiento(mantenimientoId);
+            new bootstrap.Modal(document.getElementById('editModal')).show();
+        } catch (error) {
+            Swal.fire('Error', 'No se pudo cargar el mantenimiento.', 'error');
+        }
+    }
+});
+
+
+
+
+
 
 
 
@@ -264,10 +510,11 @@ const formatFecha = (fechaIso) => {
     document.addEventListener('DOMContentLoaded', () => {
         loadVehiculo();
         loadTipoMantenimiento();
+        loadMantenimiento();
+
+        document.getElementById('fecha-inicio-input').value = obtenerFechaActual();
+        document.getElementById('add-mantenimiento-button').addEventListener('click', saveMantenimiento);
     });
-
-
-    
 </script>
 
 {% endblock %}

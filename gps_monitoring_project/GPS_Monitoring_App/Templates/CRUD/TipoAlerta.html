@@ -134,9 +134,32 @@
             tbody.innerHTML = '<tr><td colspan="3" class="text-center">Error al cargar los datos</td></tr>';
         }
     }
-    
+
+    // Función para verificar si el tipo de alerta ya existe (sin importar mayúsculas y minúsculas)
+    async function verificarTipoAlertaExistente(tipoAlerta) {
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error('Error al cargar los datos');
+            const data = await response.json();
+
+            // Verificar si el tipo de alerta existe, ignorando mayúsculas/minúsculas
+            const tipoAlertaExistente = data.some(alerta => alerta.Tipo_Alerta.toLowerCase() === tipoAlerta.toLowerCase());
+            return tipoAlertaExistente;
+        } catch (error) {
+            console.error(error);
+            return false; // Si hay error en la consulta, asumimos que no existe
+        }
+    }
+
     // Función para registrar un nuevo tipo de alerta
     async function registrarTipoAlerta(tipoAlerta) {
+        // Verificar si el tipo de alerta ya existe
+        const existe = await verificarTipoAlertaExistente(tipoAlerta);
+        if (existe) {
+            Swal.fire('Error', 'Este tipo de alerta ya está registrado.', 'error');
+            return;
+        }
+
         try {
             const response = await fetch(API_URL, {
                 method: 'POST',
@@ -162,6 +185,13 @@
     
     // Función para editar un tipo de alerta
     async function editarTipoAlerta(id, tipoAlerta) {
+        // Verificar si el tipo de alerta ya existe
+        const existe = await verificarTipoAlertaExistente(tipoAlerta);
+        if (existe) {
+            Swal.fire('Error', 'Este tipo de alerta ya está registrado.', 'error');
+            return;
+        }
+
         const editUrl = `${API_URL}${id}/`;
         try {
             const response = await fetch(editUrl, {
@@ -205,7 +235,7 @@
             Swal.fire('Error', 'Error al eliminar el tipo de alerta.', 'error');
         }
     }
-    
+
     // Inicialización de eventos
     document.addEventListener('DOMContentLoaded', () => {
         listarTiposAlerta();
@@ -265,5 +295,6 @@
         });
     });
 </script>
+
 
 {% endblock %}

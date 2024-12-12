@@ -129,40 +129,142 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 
-const VEHICULO_API_URL = 'https://apitesis.fly.dev/api/v1/vehiculo/';
+
+ const VEHICULO_API_URL = 'https://apitesis.fly.dev/api/v1/vehiculo/';
+ const API_URL = 'https://apitesis.fly.dev/api/v1/TipoMantenimiento/';
+ const MANTENIMIENTO_API_URL = 'https://apitesis.fly.dev/api/v1/Mantenimiento_Vehiculo/';
 
 
-// Cargar opciones de IMEIs y Vehículos
-    const loadOptions = async (url, selectId, placeholder) => {
-        const select = document.getElementById(selectId);
-        select.innerHTML = `<option value="">${placeholder}</option>`;
+// Función para ajustar la fecha al formato UTC sin hora
+function ajustarFechaUTC(fecha) {
+    const fechaObj = new Date(fecha);
+    return new Date(fechaObj.getTime() + fechaObj.getTimezoneOffset() * 60000).toISOString().split('T')[0];
+}
+
+// Formatear fecha para mostrarla correctamente en la tabla
+const formatFecha = (fechaIso) => {
+    if (!fechaIso) return 'N/A';
+    const fecha = new Date(fechaIso);
+    const fechaUTC = new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000);
+    return fechaUTC.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
+};
+
+
+
+
+    const loadVehiculo = async () => {
+        const vehiculoSelect = document.getElementById('vehiculo-select');
+        const editVehiculoSelect = document.getElementById('edit-vehiculo-input');
+        vehiculoSelect.innerHTML = '<option value="">Seleccione un vehiculo</option>';
+        editVehiculoSelect.innerHTML = '<option value="">Seleccione un vehiculo</option>';
         try {
-            const response = await fetch(url);
-            if (!response.ok) throw new Error(`Error al cargar datos de ${selectId}.`);
-
-            const data = await response.json();
-            select.innerHTML += data.map(item => `<option value="${item.imei || item.ID_Vehiculo}">${item.imei || item.Matricula}</option>`).join('');
+            const response = await fetch(VEHICULO_API_URL);
+            const vehiculos = await response.json();
+            vehiculos.forEach((vehiculo) => {
+                const option = `<option value="${vehiculo.ID_Vehiculo}">${vehiculo.Matricula}</option>`;
+                vehiculoSelect.innerHTML += option;
+                editVehiculoSelect.innerHTML += option;
+            });
         } catch (error) {
-            console.error(`Error al cargar ${selectId}:`, error);
+            console.error('Error al cargar vehiculos:', error);
+        }
+    };
+
+    const loadTipoMantenimiento = async () => {
+        const mantenimientoSelect = document.getElementById('tipomantenimiento-select');
+        const editMantenimientoSelect = document.getElementById('edit-tipo-mantenimiento-input');
+        mantenimientoSelect.innerHTML = '<option value="">Seleccione un Tipo Mantenimiento</option>';
+        editMantenimientoSelect.innerHTML = '<option value="">Seleccione un Tipo Mantenimiento</option>';
+        try {
+            const response = await fetch(API_URL);
+            const mantenimientos = await response.json();
+            mantenimientos.forEach((mantenimiento) => {
+                const option = `<option value="${mantenimiento.ID_Mantenimiento }">${mantenimiento.Tipo_Mantenimiento }</option>`;
+                mantenimientoSelect.innerHTML += option;
+                editMantenimientoSelect.innerHTML += option;
+            });
+        } catch (error) {
+            console.error('Error al cargar Tipo Mantenimiento:', error);
+        }
+    };
+
+
+
+    const loadMantenimiento = async () => {
+        const tbody = document.getElementById('mantenimiento-table-body');
+        tbody.innerHTML = '';
+        try {
+            const response = await fetch(MANTENIMIENTO_API_URL);
+            if (!response.ok) throw new Error('Error al cargar los mantenimientos');
+            const mantenimientos = await response.json();
+
+            mantenimientos.forEach((mantenimiento) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${mantenimiento.id}</td>
+                    <td>${mantenimiento.ID_Mantenimiento}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="openEditModal(${mantenimiento.id}, '${mantenimiento.ID_Mantenimiento}')">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteMarca(${mantenimiento.id})">Eliminar</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        } catch (error) {
+            Swal.fire('Error', 'No se pudieron cargar los mantenimientos.', 'error');
         }
     };
 
 
 
 
-    // Inicializar eventos y carga inicial
-    document.addEventListener('DOMContentLoaded', () => {
-        loadGpsList();
-        loadOptions(GPS_DISPOSITIVO_API_URL, 'add-imei', 'Seleccione un IMEI');
-        loadOptions(VEHICULO_API_URL, 'add-vehiculo', 'Seleccione un vehículo');
-        document.getElementById('saveDevice').addEventListener('click', saveGps);
-        document.getElementById('updateDevice').addEventListener('click', updateGps);
+    const saveMantenimiento = async () => {
+        const matriculaInput = document.getElementById('matricula');
+        const tipo_mantenimientoInput = document.getElementById('tipo_mantenimiento');
+        const fecha_inicioInput = document.getElementById('fecha_inicio');
+        const fecha_finInput = document.getElementById('fecha_fin');
+        
+
+        try {
+            const response = await fetch(MANTENIMIENTO_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ ID_Vehiculo: Matricula, ID_Mantenimiento: Tipo_Mantenimiento, Fecha_Inicio, Fecha_Fin }),
+            });
+
+            if (!response.ok) throw new Error('Error al guardar el mantenimiento');
+            Swal.fire('Éxito', 'Mantenimiento agregado exitosamente.', 'success');
+            mantenimientoInput.value = '';
+            loadMantenimiento();
+            document.querySelector('#addModal .btn-close').click();
+        } catch (error) {
+            Swal.fire('Error', 'No se pudo guardar el mantenimiento.', 'error');
+        }
+    };
+
+
+    document.getElementById('add-mantenimiento-button').addEventListener('click', saveMantenimiento);
+    ({
     });
 
 
 
+
+
+
+
+
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        loadVehiculo();
+        loadTipoMantenimiento();
+    });
 
 
     

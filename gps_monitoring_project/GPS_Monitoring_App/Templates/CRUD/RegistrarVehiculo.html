@@ -17,6 +17,13 @@
             <p class="text-muted">Administra los vehículos registrados en el sistema.</p>
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
+                
+                <div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-secondary" id="filterKilometraje">
+        Ordenar por Kilometraje (Mayor a Menor)
+    </button>
+</div>
+
                     <thead class="table-dark">
                         <tr>
                             <th>ID</th>
@@ -465,6 +472,49 @@ document.getElementById('kilometraje').addEventListener('input', function (e) {
         // Actualiza el valor del input
         e.target.value = value;
     });
+
+
+    // Función para ordenar y renderizar los vehículos
+const sortAndRenderVehiculos = async () => {
+    const vehiculoList = document.getElementById('vehiculo-list');
+    vehiculoList.innerHTML = ''; // Limpia el contenido anterior
+
+    try {
+        const modelosMap = await getModelosMap(); // Obtener el mapa de modelos
+        const response = await fetch(VEHICULO_API_URL);
+        if (!response.ok) throw new Error('Error al cargar los vehículos.');
+
+        let vehiculos = await response.json();
+        
+        // Ordenar vehículos por kilometraje de mayor a menor
+        vehiculos.sort((a, b) => b.kilometraje - a.kilometraje);
+
+        vehiculos.forEach((vehiculo) => {
+            const modeloNombre = modelosMap[vehiculo.ID_Modelo] || 'Sin modelo asociado';
+            const row = `
+                <tr>
+                    <td>${vehiculo.ID_Vehiculo}</td>
+                    <td>${vehiculo.Matricula}</td>
+                    <td>${vehiculo.Estado_Vehiculo}</td>
+                    <td>${vehiculo.kilometraje}</td>
+                    <td>${modeloNombre}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" data-id="${vehiculo.ID_Vehiculo}" data-bs-toggle="modal" data-bs-target="#addVehiculoModal">Editar</button>
+                        <button class="btn btn-danger btn-sm" data-id="${vehiculo.ID_Vehiculo}">Eliminar</button>
+                    </td>
+                </tr>
+            `;
+            vehiculoList.innerHTML += row;
+        });
+    } catch (error) {
+        console.error('Error al cargar vehículos:', error);
+        vehiculoList.innerHTML = '<tr><td colspan="6" class="text-center">Error al cargar los datos.</td></tr>';
+    }
+};
+
+// Evento para el botón de ordenar
+document.getElementById('filterKilometraje').addEventListener('click', sortAndRenderVehiculos);
+
 
 
 

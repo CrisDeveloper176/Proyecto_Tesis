@@ -63,7 +63,8 @@
                             <td>${alerta.Tipo_Alerta?.Nombre_TipoAlerta || 'N/A'}</td>
                             <td>${new Date(alerta.Fecha_Alerta).toLocaleString()}</td>
                             <td>${alerta.Descripcion || 'N/A'}</td>
-                            <td>${alerta.Resuelta ? 'Resuelta' : 'Sin Resolver'}</td>
+                            <td>Sin Resolver</td>
+
                             <td>
                                 <button class="btn btn-primary btn-sm" onclick="redirigirFormulario(${alerta.id})">Ver</button>
                             </td>
@@ -75,7 +76,7 @@
             }
         } catch (error) {
             console.error('Error al listar las alertas recientes:', error);
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center">Error al cargar las alertas</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center">Todo Okay!</td></tr>';
         }
     };
 

@@ -24,7 +24,7 @@ from .Views.Mantenimiento import *
 
 
 urlpatterns = [
-    path('login/', LoginView.as_view(template_name='TemplatesBase/login.html'), name='login'),
+    path('login/', LoginView.as_view(template_name='TemplatesBase/Login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path('', RedirectView.as_view(url= 'login/', permanent =False)),
     path('home/', home, name='home'),

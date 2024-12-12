@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-e1a!_w6nluw_3elwo+2d_$09gh48xex$+jqa9_-h0p7460!il=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['gps-monitoring-project.fly.dev','localhost','127.0.0.1']
 
 
 # Application definition
@@ -58,7 +58,7 @@ ROOT_URLCONF = 'gps_monitoring_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'GPS_Monitoring_App/Templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'GPS_Monitoring_App', 'Templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -124,10 +124,15 @@ USE_TZ = True
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = 'login'
 API_TOKEN = "60XMXnbzk4eybuLoxgj02GxemnCq7AX8b1OmeN5tp"
 API_BASE_URL = "https://apitesis.fly.dev/"
 CORS_ALLOW_ALL_ORIGINS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://gps-monitoring-project.fly.dev',  # Agrega tu dominio aquí
+    'http://gps-monitoring-project.fly.dev',  # Si usas HTTP también, incluye este
+]
